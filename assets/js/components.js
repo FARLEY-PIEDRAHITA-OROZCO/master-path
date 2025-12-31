@@ -25,7 +25,7 @@ export const UIComponents = {
         </nav>
         `,
         footer: `
-        <footer class="mt-20 pt-8 border-t border-white/5 pb-12 px-6">
+        <footer class="relative z-50 mt-20 pt-8 border-t border-white/5 pb-12 px-6 bg-slate-950">
             <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
                 <div class="flex flex-col">
                     <span class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1 text-center md:text-left">System Engineering</span>
@@ -56,7 +56,7 @@ export const UIComponents = {
     highlightActiveLink() {
         const currentPath = window.location.pathname;
         const links = document.querySelectorAll('.nav-item');
-        
+
         links.forEach(link => {
             const linkPath = link.getAttribute('href');
             // Verificamos si el path actual termina con el href del link
