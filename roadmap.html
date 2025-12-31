@@ -13,7 +13,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in { animation: fadeIn 0.5s ease forwards; }
-        
         .progress-ring-circle {
             transition: stroke-dashoffset 0.6s ease;
             transform: rotate(-90deg);
@@ -21,7 +20,7 @@
         }
     </style>
 </head>
-<body class="text-slate-300 min-h-screen">
+<body class="bg-slate-950 text-slate-300 min-h-screen">
 
     <main class="pt-32 pb-20 px-6 max-w-6xl mx-auto">
         <header class="mb-16 gap-6">
@@ -43,189 +42,25 @@
                     Tech Stack Interconnection
                 </h4>
                 <div class="flex flex-wrap items-center justify-center gap-4 md:gap-8">
-                    <div class="group flex flex-col items-center">
-                        <span class="px-5 py-2 bg-white/5 rounded-xl border border-white/10 text-[10px] font-bold text-slate-400 group-hover:text-white transition">SDLC/QA Core</span>
-                    </div>
+                    <span class="px-5 py-2 bg-white/5 rounded-xl border border-white/10 text-[10px] font-bold text-slate-400">SDLC/QA Core</span>
                     <i class="fas fa-chevron-right text-slate-800 text-xs"></i>
-                    <div class="group flex flex-col items-center">
-                        <span class="px-5 py-2 bg-white/5 rounded-xl border border-white/10 text-[10px] font-bold text-slate-400 group-hover:text-blue-400 transition">Technical SQL/API</span>
-                    </div>
+                    <span class="px-5 py-2 bg-white/5 rounded-xl border border-white/10 text-[10px] font-bold text-slate-400">Technical SQL/API</span>
                     <i class="fas fa-chevron-right text-slate-800 text-xs"></i>
-                    <div class="group flex flex-col items-center">
-                        <span class="px-5 py-2 bg-blue-600/20 rounded-xl border border-blue-500/30 text-[10px] font-bold text-blue-400">Automation (Playwright)</span>
-                    </div>
+                    <span class="px-5 py-2 bg-blue-600/20 rounded-xl border border-blue-500/30 text-[10px] font-bold text-blue-400">Automation (Playwright)</span>
                     <i class="fas fa-chevron-right text-slate-800 text-xs"></i>
-                    <div class="group flex flex-col items-center">
-                        <span class="px-5 py-2 bg-purple-600/20 rounded-xl border border-purple-500/30 text-[10px] font-bold text-purple-400">Expert CI/CD</span>
-                    </div>
+                    <span class="px-5 py-2 bg-purple-600/20 rounded-xl border border-purple-500/30 text-[10px] font-bold text-purple-400">Expert CI/CD</span>
                 </div>
             </div>
         </section>
 
         <div id="roadmap-container" class="space-y-8">
+            <div class="text-center py-20">
+                <i class="fas fa-circle-notch animate-spin text-blue-500 text-3xl"></i>
+                <p class="mt-4 text-xs font-black uppercase tracking-widest text-slate-600">Sincronizando Módulos...</p>
             </div>
+        </div>
     </main>
 
-    <script src="assets/app.js"></script>
-    <script src="assets/components.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            renderProfessionalRoadmap();
-        });
-
-        function renderProfessionalRoadmap() {
-            const container = document.getElementById('roadmap-container');
-            const progress = getProgress();
-            const subProgress = getSubtaskProgress();
-
-            container.innerHTML = modules.map(m => {
-                // Cálculo de progreso para el Progress Ring
-                const totalTasks = m.schedule.length;
-                const completedTasks = m.schedule.filter((_, i) => subProgress[`${m.id}-${i}`]).length;
-                const percentage = Math.round((completedTasks / totalTasks) * 100) || 0;
-                const strokeDash = 251.2 - (251.2 * percentage) / 100;
-
-                return `
-                <div class="glass-panel rounded-[3rem] border border-white/5 overflow-hidden transition-all duration-500 hover:border-blue-500/20">
-                    <div class="p-8 flex flex-col md:flex-row md:items-center justify-between bg-white/[0.01] gap-6">
-                        <div class="flex items-center gap-8">
-                            <div class="relative w-20 h-20 flex items-center justify-center">
-                                <svg class="w-full h-full">
-                                    <circle cx="40" cy="40" r="32" stroke="currentColor" stroke-width="5" fill="transparent" class="text-slate-900" />
-                                    <circle cx="40" cy="40" r="32" stroke="currentColor" stroke-width="5" fill="transparent" 
-                                            class="text-blue-500 progress-ring-circle"
-                                            stroke-dasharray="251.2"
-                                            stroke-dashoffset="${strokeDash}"
-                                            stroke-linecap="round" />
-                                </svg>
-                                <span class="absolute text-[11px] font-black text-white italic">${percentage}%</span>
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-3 mb-2">
-                                    <span class="px-3 py-1 bg-blue-600/10 text-blue-500 text-[8px] font-black uppercase tracking-widest rounded-full border border-blue-500/20">${m.phase} Phase</span>
-                                    <span class="text-[9px] font-bold text-slate-500 uppercase italic"><i class="far fa-clock mr-1"></i>${m.duration}</span>
-                                </div>
-                                <h3 class="text-2xl font-black text-white italic tracking-tight uppercase">${m.title}</h3>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center gap-6">
-                            <div class="text-right">
-                                <p class="text-[9px] text-slate-500 uppercase font-black tracking-widest mb-1">XP Reward</p>
-                                <p class="text-lg font-black text-amber-400 italic leading-none">+${m.xp}</p>
-                            </div>
-                            <button onclick="toggleExpand(${m.id})" class="w-14 h-14 rounded-2xl bg-slate-900 border border-white/5 flex items-center justify-center text-slate-500 hover:text-blue-500 transition-all">
-                                <i class="fas fa-chevron-down transition-transform duration-300" id="icon-${m.id}"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="content-${m.id}" class="hidden border-t border-white/5 bg-black/40">
-                        <div class="p-8 grid grid-cols-1 lg:grid-cols-3 gap-12">
-                            
-                            <div class="space-y-8">
-                                <div>
-                                    <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Masterclass Video</h4>
-                                    <div class="aspect-video bg-slate-950 rounded-[2rem] border border-white/5 flex flex-col items-center justify-center group overflow-hidden relative cursor-pointer">
-                                        <div class="absolute inset-0 bg-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                        <i class="fas fa-play text-3xl text-blue-500 z-10 group-hover:scale-125 transition-transform"></i>
-                                        <p class="text-[9px] font-black text-white mt-4 z-10 uppercase tracking-widest opacity-40 group-hover:opacity-100 transition-opacity">Launch Module Player</p>
-                                    </div>
-                                </div>
-
-                                <div class="space-y-3">
-                                    <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Editor de Notas Rápido</h4>
-                                    <textarea onchange="saveModuleNote(${m.id}, this.value)" 
-                                              placeholder="Escribe tus hallazgos clave de este sprint..."
-                                              class="w-full h-40 bg-white/[0.02] border border-white/5 rounded-3xl p-5 text-xs text-slate-300 focus:border-blue-500/50 outline-none transition resize-none leading-relaxed">${getModuleNote(m.id)}</textarea>
-                                </div>
-                            </div>
-
-                            <div class="space-y-6">
-                                <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Estatus de Lecciones Diarias</h4>
-                                <div class="space-y-4">
-                                    ${m.schedule.map((s, i) => `
-                                        <label class="flex items-start gap-4 p-5 bg-white/[0.02] rounded-3xl border border-white/5 hover:border-blue-500/30 transition cursor-pointer group">
-                                            <input type="checkbox" 
-                                                   ${subProgress[`${m.id}-${i}`] ? 'checked' : ''} 
-                                                   onchange="handleSubtask(${m.id}, ${i})"
-                                                   class="mt-1 w-5 h-5 rounded-lg border-slate-700 bg-slate-800 text-blue-600 focus:ring-blue-500 transition-all">
-                                            <div>
-                                                <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1 group-hover:translate-x-1 transition-transform">${s.day} • ${s.topic}</p>
-                                                <p class="text-xs text-slate-400 italic leading-snug">${s.task}</p>
-                                            </div>
-                                        </label>
-                                    `).join('')}
-                                </div>
-                            </div>
-
-                            <div class="space-y-8">
-                                <div class="p-8 bg-gradient-to-b from-blue-600/10 to-transparent rounded-[2.5rem] border border-blue-500/10">
-                                    <h4 class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-6 italic">Training Resources</h4>
-                                    <div class="space-y-4">
-                                        ${m.resources.map(res => {
-                                            const icons = { video: 'fa-video text-blue-400', code: 'fa-code text-emerald-400', doc: 'fa-file-pdf text-orange-400', flask: 'fa-flask text-purple-400' };
-                                            return `
-                                                <a href="${res.url}" target="_blank" class="flex items-center gap-4 p-3 rounded-2xl hover:bg-white/5 transition border border-transparent hover:border-white/5 group">
-                                                    <div class="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center">
-                                                        <i class="fas ${icons[res.type] || 'fa-link'}"></i>
-                                                    </div>
-                                                    <span class="text-[11px] font-bold text-slate-300 group-hover:text-white transition">${res.name}</span>
-                                                </a>
-                                            `;
-                                        }).join('')}
-                                    </div>
-                                </div>
-
-                                <div class="space-y-4">
-                                    <div class="p-6 bg-slate-900/50 rounded-3xl border border-white/5">
-                                        <h4 class="text-[9px] font-black text-slate-500 uppercase mb-4 text-center">Sprint Checklist</h4>
-                                        <ul class="space-y-2">
-                                            ${m.deliverables.map(d => `<li class="text-[10px] text-slate-500 italic flex items-center gap-2"><i class="fas fa-check-circle text-blue-500/30"></i> ${d}</li>`).join('')}
-                                        </ul>
-                                    </div>
-
-                                    <button onclick="handleModuleFinalize(${m.id}, ${!progress[m.id]})" 
-                                            class="w-full py-5 rounded-3xl font-black text-[11px] uppercase tracking-[0.2em] transition-all transform hover:scale-[1.02] active:scale-95 ${progress[m.id] ? 'bg-emerald-500/20 text-emerald-500 border border-emerald-500/30' : 'bg-blue-600 text-white shadow-xl shadow-blue-600/20 hover:bg-blue-500'}">
-                                        ${progress[m.id] ? 'Sprint Completado ✓' : 'Cerrar Sprint & Reclamar XP'}
-                                    </button>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                `;
-            }).join('');
-        }
-
-        // Funciones de Orquestación
-        function handleSubtask(mId, tIdx) {
-            toggleSubtask(mId, tIdx);
-            renderProfessionalRoadmap();
-        }
-
-        function handleModuleFinalize(id, status) {
-            toggleModule(id, status);
-            renderProfessionalRoadmap();
-        }
-
-        function toggleExpand(id) {
-            const content = document.getElementById(`content-${id}`);
-            const icon = document.getElementById(`icon-${id}`);
-            const isHidden = content.classList.contains('hidden');
-            
-            if (isHidden) {
-                content.classList.remove('hidden');
-                content.classList.add('animate-fade-in');
-                icon.style.transform = 'rotate(180deg)';
-                icon.classList.add('text-blue-500');
-            } else {
-                content.classList.add('hidden');
-                icon.style.transform = 'rotate(0deg)';
-                icon.classList.remove('text-blue-500');
-            }
-        }
-    </script>
+    <script type="module" src="assets/js/roadmap-ui.js"></script>
 </body>
 </html>
