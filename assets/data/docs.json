@@ -1,0 +1,23 @@
+{
+  "blocks": [
+    {
+      "id": "base-foundations",
+      "title": "Bloque 1: Fundamentos Obligatorios",
+      "badge": "La Base",
+      "topics": [
+        {
+          "id": "sdlc-stlc",
+          "title": "Ciclos de Vida: SDLC & STLC",
+          "content": "### El Ciclo de Vida del Software (SDLC)\nEs el proceso que sigue un producto desde su concepción hasta su retiro...\n\n### El Ciclo de Vida del Testing (STLC)\n1. **Análisis**: Entender los requisitos.\n2. **Planificación**: Definir la estrategia.",
+          "evidence": "Diagrama de flujo de estados de un Bug"
+        },
+        {
+          "id": "defect-management",
+          "title": "Gestión de Defectos",
+          "content": "### Severidad vs Prioridad\n* **Severidad:** Impacto técnico.\n* **Prioridad:** Urgencia de negocio.",
+          "evidence": "2 Reportes de bug en Jira/GitHub"
+        }
+      ]
+    }
+  ]
+}
