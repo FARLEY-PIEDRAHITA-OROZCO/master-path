@@ -1,7 +1,9 @@
 import { AppEngine } from './app.js';
+import { UIComponents } from './components.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     // Inicializamos el motor para cargar el JSON
+    UIComponents.init();
     await AppEngine.init();
     renderToolbox();
 });
@@ -17,7 +19,7 @@ function renderToolbox() {
     };
 
     // Limpiamos contenedores por si acaso
-    Object.values(containers).forEach(c => if(c) c.innerHTML = '');
+    Object.values(containers).forEach(c => { if(c) c.innerHTML = ''; });
 
     tools.forEach(tool => {
         const targetContainer = containers[tool.category];

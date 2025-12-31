@@ -1,9 +1,11 @@
 import { AppEngine } from './app.js';
 import { StorageService, KEYS } from './storage.js';
+import { UIComponents } from './components.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
+    UIComponents.init();
     await AppEngine.init();
-    renderRoadmap();
+    renderRoadmap(); 
 });
 
 function renderRoadmap() {
