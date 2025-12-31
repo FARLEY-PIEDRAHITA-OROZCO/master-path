@@ -48,7 +48,12 @@ function renderRoadmap() {
                             <span class="px-3 py-1 bg-blue-600/10 text-blue-500 text-[8px] font-black uppercase tracking-widest rounded-full border border-blue-500/20">${m.phase} Phase</span>
                             <span class="text-[9px] font-bold text-slate-500 uppercase italic"><i class="far fa-clock mr-1"></i>${m.duration}</span>
                         </div>
-                        <h3 class="text-2xl font-black text-white italic tracking-tight uppercase">${m.title}</h3>
+                        <h3 class="text-2xl font-black text-white italic tracking-tight uppercase leading-none mb-2">${m.title}</h3>
+                        
+                        <a href="knowledge-base.html?topic=${m.doc_ref}" class="inline-flex items-center gap-2 text-[10px] font-black text-blue-500 hover:text-blue-400 uppercase tracking-widest transition-colors group">
+                            <i class="fas fa-book-open group-hover:scale-110 transition-transform"></i>
+                            Ver Documentación Técnica
+                        </a>
                     </div>
                 </div>
                 
