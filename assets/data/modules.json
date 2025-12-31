@@ -1,5 +1,5 @@
 {
-  "sprints": [
+  "modules": [
     {
       "id": 1,
       "phase": "Core",
@@ -553,7 +553,6 @@
       ]
     }
   ],
-  
   "tools": [
     {
       "category": "api",

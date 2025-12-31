@@ -5,16 +5,19 @@
 import { StorageService, KEYS } from './storage.js';
 
 export const AppEngine = {
+    data: null,
     modules: [],
 
     async init() {
         try {
             const response = await fetch('./assets/data/modules.json');
-            const data = await response.json();
-            this.modules = data.sprints;
-            console.log("🚀 QA Engine Ready");
+            const jsonData = await response.json();
+            this.data = jsonData;
+            this.modules = jsonData.modules || [];
+
+            console.log("🚀 Engine Ready. Modules:", this.modules.length, "Tools:", this.data.tools?.length);
         } catch (error) {
-            console.error("❌ Error loading modules:", error);
+            console.error("❌ Error loading data:", error);
         }
     },
 

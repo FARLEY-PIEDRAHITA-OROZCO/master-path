@@ -4,8 +4,15 @@ import { UIComponents } from './components.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     UIComponents.init();
-    await AppEngine.init();
-    renderRoadmap(); 
+    await AppEngine.init(); // Esperamos a que el JSON cargue
+    
+    // Verificación de seguridad
+    if (AppEngine.modules && AppEngine.modules.length > 0) {
+        renderRoadmap(); 
+    } else {
+        console.error("No se pudieron cargar los módulos para el Roadmap");
+        document.getElementById('roadmap-container').innerHTML = `<p class="text-center text-slate-500">Error al cargar el contenido...</p>`;
+    }
 });
 
 function renderRoadmap() {

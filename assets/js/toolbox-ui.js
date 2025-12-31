@@ -2,31 +2,42 @@ import { AppEngine } from './app.js';
 import { UIComponents } from './components.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Inicializamos el motor para cargar el JSON
     UIComponents.init();
-    await AppEngine.init();
-    renderToolbox();
+    
+    try {
+        await AppEngine.init();
+        console.log("Datos cargados:", AppEngine.data); // DEBUG
+        renderToolbox();
+    } catch (error) {
+        console.error("Error cargando Toolbox:", error);
+    }
 });
 
 function renderToolbox() {
-    // Obtenemos las herramientas desde el motor
-    const tools = AppEngine.data.tools || [];
-    
+    // Verificamos que existan las herramientas en el JSON
+    const tools = AppEngine.data?.tools || [];
+    console.log("Herramientas encontradas:", tools); // DEBUG
+
     const containers = {
         api: document.getElementById('api-tools'),
         automation: document.getElementById('automation-tools'),
         docs: document.getElementById('docs-tools')
     };
 
-    // Limpiamos contenedores por si acaso
-    Object.values(containers).forEach(c => { if(c) c.innerHTML = ''; });
+    // Validar que los contenedores existen en el DOM
+    if (!containers.api || !containers.automation || !containers.docs) {
+        console.error("No se encontraron los contenedores en el HTML");
+        return;
+    }
+
+    // Limpiar antes de renderizar
+    containers.api.innerHTML = '';
+    containers.automation.innerHTML = '';
+    containers.docs.innerHTML = '';
 
     tools.forEach(tool => {
-        const targetContainer = containers[tool.category];
-        if (!targetContainer) return;
-
         const card = `
-            <a href="${tool.url}" target="_blank" class="block glass-panel p-6 rounded-3xl border border-white/5 hover:border-blue-500/40 transition group relative overflow-hidden">
+            <a href="${tool.url}" target="_blank" class="block glass-panel p-6 rounded-3xl border border-white/5 hover:border-blue-500/40 transition group relative overflow-hidden bg-white/[0.02]">
                 <div class="flex items-start justify-between relative z-10">
                     <div class="bg-slate-900/80 p-3 rounded-xl border border-white/5 mb-4">
                         <i class="fas ${tool.icon} text-blue-500 group-hover:scale-110 transition"></i>
@@ -37,6 +48,9 @@ function renderToolbox() {
                 <p class="text-slate-500 text-[10px] leading-relaxed">${tool.desc}</p>
             </a>
         `;
-        targetContainer.innerHTML += card;
+
+        if (containers[tool.category]) {
+            containers[tool.category].insertAdjacentHTML('beforeend', card);
+        }
     });
 }
