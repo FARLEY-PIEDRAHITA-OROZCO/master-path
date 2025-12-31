@@ -11,9 +11,15 @@ export const UIComponents = {
                 <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black text-white italic shadow-lg shadow-blue-900/40">QA</div>
                 <span class="font-extrabold tracking-tighter text-xl uppercase text-white">Master<span class="text-blue-500 italic">Path</span></span>
             </div>
-            <div id="nav-links" class="space-x-8 text-[11px] font-bold uppercase tracking-widest text-slate-400">
+            <div id="nav-links" class="flex items-center space-x-8 text-[11px] font-bold uppercase tracking-widest text-slate-400">
                 <a href="index.html" class="nav-item hover:text-white transition-colors">Inicio</a>
                 <a href="roadmap.html" class="nav-item hover:text-white transition-colors">Semanas</a>
+                
+                <a href="knowledge-base.html" class="nav-item hover:text-blue-400 transition-colors flex items-center gap-2">
+                    <span class="w-1 h-1 bg-blue-500 rounded-full animate-pulse"></span>
+                    Docs
+                </a>
+
                 <a href="toolbox.html" class="nav-item hover:text-white transition-colors">Toolbox</a>
             </div>
         </nav>
@@ -54,7 +60,8 @@ export const UIComponents = {
         links.forEach(link => {
             const linkPath = link.getAttribute('href');
             // Verificamos si el path actual termina con el href del link
-            if (currentPath.endsWith(linkPath) || (currentPath.endsWith('/') && linkPath === 'index.html')) {
+            // Agregamos lógica para manejar parámetros (como ?topic=...)
+            if (currentPath.includes(linkPath) || (currentPath.endsWith('/') && linkPath === 'index.html')) {
                 link.classList.remove('text-slate-400');
                 link.classList.add('text-white', 'border-b-2', 'border-blue-500', 'pb-1');
             }
