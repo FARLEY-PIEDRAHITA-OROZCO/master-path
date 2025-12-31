@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testing Toolbox | QA Engineering</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="text-slate-300 min-h-screen">
+
+    <main class="pt-32 pb-20 px-6 max-w-6xl mx-auto">
+        <header class="mb-16 gap-6">
+            <h1 class="text-5xl font-black text-white italic uppercase tracking-tighter mb-4">
+                Testing <span class="text-blue-600 underline decoration-blue-500/30">Toolbox</span>
+            </h1>
+            <p class="text-slate-500 text-sm max-w-2xl italic leading-relaxed">System utilities: <span class="text-blue-500">Accelerating the testing workflow...</span></p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            <div class="space-y-4">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
+                    <i class="fas fa-server text-blue-500"></i> API & Data Validation
+                </h3>
+                <div id="api-tools" class="space-y-4"></div>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
+                    <i class="fas fa-robot text-emerald-500"></i> Automation & Web
+                </h3>
+                <div id="automation-tools" class="space-y-4"></div>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
+                    <i class="fas fa-file-code text-purple-500"></i> CheatSheets & Docs
+                </h3>
+                <div id="docs-tools" class="space-y-4"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="assets/app.js"></script>
+    <script src="assets/components.js"></script>
+    <script>
+        // Lógica para cargar las herramientas
+        const tools = [
+            { category: 'api', name: 'JSON Placeholder', desc: 'API falsa para pruebas de frontend.', url: 'https://jsonplaceholder.typicode.com/', icon: 'fa-database' },
+            { category: 'api', name: 'JSON Schema Validator', desc: 'Valida estructuras JSON contra schemas.', url: 'https://www.jsonschemavalidator.net/', icon: 'fa-check-double' },
+            { category: 'automation', name: 'SelectorsHub', desc: 'La herramienta #1 para XPath y CSS Selectors.', url: 'https://selectorshub.com/', icon: 'fa-crosshairs' },
+            { category: 'automation', name: 'Playwright Codegen', desc: 'Genera código grabando tu navegación.', url: 'https://playwright.dev/docs/codegen', icon: 'fa-code' },
+            { category: 'docs', name: 'ISTQB Glossary', desc: 'Términos oficiales de certificación.', url: 'https://glossary.istqb.org/', icon: 'fa-book' },
+            { category: 'docs', name: 'Git Cheat Sheet', desc: 'Comandos esenciales para versionado.', url: 'https://education.github.com/git-cheat-sheet-education.pdf', icon: 'fa-terminal' }
+        ];
+
+        function renderToolbox() {
+            const apiContainer = document.getElementById('api-tools');
+            const autoContainer = document.getElementById('automation-tools');
+            const docsContainer = document.getElementById('docs-tools');
+
+            tools.forEach(tool => {
+                const card = `
+                    <a href="${tool.url}" target="_blank" class="block glass-panel p-6 rounded-3xl border border-white/5 hover:border-blue-500/40 transition group relative overflow-hidden">
+                        <div class="flex items-start justify-between relative z-10">
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-white/5 mb-4">
+                                <i class="fas ${tool.icon} text-blue-500 group-hover:scale-110 transition"></i>
+                            </div>
+                            <i class="fas fa-external-link-alt text-[10px] text-slate-700 group-hover:text-blue-500 transition"></i>
+                        </div>
+                        <h4 class="text-white font-bold text-sm mb-1 italic">${tool.name}</h4>
+                        <p class="text-slate-500 text-[10px] leading-relaxed">${tool.desc}</p>
+                    </a>
+                `;
+
+                if(tool.category === 'api') apiContainer.innerHTML += card;
+                if(tool.category === 'automation') autoContainer.innerHTML += card;
+                if(tool.category === 'docs') docsContainer.innerHTML += card;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderToolbox);
+    </script>
+</body>
+</html>
