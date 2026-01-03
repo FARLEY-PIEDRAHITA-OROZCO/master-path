@@ -8,7 +8,7 @@
 
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from './firebase-config.js';
-import { authService } from './auth-service.js';
+import { Logger } from './logger.js';
 
 // ==================== CONFIGURACIÓN ====================
 
