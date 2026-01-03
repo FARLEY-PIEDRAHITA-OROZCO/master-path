@@ -4,6 +4,12 @@
  * @module StorageService
  */
 
+// ==================== IMPORTS ====================
+
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
+import { db } from './firebase-config.js';
+import { authService } from './auth-service.js';
+
 // ==================== CONFIGURACIÓN ====================
 
 const KEYS = {
@@ -540,3 +546,86 @@ export { KEYS, Logger, Validator };
 if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
   StorageService.init();
 }
+
+// Método para sincronizar con Firestore
+StorageService.syncWithFirestore = async function(key, data) {
+  try {
+    const user = authService.getCurrentUser();
+    
+    if (!user) {
+      // No autenticado - solo guardar local
+      return this.save(key, data);
+    }
+
+    // Guardar localmente
+    const saved = this.save(key, data);
+
+    // Sincronizar con Firestore
+    const userDocRef = doc(db, 'users', user.uid);
+    const fieldName = key.replace('qa_', '').replace('_', '');
+
+    await updateDoc(userDocRef, {
+      [fieldName]: data,
+      lastSync: new Date().toISOString()
+    });
+
+    Logger.success('Data synced with Firestore', { key });
+
+    return saved;
+
+  } catch (error) {
+    Logger.error('Failed to sync with Firestore', { key, error });
+    // No fallar, al menos tenemos copia local
+    return true;
+  }
+};
+
+// Método para cargar desde Firestore
+StorageService.loadFromFirestore = async function() {
+  try {
+    const user = authService.getCurrentUser();
+    
+    if (!user) {
+      Logger.info('No user logged in, using local data');
+      return false;
+    }
+
+    const userDocRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userDocRef);
+
+    if (!userDoc.exists()) {
+      Logger.warn('User document not found in Firestore');
+      return false;
+    }
+
+    const data = userDoc.data();
+
+    // Cargar cada tipo de dato
+    if (data.progress) {
+      this.save(KEYS.PROGRESS, data.progress);
+    }
+    if (data.subtasks) {
+      this.save(KEYS.SUBTASKS, data.subtasks);
+    }
+    if (data.notes) {
+      this.save(KEYS.NOTES, data.notes);
+    }
+    if (data.badges) {
+      this.save(KEYS.BADGES, data.badges);
+    }
+
+    Logger.success('Data loaded from Firestore');
+    return true;
+
+  } catch (error) {
+    Logger.error('Failed to load from Firestore', { error });
+    return false;
+  }
+};
+
+// Auto-cargar datos cuando el usuario inicia sesión
+authService.onAuthChange(async (user) => {
+  if (user) {
+    await StorageService.loadFromFirestore();
+  }
+});
