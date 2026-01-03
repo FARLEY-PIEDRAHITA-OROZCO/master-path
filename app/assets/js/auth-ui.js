@@ -1,5 +1,18 @@
 import { authService } from './auth-service.js';
 
+// ==================== UTILIDADES ====================
+
+/**
+ * Obtiene la ruta base del proyecto
+ */
+function getBasePath() {
+  const path = window.location.pathname;
+  if (path.includes('/app/')) {
+    return '/app/';
+  }
+  return '/';
+}
+
 // ==================== ELEMENTOS DOM ====================
 
 const elements = {
