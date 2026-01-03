@@ -8,7 +8,7 @@ vi.mock('./storage.js', () => ({
     PROGRESS: 'qa_master_progress'
   },
   StorageService: {
-    get: vi.fn() 
+    get: vi.fn()
   }
 }));
 
@@ -37,7 +37,7 @@ class AppEngine {
     try {
       const response = await fetch('./app/assets/data/modules.json');
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      
+
       const jsonData = await response.json();
       this.data = jsonData;
       this.modules = jsonData.modules || [];
@@ -114,6 +114,56 @@ describe('AppEngine System Tests', () => {
       expect(result.success).toBe(false);
       expect(result.error).toBe('Network error');
     });
+
+    it('debería manejar un JSON corrupto o mal formado', async () => {
+      // Simulamos una respuesta que parece exitosa (ok: true) 
+      // pero cuyo contenido es un desastre total
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => {
+          // Forzamos un error de parseo manual
+          throw new SyntaxError('Unexpected token m in JSON at position 0');
+        }
+      });
+
+      const result = await engine.init();
+
+      // VERIFICACIONES (ASSERTIONS)
+      expect(result.success).toBe(false);
+      // Validamos que el sistema no explote y limpie los módulos
+      expect(engine.modules).toEqual([]);
+      // Opcional: Verificar que el error sea capturado
+      expect(result.error).toBeDefined();
+    });
+
+    it('debería manejar una respuesta extremadamente lenta (Timeout)', async () => {
+      // 1. Configuramos el mock para que tarde 5 segundos en responder
+      global.fetch.mockImplementation(() =>
+        new Promise((resolve) => {
+          setTimeout(() => {
+            resolve({
+              ok: true,
+              json: async () => mockModulesData
+            });
+          }, 5000); // 5 segundos de retraso
+        })
+      );
+
+      // 2. Usamos 'vi.useFakeTimers' para no tener que esperar 5 segundos reales en el test
+      vi.useFakeTimers();
+
+      const initPromise = engine.init();
+
+      // 3. Adelantamos el tiempo artificialmente
+      vi.advanceTimersByTime(5000);
+
+      const result = await initPromise;
+
+      // 4. Verificamos que al final cargó (o podrías configurar un error de timeout)
+      expect(result.success).toBe(true);
+
+      vi.useRealTimers(); // Limpiamos los timers
+    });
   });
 
   describe('getAnalytics() con Mocking Real', () => {
@@ -143,9 +193,9 @@ describe('AppEngine System Tests', () => {
   describe('getBadgeStatus() con Mocking', () => {
     it('debería otorgar el badge "Core" solo cuando 1 y 2 son true', () => {
       StorageService.get.mockReturnValue({ 1: true, 2: true });
-      
+
       // USAMOS LA INSTANCIA 'engine', NO LA CLASE
-      const status = engine.getBadgeStatus(); 
+      const status = engine.getBadgeStatus();
 
       expect(status.core).toBe(true);
       expect(status.technical).toBeFalsy(); // Corregido: .toBeFalsy()
