@@ -164,8 +164,9 @@ elements.btnGoogle.addEventListener('click', async () => {
   if (result.success) {
     showMessage('¡Bienvenido!', 'success');
     
+    const basePath = getBasePath();
     setTimeout(() => {
-      window.location.href = '/index.html';
+      window.location.href = `${basePath}index.html`;
     }, 1000);
   } else {
     showMessage(result.error, 'error');
