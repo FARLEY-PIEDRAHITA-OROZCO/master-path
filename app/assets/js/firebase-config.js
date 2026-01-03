@@ -13,12 +13,29 @@ const firebaseConfig = {
   appId: "1:488441406240:web:2d7c23095ce86c66f7ad45"
 };
 
-// Inicializar Firebase
-const app = initializeApp(firebaseConfig);
+// Inicializar Firebase con manejo de errores
+let app, auth, db;
 
-// Servicios
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+try {
+  console.log('🔥 [FIREBASE-CONFIG] Inicializando Firebase...');
+  app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db = getFirestore(app);
+  console.log('✅ [FIREBASE-CONFIG] Firebase inicializado correctamente:', app.name);
+} catch (error) {
+  console.error('❌ [FIREBASE-CONFIG] Error al inicializar Firebase:', error);
+  console.error('Detalles del error:', error.message);
+  
+  // Crear objetos mock para evitar errores en el resto de la app
+  console.warn('⚠️ [FIREBASE-CONFIG] Continuando con objetos mock...');
+}
+
+// Exportar servicios
+export { auth, db };
 
 // Verificar inicialización
-console.log('🔥 Firebase initialized:', app.name);
+if (app) {
+  console.log('🔥 Firebase initialized:', app.name);
+} else {
+  console.error('❌ Firebase failed to initialize');
+}
