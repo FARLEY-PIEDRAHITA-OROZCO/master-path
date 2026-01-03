@@ -1,6 +1,7 @@
 import { AppEngine } from './app.js';
 import { StorageService, KEYS } from './storage.js';
 import { UIComponents } from './components.js';
+import { requireAuth } from './auth-guard.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   UIComponents.init();
@@ -190,3 +191,6 @@ function toggleExpand(id) {
   content.classList.toggle('hidden');
   icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
 }
+
+// Requerir autenticación para esta página
+requireAuth();

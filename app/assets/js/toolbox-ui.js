@@ -1,6 +1,7 @@
 import { AppEngine } from './app.js';
 import { UIComponents } from './components.js';
 import { Logger } from './storage.js';
+import { requireAuth } from './auth-guard.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   // Inicialización de componentes base
@@ -65,3 +66,6 @@ function renderToolbox() {
     }
   });
 }
+
+// Requerir autenticación para esta página
+requireAuth();
