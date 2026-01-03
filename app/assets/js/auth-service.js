@@ -11,7 +11,7 @@ import {
   sendEmailVerification
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { Logger } from './storage.js';
+import { Logger } from './logger.js';
 
 /**
  * Servicio de Autenticación
