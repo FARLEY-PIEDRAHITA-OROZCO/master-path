@@ -15,12 +15,6 @@ export const AppEngine = {
       this.data = jsonData;
       this.modules = jsonData.modules || [];
 
-      console.log(
-        '🚀 Engine Ready. Modules:',
-        this.modules.length,
-        'Tools:',
-        this.data.tools?.length
-      );
     } catch (error) {
       console.error('❌ Error loading data:', error);
     }

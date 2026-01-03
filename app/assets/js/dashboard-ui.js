@@ -1,3 +1,4 @@
+/* global confetti */
 import { AppEngine } from './app.js';
 import { StorageService, KEYS } from './storage.js';
 import { UIComponents } from './components.js';

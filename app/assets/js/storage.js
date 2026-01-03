@@ -29,13 +29,6 @@ const DEFAULT_VALUES = {
 
 class Logger {
   static log(level, message, data = {}) {
-    const timestamp = new Date().toISOString();
-    const logEntry = {
-      timestamp,
-      level,
-      message,
-      ...data,
-    };
 
     // En desarrollo, mostrar en consola con colores
     const colors = {
@@ -48,6 +41,7 @@ class Logger {
     const reset = '\x1b[0m';
     const color = colors[level] || '';
 
+    // eslint-disable-next-line no-console
     console.log(`${color}[${level.toUpperCase()}]${reset}`, message, data);
 
     // En producción, podrías enviar a servicio de logging

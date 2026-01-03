@@ -1,3 +1,4 @@
+/* global marked */
 import { UIComponents } from './components.js';
 
 const DocsEngine = {
