@@ -176,10 +176,10 @@ Ver **[README_ROADMAP.md](./README_ROADMAP.md)** para plan detallado de 12 seman
 
 ## 📖 Documentación Adicional
 
-- **[DOCS_ARQUITECTURA.md](./DOCS_ARQUITECTURA.md)** - Arquitectura detallada
-- **[README_ROADMAP.md](./README_ROADMAP.md)** - Plan de mejoras
-- **[ROADMAP_DETALLADO.md](./ROADMAP_DETALLADO.md)** - Sprint 1 paso a paso
-- **[ROADMAP_SPRINT_2.md](./ROADMAP_SPRINT_2.md)** - Autenticación
+- **[DOCS_ARQUITECTURA.md](./docs/DOCS_ARQUITECTURA.md)** - Arquitectura detallada
+- **[README_ROADMAP.md](./docs/README_ROADMAP.md)** - Plan de mejoras
+- **[ROADMAP_DETALLADO.md](./docs/ROADMAP_DETALLADO.md)** - Sprint 1 paso a paso
+- **[ROADMAP_SPRINT_2.md](./docs/ROADMAP_SPRINT_2.md)** - Autenticación
 
 ## 📝 Licencia
 
