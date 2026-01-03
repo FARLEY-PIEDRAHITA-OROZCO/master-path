@@ -198,3 +198,6 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
+
+// Verificar si ya está autenticado y redirigir
+redirectIfAuthenticated();
