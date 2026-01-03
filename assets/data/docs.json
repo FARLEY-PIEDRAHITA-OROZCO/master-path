@@ -8,14 +8,20 @@
         {
           "id": "sdlc-stlc",
           "title": "Ciclos de Vida: SDLC & STLC",
-          "content": "### El Ciclo de Vida del Software (SDLC)\nEs el proceso que sigue un producto desde su concepción hasta su retiro...\n\n### El Ciclo de Vida del Testing (STLC)\n1. **Análisis**: Entender los requisitos.\n2. **Planificación**: Definir la estrategia.",
-          "evidence": "Diagrama de flujo de estados de un Bug"
+          "content": "### Fundamentos de Testing\n\nEl testing no es una fase al final; es una actividad continua que garantiza la calidad desde el día uno.\n\n#### SDLC (Software Development Life Cycle)\n\nEs el proceso que sigue un producto desde su concepción hasta su retiro. Comprenderlo permite al QA saber **cuándo** entrar en acción para prevenir errores antes de que se escriba código.\n\n#### STLC (Software Testing Life Cycle)\n\n1. **Análisis de Requisitos:** Evaluar si las historias de usuario son testeables.\n2. **Planificación:** Definir el alcance, recursos y cronograma.\n3. **Diseño de Casos:** Crear escenarios basados en los criterios de aceptación.\n4. **Configuración del Entorno:** Preparar datos y herramientas.\n5. **Ejecución:** Correr las pruebas y reportar hallazgos.\n6. **Cierre:** Resumen de resultados y métricas de calidad.",
+          "evidence": "Diagrama de flujo de estados de un Bug y comparativa de ciclos."
         },
         {
           "id": "defect-management",
           "title": "Gestión de Defectos",
-          "content": "### Severidad vs Prioridad\n* **Severidad:** Impacto técnico.\n* **Prioridad:** Urgencia de negocio.",
-          "evidence": "2 Reportes de bug en Jira/GitHub"
+          "content": "### Gestión Profesional de Hallazgos\n\nUn reporte de bug es el producto principal de un QA. Si es de alta calidad, acelera la corrección y mejora la comunicación con desarrollo.\n\n#### Severidad vs Prioridad\n\n* **Severidad (Impacto Técnico):** ¿Qué tanto rompe el sistema? (Bloqueante, Crítica, Menor).\n* **Prioridad (Impacto de Negocio):** ¿Qué tan rápido debe arreglarse? (Alta, Media, Baja).\n\n#### Anatomía de un Reporte Épico\n\n1. **Título Conciso:** Qué, dónde y bajo qué condición.\n2. **Pasos para Reproducir:** Numerados y claros.\n3. **Resultado Obtenido vs. Esperado.**\n4. **Evidencia:** Screenshots, videos o logs de consola.\n5. **Entorno:** Navegador, versión y dispositivo.",
+          "evidence": "2 Reportes de bug documentados con estándar profesional."
+        },
+        {
+          "id": "agile-qa",
+          "title": "Agile QA & Scrum",
+          "content": "### El QA en equipos modernos\n\nEn Agile, la calidad es responsabilidad de todos, pero el QA actúa como el facilitador y guardián de los estándares.\n\n#### Ceremonias Scrum\n\n* **Planning:** Identificar riesgos técnicos y estimar el esfuerzo de las pruebas.\n* **Daily:** Comunicar bloqueos y el avance de la ejecución de pruebas.\n* **Retro:** Proponer mejoras en el proceso de calidad del equipo.\n\n#### Definiciones Cruciales\n\n* **Definition of Ready (DoR):** Requisitos mínimos que debe cumplir una Historia de Usuario para empezar a desarrollarse.\n* **Definition of Done (DoD):** Criterios finales para considerar que una tarea está terminada (incluye pruebas pasadas y código revisado).",
+          "evidence": "Checklist de DoD aplicado a un Sprint de ejemplo."
         }
       ]
     }
