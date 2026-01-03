@@ -279,7 +279,7 @@ export const StorageService = {
       const progress = this.get(KEYS.PROGRESS);
       progress[id] = Boolean(isChecked);
 
-      const saved = this.save(KEYS.PROGRESS, progress);
+      const saved = this.syncWithFirestore(KEYS.PROGRESS, progress);
 
       if (saved) {
         Logger.info('Progress toggled', { moduleId: id, isChecked });
@@ -305,7 +305,7 @@ export const StorageService = {
 
       subProgress[key] = !subProgress[key];
 
-      const saved = this.save(KEYS.SUBTASKS, subProgress);
+      const saved = this.syncWithFirestore(KEYS.SUBTASKS, subProgress);
 
       if (saved) {
         Logger.info('Subtask toggled', { moduleId, taskIndex, newState: subProgress[key] });
@@ -335,7 +335,7 @@ export const StorageService = {
       const notes = this.get(KEYS.NOTES);
       notes[moduleId] = sanitized;
 
-      return this.save(KEYS.NOTES, notes);
+      return this.syncWithFirestore(KEYS.NOTES, notes);
     } catch (error) {
       Logger.error('Error saving note', { moduleId, error });
       return false;
