@@ -1,0 +1,46 @@
+{
+  "name": "qa-master-path",
+  "version": "1.0.0",
+  "description": "Plataforma educativa gamificada para QA Engineers",
+  "main": "index.html",
+  "type": "module",
+  "scripts": {
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint \"app/assets/js/**/*.{js,jsx}\"",
+    "lint:fix": "eslint \"app/assets/js/**/*.{js,jsx}\" --fix",
+    "format": "prettier --write \"app/assets/**/*.{js,css,html,json}\"",
+    "format:check": "prettier --check \"app/assets/**/*.{js,css,html,json}\""
+  },
+  "keywords": [
+    "qa",
+    "testing",
+    "education",
+    "gamification"
+  ],
+  "author": "Farley Piedrahita Orozco <frlpiedrahita@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FARLEY-PIEDRAHITA-OROZCO/master-path"
+  },
+  "bugs": {
+    "url": "https://github.com/FARLEY-PIEDRAHITA-OROZCO/master-path/issues"
+  },
+  "homepage": "https://github.com/FARLEY-PIEDRAHITA-OROZCO/master-path#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@vitest/coverage-v8": "^4.0.16",
+    "@vitest/ui": "^4.0.16",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^17.0.0",
+    "happy-dom": "^20.0.11",
+    "jsdom": "^27.4.0",
+    "prettier": "^3.7.4",
+    "vitest": "^4.0.16"
+  }
+}

@@ -3,32 +3,34 @@ import { StorageService, KEYS } from './storage.js';
 import { UIComponents } from './components.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    UIComponents.init();
-    await AppEngine.init(); // Esperamos a que el JSON cargue
-    
-    // Verificación de seguridad
-    if (AppEngine.modules && AppEngine.modules.length > 0) {
-        renderRoadmap(); 
-    } else {
-        console.error("No se pudieron cargar los módulos para el Roadmap");
-        document.getElementById('roadmap-container').innerHTML = `<p class="text-center text-slate-500">Error al cargar el contenido...</p>`;
-    }
+  UIComponents.init();
+  await AppEngine.init(); // Esperamos a que el JSON cargue
+
+  // Verificación de seguridad
+  if (AppEngine.modules && AppEngine.modules.length > 0) {
+    renderRoadmap();
+  } else {
+    console.error('No se pudieron cargar los módulos para el Roadmap');
+    document.getElementById('roadmap-container').innerHTML =
+      `<p class="text-center text-slate-500">Error al cargar el contenido...</p>`;
+  }
 });
 
 function renderRoadmap() {
-    const container = document.getElementById('roadmap-container');
-    const progress = StorageService.get(KEYS.PROGRESS);
-    const subProgress = StorageService.get(KEYS.SUBTASKS);
-    const notes = StorageService.get(KEYS.NOTES);
+  const container = document.getElementById('roadmap-container');
+  const progress = StorageService.get(KEYS.PROGRESS);
+  const subProgress = StorageService.get(KEYS.SUBTASKS);
+  const notes = StorageService.get(KEYS.NOTES);
 
-    container.innerHTML = AppEngine.modules.map(m => {
-        // Cálculo de progreso interno del módulo
-        const totalTasks = m.schedule.length;
-        const completedTasks = m.schedule.filter((_, i) => subProgress[`${m.id}-${i}`]).length;
-        const percentage = Math.round((completedTasks / totalTasks) * 100) || 0;
-        const strokeDash = 251.2 - (251.2 * percentage) / 100;
+  container.innerHTML = AppEngine.modules
+    .map(m => {
+      // Cálculo de progreso interno del módulo
+      const totalTasks = m.schedule.length;
+      const completedTasks = m.schedule.filter((_, i) => subProgress[`${m.id}-${i}`]).length;
+      const percentage = Math.round((completedTasks / totalTasks) * 100) || 0;
+      const strokeDash = 251.2 - (251.2 * percentage) / 100;
 
-        return `
+      return `
         <div class="glass-panel rounded-[3rem] border border-white/5 overflow-hidden transition-all duration-500 hover:border-blue-500/20">
             <div class="p-8 flex flex-col md:flex-row md:items-center justify-between bg-white/[0.01] gap-6">
                 <div class="flex items-center gap-8">
@@ -89,7 +91,9 @@ function renderRoadmap() {
                     <div class="space-y-6">
                         <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Estatus de Lecciones</h4>
                         <div class="space-y-4">
-                            ${m.schedule.map((s, i) => `
+                            ${m.schedule
+                              .map(
+                                (s, i) => `
                                 <label class="flex items-start gap-4 p-5 bg-white/[0.02] rounded-3xl border border-white/5 hover:border-blue-500/30 transition cursor-pointer group">
                                     <input type="checkbox" 
                                            ${subProgress[`${m.id}-${i}`] ? 'checked' : ''} 
@@ -100,7 +104,9 @@ function renderRoadmap() {
                                         <p class="text-xs text-slate-400 italic leading-snug">${s.task}</p>
                                     </div>
                                 </label>
-                            `).join('')}
+                            `
+                              )
+                              .join('')}
                         </div>
                     </div>
 
@@ -108,14 +114,18 @@ function renderRoadmap() {
                         <div class="p-8 bg-gradient-to-b from-blue-600/10 to-transparent rounded-[2.5rem] border border-blue-500/10">
                             <h4 class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-6 italic">Training Resources</h4>
                             <div class="space-y-4">
-                                ${m.resources.map(res => `
+                                ${m.resources
+                                  .map(
+                                    res => `
                                     <a href="${res.url}" target="_blank" class="flex items-center gap-4 p-3 rounded-2xl hover:bg-white/5 transition border border-transparent hover:border-white/5 group">
                                         <div class="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center">
                                             <i class="fas fa-link text-blue-400"></i>
                                         </div>
                                         <span class="text-[11px] font-bold text-slate-300 group-hover:text-white transition">${res.name}</span>
                                     </a>
-                                `).join('')}
+                                `
+                                  )
+                                  .join('')}
                             </div>
                         </div>
 
@@ -136,46 +146,47 @@ function renderRoadmap() {
             </div>
         </div>
         `;
-    }).join('');
+    })
+    .join('');
 
-    attachEventListeners();
+  attachEventListeners();
 }
 
 function attachEventListeners() {
-    // Delegación de eventos para optimizar memoria
-    document.querySelectorAll('[data-expand]').forEach(btn => {
-        btn.onclick = () => toggleExpand(btn.dataset.expand);
-    });
+  // Delegación de eventos para optimizar memoria
+  document.querySelectorAll('[data-expand]').forEach(btn => {
+    btn.onclick = () => toggleExpand(btn.dataset.expand);
+  });
 
-    document.querySelectorAll('[data-task]').forEach(input => {
-        input.onchange = () => {
-            const [mId, tIdx] = input.dataset.task.split('-');
-            StorageService.toggleSubtask(mId, tIdx);
-            renderRoadmap();
-        };
-    });
+  document.querySelectorAll('[data-task]').forEach(input => {
+    input.onchange = () => {
+      const [mId, tIdx] = input.dataset.task.split('-');
+      StorageService.toggleSubtask(mId, tIdx);
+      renderRoadmap();
+    };
+  });
 
-    document.querySelectorAll('[data-finalize]').forEach(btn => {
-        btn.onclick = () => {
-            const mId = btn.dataset.finalize;
-            const currentStatus = StorageService.get(KEYS.PROGRESS)[mId];
-            StorageService.toggleProgress(mId, !currentStatus);
-            renderRoadmap();
-        };
-    });
+  document.querySelectorAll('[data-finalize]').forEach(btn => {
+    btn.onclick = () => {
+      const mId = btn.dataset.finalize;
+      const currentStatus = StorageService.get(KEYS.PROGRESS)[mId];
+      StorageService.toggleProgress(mId, !currentStatus);
+      renderRoadmap();
+    };
+  });
 
-    document.querySelectorAll('[data-module-note]').forEach(txt => {
-        txt.onchange = () => {
-            const notes = StorageService.get(KEYS.NOTES);
-            notes[txt.dataset.moduleNote] = txt.value;
-            StorageService.save(KEYS.NOTES, notes);
-        };
-    });
+  document.querySelectorAll('[data-module-note]').forEach(txt => {
+    txt.onchange = () => {
+      const notes = StorageService.get(KEYS.NOTES);
+      notes[txt.dataset.moduleNote] = txt.value;
+      StorageService.save(KEYS.NOTES, notes);
+    };
+  });
 }
 
 function toggleExpand(id) {
-    const content = document.getElementById(`content-${id}`);
-    const icon = document.getElementById(`icon-${id}`);
-    content.classList.toggle('hidden');
-    icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+  const content = document.getElementById(`content-${id}`);
+  const icon = document.getElementById(`icon-${id}`);
+  content.classList.toggle('hidden');
+  icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
 }
