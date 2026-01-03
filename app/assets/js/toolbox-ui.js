@@ -3,13 +3,15 @@ import { UIComponents } from './components.js';
 import { Logger } from './storage.js';
 import { requireAuth } from './auth-guard.js';
 
+// ⚠️ CRÍTICO: Verificar autenticación PRIMERO antes de cargar nada
+requireAuth();
+
 document.addEventListener('DOMContentLoaded', async () => {
   // Inicialización de componentes base
   UIComponents.init();
 
   try {
     await AppEngine.init();
-    // Eliminamos el log de debug para cumplir con la regla no-console
     renderToolbox();
   } catch (error) {
     // console.error es permitido por tu ESLint config
@@ -66,6 +68,3 @@ function renderToolbox() {
     }
   });
 }
-
-// Requerir autenticación para esta página
-requireAuth();

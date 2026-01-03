@@ -2,6 +2,9 @@
 import { UIComponents } from './components.js';
 import { requireAuth } from './auth-guard.js';
 
+// ⚠️ CRÍTICO: Verificar autenticación PRIMERO antes de cargar nada
+requireAuth();
+
 const DocsEngine = {
   data: null,
 
@@ -88,6 +91,3 @@ const DocsEngine = {
 };
 
 document.addEventListener('DOMContentLoaded', () => DocsEngine.init());
-
-// Requerir autenticación para esta página
-requireAuth();

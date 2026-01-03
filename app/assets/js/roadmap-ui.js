@@ -3,6 +3,9 @@ import { StorageService, KEYS } from './storage.js';
 import { UIComponents } from './components.js';
 import { requireAuth } from './auth-guard.js';
 
+// ⚠️ CRÍTICO: Verificar autenticación PRIMERO antes de cargar nada
+requireAuth();
+
 document.addEventListener('DOMContentLoaded', async () => {
   UIComponents.init();
   await AppEngine.init(); // Esperamos a que el JSON cargue
@@ -191,6 +194,3 @@ function toggleExpand(id) {
   content.classList.toggle('hidden');
   icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
 }
-
-// Requerir autenticación para esta página
-requireAuth();
