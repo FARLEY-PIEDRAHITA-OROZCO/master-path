@@ -1,0 +1,23 @@
+{
+  "name": "qa-master-path",
+  "version": "1.0.0",
+  "description": "Plataforma educativa gamificada para QA Engineers",
+  "main": "index.html",
+  "scripts": {
+    "dev": "echo 'Servidor de desarrollo configurado más adelante'",
+    "build": "echo 'Build configurado más adelante'",
+    "test": "echo 'Tests configurados más adelante'",
+    "lint": "echo 'Linter configurado más adelante'"
+  },
+  "keywords": ["qa", "testing", "education", "gamification"],
+  "author": "Farley Piedrahita Orozco <frlpiedrahita@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FARLEY-PIEDRAHITA-OROZCO/master-path"
+  },
+  "bugs": {
+    "url": "https://github.com/FARLEY-PIEDRAHITA-OROZCO/master-path/issues"
+  },
+  "homepage": "https://github.com/FARLEY-PIEDRAHITA-OROZCO/master-path#readme"
+}
