@@ -589,8 +589,13 @@ StorageService.loadFromFirestore = async function() {
 };
 
 // Auto-cargar datos cuando el usuario inicia sesión
-authService.onAuthChange(async (user) => {
-  if (user) {
-    await StorageService.loadFromFirestore();
-  }
-});
+if (typeof window !== 'undefined') {
+  // Importar authService dinámicamente
+  import('./auth-service.js').then(({ authService }) => {
+    authService.onAuthChange(async (user) => {
+      if (user) {
+        await StorageService.loadFromFirestore();
+      }
+    });
+  });
+}
