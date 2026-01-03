@@ -6,7 +6,7 @@ const DocsEngine = {
     async init() {
         UIComponents.init();
         try {
-            const response = await fetch('./assets/data/docs.json');
+            const response = await fetch('./app/assets/data/docs.json');
             this.data = await response.json();
             this.renderMenu();
             this.handleNavigation();

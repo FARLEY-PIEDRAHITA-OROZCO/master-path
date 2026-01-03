@@ -10,7 +10,7 @@ export const AppEngine = {
 
     async init() {
         try {
-            const response = await fetch('./assets/data/modules.json');
+            const response = await fetch('./app/assets/data/modules.json');
             const jsonData = await response.json();
             this.data = jsonData;
             this.modules = jsonData.modules || [];
