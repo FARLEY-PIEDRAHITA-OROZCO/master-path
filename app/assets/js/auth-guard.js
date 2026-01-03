@@ -63,13 +63,32 @@ export function requireAuth() {
  * Redirige al dashboard si ya está autenticado (solo para página de login)
  */
 export function redirectIfAuthenticated() {
-  authService.init().then((user) => {
-    if (user) {
+  console.log('🔓 [AUTH-GUARD] Verificando si ya está autenticado...');
+  
+  // Timeout de 3 segundos para evitar esperar infinitamente
+  const timeout = new Promise((resolve) => {
+    setTimeout(() => {
+      console.log('⏱️ [AUTH-GUARD] Timeout en redirectIfAuthenticated - continuando...');
+      resolve({ timeout: true });
+    }, 3000);
+  });
+  
+  Promise.race([
+    authService.init().then(user => ({ user, timeout: false })),
+    timeout
+  ]).then((result) => {
+    if (!result.timeout && result.user) {
       // Ya autenticado - redirigir a dashboard
+      console.log('✅ [AUTH-GUARD] Usuario ya autenticado, redirigiendo...');
       const params = new URLSearchParams(window.location.search);
       const redirect = params.get('redirect') || '/app/pages/dashboard.html';
       window.location.href = redirect;
+    } else {
+      console.log('ℹ️ [AUTH-GUARD] Usuario no autenticado, mostrando formulario');
     }
+  }).catch((error) => {
+    console.error('❌ [AUTH-GUARD] Error en redirectIfAuthenticated:', error);
+    // Continuar normalmente - mostrar el formulario de login
   });
 }
 
