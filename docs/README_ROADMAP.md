@@ -254,14 +254,14 @@ Usa este checklist para trackear tu avance:
 - [X] 0.1 - Git configurado
 - [X] 0.2 - Branches setup
 - [X] 0.3 - GitHub conectado
-- [ ] 0.4 - Node.js instalado
-- [ ] 0.5 - package.json creado
-- [ ] 1.1 - Vitest configurado
-- [ ] 1.2 - Tests StorageService
-- [ ] 1.3 - StorageService refactorizado
-- [ ] 1.4 - Tests AppEngine
-- [ ] 1.5 - ESLint + Prettier
-- [ ] 1.6 - GitHub Actions CI
+- [x] 0.4 - Node.js instalado
+- [x] 0.5 - package.json creado
+- [x] 1.1 - Vitest configurado
+- [x] 1.2 - Tests StorageService
+- [x] 1.3 - StorageService refactorizado
+- [x] 1.4 - Tests AppEngine
+- [x] 1.5 - ESLint + Prettier
+- [x] 1.6 - GitHub Actions CI
 
 ### Sprint 2: Autenticación
 - [ ] 2.1 - Firebase/Backend configurado
