@@ -146,8 +146,9 @@ elements.formRegister.addEventListener('submit', async (e) => {
     showMessage('¡Cuenta creada! Revisa tu email para verificar tu cuenta.', 'success');
     
     // Redirigir al dashboard
+    const basePath = getBasePath();
     setTimeout(() => {
-      window.location.href = '/index.html';
+      window.location.href = `${basePath}index.html`;
     }, 2000);
   } else {
     showMessage(result.error, 'error');
