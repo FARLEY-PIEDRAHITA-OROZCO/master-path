@@ -1,4 +1,5 @@
 import { authService } from './auth-service.js';
+import { redirectIfAuthenticated } from './auth-guard.js';
 
 // ==================== UTILIDADES ====================
 
