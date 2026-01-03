@@ -1,6 +1,17 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { StorageService, KEYS } from './storage.js';
 
-// Mock fetch global
+// 1. MOCK DEL SERVICIO DE STORAGE
+// Esto reemplaza el archivo real para que no toque el LocalStorage
+vi.mock('./storage.js', () => ({
+  KEYS: {
+    PROGRESS: 'qa_master_progress'
+  },
+  StorageService: {
+    get: vi.fn() // Creamos una función espía
+  }
+}));
+
 global.fetch = vi.fn();
 
 // Mock de modules.json
@@ -25,7 +36,7 @@ class AppEngine {
   async init() {
     try {
       const response = await fetch('./assets/data/modules.json');
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -41,13 +52,17 @@ class AppEngine {
     }
   }
 
+  // ... dentro de tu clase o módulo de Analytics ...
+
   getAnalytics() {
-    // Simulamos obtener datos del storage
-    // En tests reales, mockearíamos StorageService
-    const progress = { 1: true, 2: true, 3: false };
+    // 1. En lugar de hardcodear, pedimos el progreso real al Storage
+    const progress = StorageService.get(KEYS.PROGRESS);
+
+    // 2. Calculamos los módulos completados basándonos en los datos dinámicos
     const completedCount = Object.values(progress).filter(v => v === true).length;
+
     const totalXP = this.modules.reduce(
-      (acc, m) => progress[m.id] ? acc + m.xp : acc, 
+      (acc, m) => progress[m.id] ? acc + m.xp : acc,
       0
     );
 
@@ -88,7 +103,7 @@ describe('AppEngine', () => {
 
   beforeEach(() => {
     engine = new AppEngine();
-    
+
     // Resetear mock de fetch
     vi.clearAllMocks();
   });
@@ -142,7 +157,7 @@ describe('AppEngine', () => {
     });
   });
 
-  describe('getAnalytics()', () => {
+  describe('getAnalytics() con Mocking Real', () => {
     beforeEach(async () => {
       global.fetch.mockResolvedValueOnce({
         ok: true,
@@ -151,78 +166,85 @@ describe('AppEngine', () => {
       await engine.init();
     });
 
-    it('debería calcular XP correctamente', () => {
+    it('debería calcular analytics cuando el usuario tiene el 100% completado', () => {
+      // CONFIGURACIÓN DEL MOCK: Simulamos que todos están en true
+      StorageService.get.mockReturnValue({ 1: true, 2: true, 3: true });
+
       const analytics = engine.getAnalytics();
 
-      // Módulos 1 y 2 completados: 500 + 600 = 1100
-      expect(analytics.xp).toBe(1100);
+      expect(analytics.xp).toBe(1900); // 500 + 600 + 800
+      expect(analytics.progressPercent).toBe(100);
+      expect(analytics.completedCount).toBe(3);
     });
 
-    it('debería calcular porcentaje de progreso', () => {
+    it('debería calcular analytics cuando el usuario no tiene nada completado', () => {
+      // CONFIGURACIÓN DEL MOCK: Simulamos que nada está completado
+      StorageService.get.mockReturnValue({});
+
       const analytics = engine.getAnalytics();
 
-      // 2 de 3 módulos = 67%
-      expect(analytics.progressPercent).toBe(67);
-    });
-
-    it('debería contar módulos completados', () => {
-      const analytics = engine.getAnalytics();
-
-      expect(analytics.completedCount).toBe(2);
-    });
-
-    it('debería retornar 0% si no hay módulos', () => {
-      engine.modules = [];
-      const analytics = engine.getAnalytics();
-
+      expect(analytics.xp).toBe(0);
       expect(analytics.progressPercent).toBe(0);
+      expect(analytics.completedCount).toBe(0);
+    });
+
+    it('debería manejar el caso de un solo módulo completado', () => {
+      // CONFIGURACIÓN DEL MOCK: Solo el primer módulo
+      StorageService.get.mockReturnValue({ 1: true });
+
+      const analytics = engine.getAnalytics();
+
+      expect(analytics.xp).toBe(500);
+      expect(analytics.completedCount).toBe(1);
+      // 1 de 3 = 33%
+      expect(analytics.progressPercent).toBe(33);
     });
   });
+});
 
-  describe('getBadgeStatus()', () => {
-    it('debería retornar estado de badges correctamente', () => {
-      const status = engine.getBadgeStatus();
+describe('getBadgeStatus()', () => {
+  it('debería retornar estado de badges correctamente', () => {
+    const status = engine.getBadgeStatus();
 
-      expect(status.core).toBe(true);  // 1 && 2 = true
-      expect(status.technical).toBe(false);
-      expect(status.automation).toBe(false);
-      expect(status.expert).toBe(false);
+    expect(status.core).toBe(true);  // 1 && 2 = true
+    expect(status.technical).toBe(false);
+    expect(status.automation).toBe(false);
+    expect(status.expert).toBe(false);
+  });
+});
+
+describe('Utility Methods', () => {
+  beforeEach(async () => {
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockModulesData
     });
+    await engine.init();
   });
 
-  describe('Utility Methods', () => {
-    beforeEach(async () => {
-      global.fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockModulesData
-      });
-      await engine.init();
-    });
+  it('debería encontrar módulo por ID', () => {
+    const module = engine.getModuleById(2);
 
-    it('debería encontrar módulo por ID', () => {
-      const module = engine.getModuleById(2);
+    expect(module).toBeDefined();
+    expect(module.title).toBe('Test Module 2');
+  });
 
-      expect(module).toBeDefined();
-      expect(module.title).toBe('Test Module 2');
-    });
+  it('debería retornar undefined para ID inexistente', () => {
+    const module = engine.getModuleById(999);
 
-    it('debería retornar undefined para ID inexistente', () => {
-      const module = engine.getModuleById(999);
+    expect(module).toBeUndefined();
+  });
 
-      expect(module).toBeUndefined();
-    });
+  it('debería filtrar módulos por fase', () => {
+    const coreModules = engine.getModulesByPhase('Core');
 
-    it('debería filtrar módulos por fase', () => {
-      const coreModules = engine.getModulesByPhase('Core');
+    expect(coreModules.length).toBe(2);
+    expect(coreModules.every(m => m.phase === 'Core')).toBe(true);
+  });
 
-      expect(coreModules.length).toBe(2);
-      expect(coreModules.every(m => m.phase === 'Core')).toBe(true);
-    });
+  it('debería calcular XP total disponible', () => {
+    const totalXP = engine.getTotalXP();
 
-    it('debería calcular XP total disponible', () => {
-      const totalXP = engine.getTotalXP();
-
-      expect(totalXP).toBe(1900); // 500 + 600 + 800
-    });
+    expect(totalXP).toBe(1900); // 500 + 600 + 800
   });
 });
