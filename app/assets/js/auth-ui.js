@@ -103,8 +103,9 @@ elements.formLogin.addEventListener('submit', async (e) => {
     showMessage('¡Bienvenido de vuelta!', 'success');
     
     // Redirigir al dashboard
+    const basePath = getBasePath();
     setTimeout(() => {
-      window.location.href = '/index.html';
+      window.location.href = `${basePath}index.html`;
     }, 1000);
   } else {
     showMessage(result.error, 'error');
