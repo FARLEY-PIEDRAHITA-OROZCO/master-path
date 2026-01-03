@@ -32,13 +32,13 @@ class AuthService {
     
     return new Promise((resolve, reject) => {
       try {
-        // Timeout de 4 segundos para la inicialización
+        // Timeout de 7 segundos para la inicialización
         const timeoutId = setTimeout(() => {
           if (!this.isInitialized) {
             console.error('❌ [AUTH-SERVICE] Timeout en inicialización de Firebase');
             reject(new Error('Firebase initialization timeout'));
           }
-        }, 4000);
+        }, 7000);
         
         onAuthStateChanged(auth, async (user) => {
           try {
