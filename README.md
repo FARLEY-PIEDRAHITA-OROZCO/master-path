@@ -2,6 +2,9 @@
 
 > Plataforma educativa gamificada para convertirse en QA Automation Engineer en 12 semanas
 
+![CI Status badge for the QA Master Path project, indicating the current status of the Continuous Integration pipeline. The badge displays the text "CI Pipeline" and visually represents whether the build is passing or failing, providing essential information about the project's code quality and integration process.](https://github.com/tu-usuario/qa-master-path/workflows/CI%20Pipeline/badge.svg)
+![Coverage badge indicating test coverage for the QA Master Path project on the main branch, displayed as a graph. The badge shows the percentage of code covered by tests, providing a visual representation of the project's testing effectiveness.](https://codecov.io/gh/tu-usuario/qa-master-path/branch/main/graph/badge.svg)
+
 ## 📋 ¿Qué es esto?
 
 Aplicación web educativa que guía a testers manuales en su transformación a QA Automation Engineers mediante:
