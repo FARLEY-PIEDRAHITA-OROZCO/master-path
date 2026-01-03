@@ -28,29 +28,64 @@ class AuthService {
    * Inicializa el servicio y escucha cambios de autenticación
    */
   init() {
-    return new Promise((resolve) => {
-      onAuthStateChanged(auth, async (user) => {
-        if (user) {
-          // Usuario logueado
-          this.currentUser = await this.getUserData(user.uid);
-          Logger.success('User authenticated', { 
-            uid: user.uid, 
-            email: user.email 
-          });
-        } else {
-          // Usuario no logueado
-          this.currentUser = null;
-          Logger.info('User not authenticated');
-        }
+    console.log('🔥 [AUTH-SERVICE] Iniciando servicio de autenticación...');
+    
+    return new Promise((resolve, reject) => {
+      try {
+        // Timeout de 4 segundos para la inicialización
+        const timeoutId = setTimeout(() => {
+          if (!this.isInitialized) {
+            console.error('❌ [AUTH-SERVICE] Timeout en inicialización de Firebase');
+            reject(new Error('Firebase initialization timeout'));
+          }
+        }, 4000);
+        
+        onAuthStateChanged(auth, async (user) => {
+          try {
+            clearTimeout(timeoutId);
+            
+            if (user) {
+              // Usuario logueado
+              console.log('👤 [AUTH-SERVICE] Usuario detectado:', user.email);
+              this.currentUser = await this.getUserData(user.uid);
+              Logger.success('User authenticated', { 
+                uid: user.uid, 
+                email: user.email 
+              });
+            } else {
+              // Usuario no logueado
+              console.log('👤 [AUTH-SERVICE] No hay usuario autenticado');
+              this.currentUser = null;
+              Logger.info('User not authenticated');
+            }
 
-        // Notificar a callbacks
-        this.onAuthChangeCallbacks.forEach(callback => callback(this.currentUser));
+            // Notificar a callbacks
+            this.onAuthChangeCallbacks.forEach(callback => callback(this.currentUser));
 
-        if (!this.isInitialized) {
-          this.isInitialized = true;
-          resolve(this.currentUser);
-        }
-      });
+            if (!this.isInitialized) {
+              this.isInitialized = true;
+              resolve(this.currentUser);
+            }
+          } catch (error) {
+            console.error('❌ [AUTH-SERVICE] Error en onAuthStateChanged:', error);
+            if (!this.isInitialized) {
+              this.isInitialized = true;
+              reject(error);
+            }
+          }
+        }, (error) => {
+          // Callback de error de onAuthStateChanged
+          console.error('❌ [AUTH-SERVICE] Error en Firebase Auth:', error);
+          clearTimeout(timeoutId);
+          if (!this.isInitialized) {
+            this.isInitialized = true;
+            reject(error);
+          }
+        });
+      } catch (error) {
+        console.error('❌ [AUTH-SERVICE] Error crítico en init():', error);
+        reject(error);
+      }
     });
   }
 
