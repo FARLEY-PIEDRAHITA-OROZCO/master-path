@@ -4,6 +4,10 @@ import { StorageService, KEYS } from './storage.js';
 import { UIComponents } from './components.js';
 import { requireAuth } from './auth-guard.js';
 
+// ⚠️ CRÍTICO: Verificar autenticación PRIMERO antes de cargar nada
+requireAuth();
+
+// Solo cargar el dashboard después de que se verifique la autenticación
 document.addEventListener('DOMContentLoaded', async () => {
   // Inicializar el motor (Cargar JSON)
   UIComponents.init();
@@ -86,6 +90,3 @@ function launchCelebration(color) {
     if (Date.now() < end) requestAnimationFrame(frame);
   })();
 }
-
-// Requerir autenticación para esta página
-requireAuth();

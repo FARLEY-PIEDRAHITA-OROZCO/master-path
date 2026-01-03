@@ -1,19 +1,6 @@
 import { authService } from './auth-service.js';
 import { redirectIfAuthenticated } from './auth-guard.js';
 
-// ==================== UTILIDADES ====================
-
-/**
- * Obtiene la ruta base del proyecto
- */
-function getBasePath() {
-  const path = window.location.pathname;
-  if (path.includes('/app/')) {
-    return '/app/';
-  }
-  return '/';
-}
-
 // ==================== ELEMENTOS DOM ====================
 
 const elements = {
@@ -103,10 +90,12 @@ elements.formLogin.addEventListener('submit', async (e) => {
   if (result.success) {
     showMessage('¡Bienvenido de vuelta!', 'success');
     
-    // Redirigir al dashboard
-    const basePath = getBasePath();
+    // Redirigir al dashboard o a la página solicitada
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get('redirect') || '/app/index.html';
+    
     setTimeout(() => {
-      window.location.href = `${basePath}index.html`;
+      window.location.href = redirect;
     }, 1000);
   } else {
     showMessage(result.error, 'error');
@@ -147,9 +136,8 @@ elements.formRegister.addEventListener('submit', async (e) => {
     showMessage('¡Cuenta creada! Revisa tu email para verificar tu cuenta.', 'success');
     
     // Redirigir al dashboard
-    const basePath = getBasePath();
     setTimeout(() => {
-      window.location.href = `${basePath}index.html`;
+      window.location.href = '/app/index.html';
     }, 2000);
   } else {
     showMessage(result.error, 'error');
@@ -165,9 +153,12 @@ elements.btnGoogle.addEventListener('click', async () => {
   if (result.success) {
     showMessage('¡Bienvenido!', 'success');
     
-    const basePath = getBasePath();
+    // Redirigir al dashboard o a la página solicitada
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get('redirect') || '/app/index.html';
+    
     setTimeout(() => {
-      window.location.href = `${basePath}index.html`;
+      window.location.href = redirect;
     }, 1000);
   } else {
     showMessage(result.error, 'error');
@@ -199,5 +190,5 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// Verificar si ya está autenticado y redirigir
+// Verificar si ya está autenticado y redirigir (ejecutar PRIMERO)
 redirectIfAuthenticated();
