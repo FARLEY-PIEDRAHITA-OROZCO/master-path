@@ -397,5 +397,5 @@ class AuthService {
 // Exportar instancia única (singleton)
 export const authService = new AuthService();
 
-// Auto-inicializar
-authService.init();
+// NO auto-inicializar aquí - dejar que cada página lo haga cuando lo necesite
+// authService.init();
