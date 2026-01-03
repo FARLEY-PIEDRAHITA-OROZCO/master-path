@@ -11,8 +11,8 @@
     "test:coverage": "vitest run --coverage",
     "lint": "eslint \"app/assets/js/**/*.{js,jsx}\"",
     "lint:fix": "eslint \"app/assets/js/**/*.{js,jsx}\" --fix",
-    "format": "prettier --write 'assets/**/*.{js,css,html,json}'",
-    "format:check": "prettier --check 'assets/**/*.{js,css,html,json}'"
+    "format": "prettier --write \"app/assets/**/*.{js,css,html,json}\"",
+    "format:check": "prettier --check \"app/assets/**/*.{js,css,html,json}\""
   },
   "keywords": [
     "qa",
