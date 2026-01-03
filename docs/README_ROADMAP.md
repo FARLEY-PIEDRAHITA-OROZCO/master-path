@@ -251,9 +251,9 @@ Usa este checklist para trackear tu avance:
 ## Mi Progreso
 
 ### Sprint 1: Fundación Técnica
-- [ ] 0.1 - Git configurado
-- [ ] 0.2 - Branches setup
-- [ ] 0.3 - GitHub conectado
+- [X] 0.1 - Git configurado
+- [X] 0.2 - Branches setup
+- [X] 0.3 - GitHub conectado
 - [ ] 0.4 - Node.js instalado
 - [ ] 0.5 - package.json creado
 - [ ] 1.1 - Vitest configurado
