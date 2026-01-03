@@ -5,6 +5,8 @@
   "main": "index.html",
   "type": "module",
   "scripts": {
+    "dev": "npx http-server -p 8000 -c-1",
+    "start": "npm run dev",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
