@@ -12,16 +12,50 @@ function getBasePath() {
  * Esta función se ejecuta PRIMERO antes de cargar cualquier contenido
  */
 export function requireAuth() {
-  // Esperar a que el auth service se inicialice
-  authService.init().then((user) => {
-    if (!user) {
+  console.log('🔐 [AUTH-GUARD] Verificando autenticación...');
+  
+  // Crear un timeout de 5 segundos para evitar loading infinito
+  const timeout = new Promise((resolve) => {
+    setTimeout(() => {
+      console.warn('⚠️ [AUTH-GUARD] Timeout alcanzado - Firebase no responde');
+      resolve({ timeout: true });
+    }, 5000);
+  });
+  
+  // Carrera entre la inicialización y el timeout
+  Promise.race([
+    authService.init().then(user => ({ user, timeout: false })),
+    timeout
+  ]).then((result) => {
+    if (result.timeout) {
+      // Timeout alcanzado - mostrar error y permitir continuar en modo desarrollo
+      console.error('❌ [AUTH-GUARD] Firebase no responde. Iniciando modo desarrollo...');
+      showAuthError('Firebase no disponible. Continuando en modo desarrollo...');
+      
+      // Permitir continuar sin autenticación en modo desarrollo
+      setTimeout(() => {
+        hideAuthLoading();
+      }, 2000);
+      
+    } else if (!result.user) {
       // No autenticado - redirigir a login
+      console.log('🔒 [AUTH-GUARD] Usuario no autenticado, redirigiendo...');
       const currentPath = window.location.pathname;
       window.location.href = `/app/pages/auth.html?redirect=${encodeURIComponent(currentPath)}`;
+      
     } else {
       // Usuario autenticado - ocultar loading y mostrar contenido
+      console.log('✅ [AUTH-GUARD] Usuario autenticado:', result.user.email);
       hideAuthLoading();
     }
+  }).catch((error) => {
+    console.error('❌ [AUTH-GUARD] Error en verificación:', error);
+    showAuthError('Error al verificar autenticación: ' + error.message);
+    
+    // Permitir continuar después de mostrar el error
+    setTimeout(() => {
+      hideAuthLoading();
+    }, 3000);
   });
 }
 
@@ -52,5 +86,22 @@ function hideAuthLoading() {
   
   if (contentEl) {
     contentEl.style.display = 'block';
+  }
+  
+  console.log('✅ [AUTH-GUARD] Contenido principal mostrado');
+}
+
+/**
+ * Muestra un mensaje de error en el loading overlay
+ */
+function showAuthError(message) {
+  const loadingEl = document.getElementById('auth-loading');
+  
+  if (loadingEl) {
+    loadingEl.innerHTML = `
+      <i class="fas fa-exclamation-triangle text-yellow-500 text-4xl"></i>
+      <p class="text-xs font-black uppercase tracking-widest text-slate-400">${message}</p>
+      <p class="text-xs text-slate-600 mt-2">La aplicación continuará en modo desarrollo</p>
+    `;
   }
 }
