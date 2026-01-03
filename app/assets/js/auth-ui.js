@@ -92,7 +92,7 @@ elements.formLogin.addEventListener('submit', async (e) => {
     
     // Redirigir al dashboard o a la página solicitada
     const params = new URLSearchParams(window.location.search);
-    const redirect = params.get('redirect') || '/app/index.html';
+    const redirect = params.get('redirect') || '/app/pages/dashboard.html';
     
     setTimeout(() => {
       window.location.href = redirect;
@@ -137,7 +137,7 @@ elements.formRegister.addEventListener('submit', async (e) => {
     
     // Redirigir al dashboard
     setTimeout(() => {
-      window.location.href = '/app/index.html';
+      window.location.href = '/app/pages/dashboard.html';
     }, 2000);
   } else {
     showMessage(result.error, 'error');
@@ -155,7 +155,7 @@ elements.btnGoogle.addEventListener('click', async () => {
     
     // Redirigir al dashboard o a la página solicitada
     const params = new URLSearchParams(window.location.search);
-    const redirect = params.get('redirect') || '/app/index.html';
+    const redirect = params.get('redirect') || '/app/pages/dashboard.html';
     
     setTimeout(() => {
       window.location.href = redirect;

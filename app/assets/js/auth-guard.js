@@ -4,7 +4,7 @@ import { authService } from './auth-service.js';
  * Obtiene la ruta base del proyecto (simplificada)
  */
 function getBasePath() {
-  return '/app/';
+  return '/app/pages/';
 }
 
 /**
@@ -17,7 +17,7 @@ export function requireAuth() {
     if (!user) {
       // No autenticado - redirigir a login
       const currentPath = window.location.pathname;
-      window.location.href = `/app/auth.html?redirect=${encodeURIComponent(currentPath)}`;
+      window.location.href = `/app/pages/auth.html?redirect=${encodeURIComponent(currentPath)}`;
     } else {
       // Usuario autenticado - ocultar loading y mostrar contenido
       hideAuthLoading();
@@ -33,7 +33,7 @@ export function redirectIfAuthenticated() {
     if (user) {
       // Ya autenticado - redirigir a dashboard
       const params = new URLSearchParams(window.location.search);
-      const redirect = params.get('redirect') || '/app/index.html';
+      const redirect = params.get('redirect') || '/app/pages/dashboard.html';
       window.location.href = redirect;
     }
   });
