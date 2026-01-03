@@ -503,7 +503,7 @@ export const StorageService = {
 };
 
 // Exportar también las constantes para uso en otros módulos
-export { KEYS, Logger, Validator };
+export { KEYS, Validator };
 
 // Auto-inicializar cuando se carga el módulo
 if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
@@ -513,6 +513,8 @@ if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
 // Método para sincronizar con Firestore
 StorageService.syncWithFirestore = async function(key, data) {
   try {
+    // Importar authService dinámicamente para evitar dependencia circular
+    const { authService } = await import('./auth-service.js');
     const user = authService.getCurrentUser();
     
     if (!user) {
