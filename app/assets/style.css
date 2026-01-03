@@ -1,81 +1,83 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
 
 :root {
-    --bg-dark: #080c14;
-    --card-bg: rgba(17, 24, 39, 0.7);
-    --blue-primary: #3b82f6;
+  --bg-dark: #080c14;
+  --card-bg: rgba(17, 24, 39, 0.7);
+  --blue-primary: #3b82f6;
 }
 
 body {
-    background-color: var(--bg-dark);
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    color: #f3f4f6;
+  background-color: var(--bg-dark);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #f3f4f6;
 }
 
 .glass-panel {
-    background: var(--card-bg);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.mono { font-family: 'JetBrains Mono', monospace; }
+.mono {
+  font-family: 'JetBrains Mono', monospace;
+}
 
 .qa-toast {
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .active-filter {
-    background: rgba(16, 185, 129, 0.1);
-    color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
 }
 
 /* Scrollbar personalizada para las carpeticas */
 .custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
+  width: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0.1);
+  background: rgba(0, 0, 0, 0.1);
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.05);
-    border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #10b981;
+  background: #10b981;
 }
 
 /* assets/style.css */
 
 /* Estado inicial: oculto y comprimido */
 .sprint-details {
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition: all 0.5s ease-in-out;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 0.5s ease-in-out;
 }
 
 /* Estado activo: se expande y se muestra */
 /* IMPORTANTE: La clase 'active' debe estar en el mismo elemento que 'sprint-card' */
 .sprint-card.active .sprint-details {
-    max-height: 1000px; /* Un valor alto para que quepa todo */
-    opacity: 1;
-    margin-top: 1rem;
-    padding-bottom: 1rem;
+  max-height: 1000px; /* Un valor alto para que quepa todo */
+  opacity: 1;
+  margin-top: 1rem;
+  padding-bottom: 1rem;
 }
 
 /* 3. Animación suave para el icono */
 #icon-1, #icon-2, #icon-3, /* etc... o usa una clase */
 .fa-chevron-down {
-    transition: transform 0.3s ease;
+  transition: transform 0.3s ease;
 }
 
 /* 4. Estilo extra para las tareas */
 .task-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
 }
 
 /* assets/style.css */
@@ -83,61 +85,77 @@ body {
 /* assets/style.css */
 
 .badge-slot {
-    perspective: 1000px;
-    cursor: help;
+  perspective: 1000px;
+  cursor: help;
 }
 
 /* El contenedor de la descripción (oculto por defecto) */
 .badge-info {
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: all 0.4s ease;
-    text-align: center;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  text-align: center;
 }
 
 /* Al pasar el mouse, expandimos la info */
 .badge-slot:hover .badge-info {
-    max-height: 80px;
-    opacity: 1;
-    margin-top: 0.75rem;
+  max-height: 80px;
+  opacity: 1;
+  margin-top: 0.75rem;
 }
 
 /* Animación de "latido" para badges desbloqueados */
 /* assets/style.css */
 
 .badge-slot.unlocked {
-    animation: unlock-reveal 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
-    border-color: rgba(255, 255, 255, 0.2);
+  animation: unlock-reveal 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 @keyframes unlock-reveal {
-    0% { transform: scale(0.8); filter: brightness(0.5); }
-    50% { transform: scale(1.1); filter: brightness(1.5); }
-    100% { transform: scale(1); filter: brightness(1); }
+  0% {
+    transform: scale(0.8);
+    filter: brightness(0.5);
+  }
+  50% {
+    transform: scale(1.1);
+    filter: brightness(1.5);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
 }
 /* assets/style.css */
 
 .skill-bar-bg {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .skill-progress {
-    transition: width 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    position: relative;
+  transition: width 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
 }
 
 .skill-progress::after {
-    content: '';
-    position: absolute;
-    top: 0; right: 0; bottom: 0; left: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    animation: shine 3s infinite;
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: shine 3s infinite;
 }
 
 @keyframes shine {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }

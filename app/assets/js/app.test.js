@@ -5,11 +5,11 @@ import { StorageService, KEYS } from './storage.js';
 // Sustituimos el archivo real para controlar los datos de los tests
 vi.mock('./storage.js', () => ({
   KEYS: {
-    PROGRESS: 'qa_master_progress'
+    PROGRESS: 'qa_master_progress',
   },
   StorageService: {
-    get: vi.fn()
-  }
+    get: vi.fn(),
+  },
 }));
 
 global.fetch = vi.fn();
@@ -19,11 +19,9 @@ const mockModulesData = {
   modules: [
     { id: 1, phase: 'Core', title: 'Test Module 1', xp: 500 },
     { id: 2, phase: 'Core', title: 'Test Module 2', xp: 600 },
-    { id: 3, phase: 'Technical', title: 'Test Module 3', xp: 800 }
+    { id: 3, phase: 'Technical', title: 'Test Module 3', xp: 800 },
   ],
-  tools: [
-    { category: 'api', name: 'Tool 1', desc: 'Description', url: '#', icon: 'fa-icon' }
-  ]
+  tools: [{ category: 'api', name: 'Tool 1', desc: 'Description', url: '#', icon: 'fa-icon' }],
 };
 
 // Implementación de AppEngine para tests
@@ -50,15 +48,12 @@ class AppEngine {
   getAnalytics() {
     const progress = StorageService.get(KEYS.PROGRESS) || {};
     const completedCount = Object.values(progress).filter(v => v === true).length;
-    const totalXP = this.modules.reduce(
-      (acc, m) => progress[m.id] ? acc + m.xp : acc,
-      0
-    );
+    const totalXP = this.modules.reduce((acc, m) => (progress[m.id] ? acc + m.xp : acc), 0);
 
     return {
       xp: totalXP,
       progressPercent: Math.round((completedCount / this.modules.length) * 100) || 0,
-      completedCount
+      completedCount,
     };
   }
 
@@ -68,7 +63,7 @@ class AppEngine {
       core: !!(p[1] && p[2]),
       technical: !!(p[3] && p[4] && p[5]),
       automation: !!(p[6] && p[7] && p[8] && p[9]),
-      expert: !!(p[10] && p[11] && p[12])
+      expert: !!(p[10] && p[11] && p[12]),
     };
   }
 
@@ -100,7 +95,7 @@ describe('AppEngine System Tests', () => {
     it('debería cargar datos exitosamente', async () => {
       global.fetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockModulesData
+        json: async () => mockModulesData,
       });
 
       const result = await engine.init();
@@ -116,14 +111,14 @@ describe('AppEngine System Tests', () => {
     });
 
     it('debería manejar un JSON corrupto o mal formado', async () => {
-      // Simulamos una respuesta que parece exitosa (ok: true) 
+      // Simulamos una respuesta que parece exitosa (ok: true)
       // pero cuyo contenido es un desastre total
       global.fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => {
           // Forzamos un error de parseo manual
           throw new SyntaxError('Unexpected token m in JSON at position 0');
-        }
+        },
       });
 
       const result = await engine.init();
@@ -138,15 +133,16 @@ describe('AppEngine System Tests', () => {
 
     it('debería manejar una respuesta extremadamente lenta (Timeout)', async () => {
       // 1. Configuramos el mock para que tarde 5 segundos en responder
-      global.fetch.mockImplementation(() =>
-        new Promise((resolve) => {
-          setTimeout(() => {
-            resolve({
-              ok: true,
-              json: async () => mockModulesData
-            });
-          }, 5000); // 5 segundos de retraso
-        })
+      global.fetch.mockImplementation(
+        () =>
+          new Promise(resolve => {
+            setTimeout(() => {
+              resolve({
+                ok: true,
+                json: async () => mockModulesData,
+              });
+            }, 5000); // 5 segundos de retraso
+          })
       );
 
       // 2. Usamos 'vi.useFakeTimers' para no tener que esperar 5 segundos reales en el test
@@ -170,7 +166,7 @@ describe('AppEngine System Tests', () => {
     beforeEach(async () => {
       global.fetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockModulesData
+        json: async () => mockModulesData,
       });
       await engine.init();
     });
@@ -212,7 +208,7 @@ describe('AppEngine System Tests', () => {
     beforeEach(async () => {
       global.fetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockModulesData
+        json: async () => mockModulesData,
       });
       await engine.init();
     });

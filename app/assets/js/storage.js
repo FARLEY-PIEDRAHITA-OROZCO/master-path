@@ -11,7 +11,7 @@ const KEYS = {
   SUBTASKS: 'qa_subtask_progress',
   NOTES: 'qa_module_notes',
   BADGES: 'qa_celebrated_badges',
-  VERSION: 'qa_data_version'
+  VERSION: 'qa_data_version',
 };
 
 const CURRENT_VERSION = '1.0';
@@ -22,7 +22,7 @@ const DEFAULT_VALUES = {
   [KEYS.SUBTASKS]: {},
   [KEYS.NOTES]: {},
   [KEYS.BADGES]: [],
-  [KEYS.VERSION]: CURRENT_VERSION
+  [KEYS.VERSION]: CURRENT_VERSION,
 };
 
 // ==================== LOGGER ====================
@@ -34,15 +34,15 @@ class Logger {
       timestamp,
       level,
       message,
-      ...data
+      ...data,
     };
 
     // En desarrollo, mostrar en consola con colores
     const colors = {
-      info: '\x1b[36m',    // Cyan
-      warn: '\x1b[33m',    // Yellow
-      error: '\x1b[31m',   // Red
-      success: '\x1b[32m'  // Green
+      info: '\x1b[36m', // Cyan
+      warn: '\x1b[33m', // Yellow
+      error: '\x1b[31m', // Red
+      success: '\x1b[32m', // Green
     };
 
     const reset = '\x1b[0m';
@@ -85,15 +85,15 @@ class Validator {
    * Valida que los datos tengan la estructura esperada
    */
   static validateDataStructure(key, data) {
-    switch(key) {
+    switch (key) {
       case KEYS.PROGRESS:
       case KEYS.SUBTASKS:
       case KEYS.NOTES:
         return typeof data === 'object' && !Array.isArray(data);
-      
+
       case KEYS.BADGES:
         return Array.isArray(data);
-      
+
       default:
         return true;
     }
@@ -119,7 +119,6 @@ class Validator {
 // ==================== STORAGE SERVICE ====================
 
 export const StorageService = {
-  
   /**
    * Inicializa el storage service
    * Verifica versión de datos y migra si es necesario
@@ -127,17 +126,17 @@ export const StorageService = {
   init() {
     try {
       const storedVersion = this.get(KEYS.VERSION);
-      
+
       if (storedVersion !== CURRENT_VERSION) {
         Logger.info('Data version mismatch, migrating...', {
           from: storedVersion,
-          to: CURRENT_VERSION
+          to: CURRENT_VERSION,
         });
         this.migrate(storedVersion, CURRENT_VERSION);
       }
 
       Logger.success('StorageService initialized', {
-        version: CURRENT_VERSION
+        version: CURRENT_VERSION,
       });
 
       return true;
@@ -162,7 +161,7 @@ export const StorageService = {
 
       // Intentar obtener datos
       const rawData = localStorage.getItem(key);
-      
+
       // Si no existe, retornar valor por defecto
       if (rawData === null || rawData === undefined) {
         return DEFAULT_VALUES[key] || {};
@@ -173,20 +172,19 @@ export const StorageService = {
 
       // Validar estructura
       if (!Validator.validateDataStructure(key, parsedData)) {
-        Logger.warn('Invalid data structure, using default', { 
-          key, 
-          receivedType: typeof parsedData 
+        Logger.warn('Invalid data structure, using default', {
+          key,
+          receivedType: typeof parsedData,
         });
         return DEFAULT_VALUES[key] || {};
       }
 
       return parsedData;
-
     } catch (error) {
       Logger.error('Error getting data from storage', {
         key,
         error: error.message,
-        stack: error.stack
+        stack: error.stack,
       });
 
       // Intentar recuperar el dato corrupto
@@ -212,9 +210,9 @@ export const StorageService = {
 
       // Validar estructura de datos
       if (!Validator.validateDataStructure(key, data)) {
-        Logger.error('Invalid data structure for key', { 
-          key, 
-          dataType: typeof data 
+        Logger.error('Invalid data structure for key', {
+          key,
+          dataType: typeof data,
         });
         return false;
       }
@@ -230,22 +228,21 @@ export const StorageService = {
 
       Logger.info('Data saved successfully', {
         key,
-        size: serialized.length
+        size: serialized.length,
       });
 
       return true;
-
     } catch (error) {
       // Manejar quota exceeded error
       if (error.name === 'QuotaExceededError') {
         Logger.error('LocalStorage quota exceeded', {
           key,
-          dataSize: JSON.stringify(data).length
+          dataSize: JSON.stringify(data).length,
         });
-        
+
         // Intentar limpiar datos viejos
         this.cleanup();
-        
+
         // Reintentar
         try {
           localStorage.setItem(key, JSON.stringify(data));
@@ -258,7 +255,7 @@ export const StorageService = {
 
       Logger.error('Error saving data to storage', {
         key,
-        error: error.message
+        error: error.message,
       });
 
       return false;
@@ -281,15 +278,14 @@ export const StorageService = {
 
       const progress = this.get(KEYS.PROGRESS);
       progress[id] = Boolean(isChecked);
-      
+
       const saved = this.save(KEYS.PROGRESS, progress);
-      
+
       if (saved) {
         Logger.info('Progress toggled', { moduleId: id, isChecked });
       }
 
       return isChecked;
-
     } catch (error) {
       Logger.error('Error toggling progress', { id, isChecked, error });
       return false;
@@ -306,17 +302,16 @@ export const StorageService = {
     try {
       const subProgress = this.get(KEYS.SUBTASKS);
       const key = `${moduleId}-${taskIndex}`;
-      
+
       subProgress[key] = !subProgress[key];
-      
+
       const saved = this.save(KEYS.SUBTASKS, subProgress);
-      
+
       if (saved) {
         Logger.info('Subtask toggled', { moduleId, taskIndex, newState: subProgress[key] });
       }
 
       return subProgress[key];
-
     } catch (error) {
       Logger.error('Error toggling subtask', { moduleId, taskIndex, error });
       return false;
@@ -341,7 +336,6 @@ export const StorageService = {
       notes[moduleId] = sanitized;
 
       return this.save(KEYS.NOTES, notes);
-
     } catch (error) {
       Logger.error('Error saving note', { moduleId, error });
       return false;
@@ -373,10 +367,9 @@ export const StorageService = {
       const data = this.get(key);
       const backupKey = `${key}_backup_${Date.now()}`;
       localStorage.setItem(backupKey, JSON.stringify(data));
-      
+
       // Mantener solo los últimos 3 backups
       this.cleanOldBackups(key);
-
     } catch (error) {
       Logger.warn('Failed to create backup', { key, error });
     }
@@ -394,7 +387,7 @@ export const StorageService = {
       if (storageKey.startsWith(backupPattern)) {
         allBackups.push({
           key: storageKey,
-          timestamp: parseInt(storageKey.split('_').pop(), 10)
+          timestamp: parseInt(storageKey.split('_').pop(), 10),
         });
       }
     }
@@ -433,9 +426,9 @@ export const StorageService = {
       try {
         const backupData = localStorage.getItem(latestBackup);
         localStorage.setItem(key, backupData);
-        Logger.success('Data recovered from backup', { 
-          key, 
-          backupKey: latestBackup 
+        Logger.success('Data recovered from backup', {
+          key,
+          backupKey: latestBackup,
         });
       } catch (error) {
         Logger.error('Failed to recover from backup', { error });
@@ -450,14 +443,14 @@ export const StorageService = {
     Logger.info('Starting storage cleanup...');
 
     // Eliminar backups muy antiguos (más de 7 días)
-    const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+    const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
 
     for (let i = localStorage.length - 1; i >= 0; i--) {
       const key = localStorage.key(i);
-      
+
       if (key && key.includes('_backup_')) {
         const timestamp = parseInt(key.split('_').pop(), 10);
-        
+
         if (timestamp < sevenDaysAgo) {
           localStorage.removeItem(key);
           Logger.info('Removed old backup', { key });
@@ -491,8 +484,8 @@ export const StorageService = {
         progress: this.get(KEYS.PROGRESS),
         subtasks: this.get(KEYS.SUBTASKS),
         notes: this.get(KEYS.NOTES),
-        badges: this.get(KEYS.BADGES)
-      }
+        badges: this.get(KEYS.BADGES),
+      },
     };
   },
 
@@ -516,7 +509,7 @@ export const StorageService = {
 
       // Importar cada tipo de dato
       const { data } = exportedData;
-      
+
       this.save(KEYS.PROGRESS, data.progress || {});
       this.save(KEYS.SUBTASKS, data.subtasks || {});
       this.save(KEYS.NOTES, data.notes || {});
@@ -524,7 +517,6 @@ export const StorageService = {
 
       Logger.success('Data imported successfully');
       return true;
-
     } catch (error) {
       Logger.error('Failed to import data', { error });
       return false;
@@ -544,7 +536,7 @@ export const StorageService = {
     });
 
     Logger.success('All data reset to defaults');
-  }
+  },
 };
 
 // Exportar también las constantes para uso en otros módulos

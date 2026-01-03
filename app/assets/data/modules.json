@@ -9,11 +9,31 @@
       "xp": 500,
       "objective": "Dominar la base teórica y aprender a pensar como un QA profesional.",
       "schedule": [
-        { "day": "Lunes", "topic": "Ciclos y Tipos de Prueba", "task": "Análisis de App Real: Elige una app y define fases del SDLC." },
-        { "day": "Martes", "topic": "HU y Criterios de Aceptación", "task": "Análisis de Requerimientos: Redacta 5 preguntas críticas para el PO." },
-        { "day": "Miércoles", "topic": "Técnicas de Diseño", "task": "Lógica de Pruebas: Aplica Clases de Equivalencia y Valores Límite." },
-        { "day": "Jueves", "topic": "Documentación de Casos", "task": "Estandarización: Crea casos con Precondiciones y Pasos profesionales." },
-        { "day": "Viernes", "topic": "Gestión de Defectos", "task": "Reporte de Bugs: Redacta 2 reportes técnicos con Severidad y Prioridad." }
+        {
+          "day": "Lunes",
+          "topic": "Ciclos y Tipos de Prueba",
+          "task": "Análisis de App Real: Elige una app y define fases del SDLC."
+        },
+        {
+          "day": "Martes",
+          "topic": "HU y Criterios de Aceptación",
+          "task": "Análisis de Requerimientos: Redacta 5 preguntas críticas para el PO."
+        },
+        {
+          "day": "Miércoles",
+          "topic": "Técnicas de Diseño",
+          "task": "Lógica de Pruebas: Aplica Clases de Equivalencia y Valores Límite."
+        },
+        {
+          "day": "Jueves",
+          "topic": "Documentación de Casos",
+          "task": "Estandarización: Crea casos con Precondiciones y Pasos profesionales."
+        },
+        {
+          "day": "Viernes",
+          "topic": "Gestión de Defectos",
+          "task": "Reporte de Bugs: Redacta 2 reportes técnicos con Severidad y Prioridad."
+        }
       ],
       "deliverables": ["Documento SDLC/STLC", "HU Analizada", "Suite de 10 Casos", "2 Bug Reports"],
       "resources": [
@@ -30,16 +50,34 @@
       "xp": 600,
       "objective": "Integrar el testing en marcos ágiles y dominar las pruebas no estructuradas.",
       "schedule": [
-        { "day": "Lunes", "topic": "Scrum para Testers", "task": "Define el rol del QA en Daily, Planning y Retrospective." },
-        { "day": "Martes", "topic": "Pruebas Exploratorias", "task": "Sesión de 30 min explorando una web (Charter Testing)." },
-        { "day": "Miércoles", "topic": "Heurísticas de Testing", "task": "Aplica la heurística SFDPO para auditar una funcionalidad." },
-        { "day": "Jueves", "topic": "Mind Maps en QA", "task": "Crea un mapa mental de los flujos de una App." },
-        { "day": "Viernes", "topic": "Estimación", "task": "Usa Planning Poker para estimar el esfuerzo de una suite." }
+        {
+          "day": "Lunes",
+          "topic": "Scrum para Testers",
+          "task": "Define el rol del QA en Daily, Planning y Retrospective."
+        },
+        {
+          "day": "Martes",
+          "topic": "Pruebas Exploratorias",
+          "task": "Sesión de 30 min explorando una web (Charter Testing)."
+        },
+        {
+          "day": "Miércoles",
+          "topic": "Heurísticas de Testing",
+          "task": "Aplica la heurística SFDPO para auditar una funcionalidad."
+        },
+        {
+          "day": "Jueves",
+          "topic": "Mind Maps en QA",
+          "task": "Crea un mapa mental de los flujos de una App."
+        },
+        {
+          "day": "Viernes",
+          "topic": "Estimación",
+          "task": "Usa Planning Poker para estimar el esfuerzo de una suite."
+        }
       ],
       "deliverables": ["Exploratory Session Log", "Mind Map de Producto"],
-      "resources": [
-        { "type": "video", "name": "Agile QA Workflow", "url": "#" }
-      ]
+      "resources": [{ "type": "video", "name": "Agile QA Workflow", "url": "#" }]
     },
     {
       "id": 3,
@@ -50,16 +88,34 @@
       "xp": 800,
       "objective": "Validar la integridad de los datos directamente en la base de datos.",
       "schedule": [
-        { "day": "Lunes", "topic": "Fundamentos de DB", "task": "Modelado Entidad-Relación: Crea el esquema de una tienda." },
-        { "day": "Martes", "topic": "Queries Esenciales", "task": "Práctica SELECT, WHERE, LIKE y ORDER BY." },
-        { "day": "Miércoles", "topic": "Joins y Relaciones", "task": "Une tablas de Clientes y Órdenes para buscar inconsistencias." },
-        { "day": "Jueves", "topic": "Funciones Agregación", "task": "Valida totales de ventas y promedios mediante SQL." },
-        { "day": "Viernes", "topic": "Data Integrity", "task": "Detecta registros duplicados y valores nulos." }
+        {
+          "day": "Lunes",
+          "topic": "Fundamentos de DB",
+          "task": "Modelado Entidad-Relación: Crea el esquema de una tienda."
+        },
+        {
+          "day": "Martes",
+          "topic": "Queries Esenciales",
+          "task": "Práctica SELECT, WHERE, LIKE y ORDER BY."
+        },
+        {
+          "day": "Miércoles",
+          "topic": "Joins y Relaciones",
+          "task": "Une tablas de Clientes y Órdenes para buscar inconsistencias."
+        },
+        {
+          "day": "Jueves",
+          "topic": "Funciones Agregación",
+          "task": "Valida totales de ventas y promedios mediante SQL."
+        },
+        {
+          "day": "Viernes",
+          "topic": "Data Integrity",
+          "task": "Detecta registros duplicados y valores nulos."
+        }
       ],
       "deliverables": ["Script SQL de Pruebas", "Reporte de Integridad"],
-      "resources": [
-        { "type": "code", "name": "SQL Sandbox Practice", "url": "#" }
-      ]
+      "resources": [{ "type": "code", "name": "SQL Sandbox Practice", "url": "#" }]
     },
     {
       "id": 4,
@@ -70,16 +126,34 @@
       "xp": 900,
       "objective": "Validar servicios REST sin depender de la interfaz gráfica.",
       "schedule": [
-        { "day": "Lunes", "topic": "Protocolo HTTP", "task": "Analiza Requests (Headers, Body, Status Codes)." },
-        { "day": "Martes", "topic": "Collections", "task": "Crea una colección para probar una API pública." },
-        { "day": "Miércoles", "topic": "Environments", "task": "Configura entornos de Dev, QA y Prod." },
-        { "day": "Jueves", "topic": "Scripts JS", "task": "Escribe tests en JS para validar esquemas JSON." },
-        { "day": "Viernes", "topic": "Documentation", "task": "Genera documentación técnica desde Postman." }
+        {
+          "day": "Lunes",
+          "topic": "Protocolo HTTP",
+          "task": "Analiza Requests (Headers, Body, Status Codes)."
+        },
+        {
+          "day": "Martes",
+          "topic": "Collections",
+          "task": "Crea una colección para probar una API pública."
+        },
+        {
+          "day": "Miércoles",
+          "topic": "Environments",
+          "task": "Configura entornos de Dev, QA y Prod."
+        },
+        {
+          "day": "Jueves",
+          "topic": "Scripts JS",
+          "task": "Escribe tests en JS para validar esquemas JSON."
+        },
+        {
+          "day": "Viernes",
+          "topic": "Documentation",
+          "task": "Genera documentación técnica desde Postman."
+        }
       ],
       "deliverables": ["Colección Postman JSON", "Suite de Tests de API"],
-      "resources": [
-        { "type": "flask", "name": "API Hands-on Lab", "url": "#" }
-      ]
+      "resources": [{ "type": "flask", "name": "API Hands-on Lab", "url": "#" }]
     },
     {
       "id": 5,
@@ -90,16 +164,34 @@
       "xp": 750,
       "objective": "Dominar el flujo de trabajo de un ingeniero de software.",
       "schedule": [
-        { "day": "Lunes", "topic": "Bash Básico", "task": "Navega y manipula archivos mediante Terminal." },
-        { "day": "Martes", "topic": "Git Fundamentals", "task": "Inicia un repo, haz commits y entiende el Staging." },
-        { "day": "Miércoles", "topic": "Branching", "task": "Crea ramas (feature/fix) y realiza Merges." },
-        { "day": "Jueves", "topic": "Pull Requests", "task": "Sube código y simula un Code Review." },
-        { "day": "Viernes", "topic": "Conflictos", "task": "Provoca y soluciona un conflicto de merge." }
+        {
+          "day": "Lunes",
+          "topic": "Bash Básico",
+          "task": "Navega y manipula archivos mediante Terminal."
+        },
+        {
+          "day": "Martes",
+          "topic": "Git Fundamentals",
+          "task": "Inicia un repo, haz commits y entiende el Staging."
+        },
+        {
+          "day": "Miércoles",
+          "topic": "Branching",
+          "task": "Crea ramas (feature/fix) y realiza Merges."
+        },
+        {
+          "day": "Jueves",
+          "topic": "Pull Requests",
+          "task": "Sube código y simula un Code Review."
+        },
+        {
+          "day": "Viernes",
+          "topic": "Conflictos",
+          "task": "Provoca y soluciona un conflicto de merge."
+        }
       ],
       "deliverables": ["Repo GitHub configurado"],
-      "resources": [
-        { "type": "code", "name": "Git Game Challenge", "url": "#" }
-      ]
+      "resources": [{ "type": "code", "name": "Git Game Challenge", "url": "#" }]
     },
     {
       "id": 6,
@@ -110,16 +202,34 @@
       "xp": 1200,
       "objective": "Iniciar la automatización moderna de pruebas web.",
       "schedule": [
-        { "day": "Lunes", "topic": "Setup Node.js", "task": "Instala Playwright y configura proyecto." },
-        { "day": "Martes", "topic": "Locators", "task": "Identifica elementos usando CSS y Locators." },
-        { "day": "Miércoles", "topic": "Interacciones", "task": "Automatiza clics, inputs y navegación." },
-        { "day": "Jueves", "topic": "Assertions", "task": "Valida estados de elementos (Visibility)." },
-        { "day": "Viernes", "topic": "Debugging", "task": "Usa el Inspector para debugear un script." }
+        {
+          "day": "Lunes",
+          "topic": "Setup Node.js",
+          "task": "Instala Playwright y configura proyecto."
+        },
+        {
+          "day": "Martes",
+          "topic": "Locators",
+          "task": "Identifica elementos usando CSS y Locators."
+        },
+        {
+          "day": "Miércoles",
+          "topic": "Interacciones",
+          "task": "Automatiza clics, inputs y navegación."
+        },
+        {
+          "day": "Jueves",
+          "topic": "Assertions",
+          "task": "Valida estados de elementos (Visibility)."
+        },
+        {
+          "day": "Viernes",
+          "topic": "Debugging",
+          "task": "Usa el Inspector para debugear un script."
+        }
       ],
       "deliverables": ["Primer Script Automatizado"],
-      "resources": [
-        { "type": "video", "name": "Playwright Crash Course", "url": "#" }
-      ]
+      "resources": [{ "type": "video", "name": "Playwright Crash Course", "url": "#" }]
     },
     {
       "id": 7,
@@ -130,16 +240,22 @@
       "xp": 1500,
       "objective": "Arquitectar frameworks de automatización escalables.",
       "schedule": [
-        { "day": "Lunes", "topic": "Concepto POM", "task": "Refactoriza un script separando locators." },
-        { "day": "Martes", "topic": "Clases y Métodos", "task": "Crea clases para Login y Dashboard." },
+        {
+          "day": "Lunes",
+          "topic": "Concepto POM",
+          "task": "Refactoriza un script separando locators."
+        },
+        {
+          "day": "Martes",
+          "topic": "Clases y Métodos",
+          "task": "Crea clases para Login y Dashboard."
+        },
         { "day": "Miércoles", "topic": "Data Driven", "task": "Usa archivos JSON para tus tests." },
         { "day": "Jueves", "topic": "Hooks", "task": "Implementa BeforeEach y AfterEach." },
         { "day": "Viernes", "topic": "Waits", "task": "Domina Auto-waits vs Explicit Waits." }
       ],
       "deliverables": ["Framework Base POM"],
-      "resources": [
-        { "type": "doc", "name": "POM Design Patterns", "url": "#" }
-      ]
+      "resources": [{ "type": "doc", "name": "POM Design Patterns", "url": "#" }]
     },
     {
       "id": 8,
@@ -150,16 +266,22 @@
       "xp": 1400,
       "objective": "Automatizar el backend con Playwright API Request.",
       "schedule": [
-        { "day": "Lunes", "topic": "APIRequestContext", "task": "Configura el cliente de API en Playwright." },
+        {
+          "day": "Lunes",
+          "topic": "APIRequestContext",
+          "task": "Configura el cliente de API en Playwright."
+        },
         { "day": "Martes", "topic": "POST Requests", "task": "Automatiza creación de recursos." },
-        { "day": "Miércoles", "topic": "Auth Tokens", "task": "Maneja Bearer Tokens para rutas protegidas." },
+        {
+          "day": "Miércoles",
+          "topic": "Auth Tokens",
+          "task": "Maneja Bearer Tokens para rutas protegidas."
+        },
         { "day": "Jueves", "topic": "E2E Hybrid", "task": "Crea dato por API y búscalo en la UI." },
         { "day": "Viernes", "topic": "Reporting", "task": "Integra Allure Reports." }
       ],
       "deliverables": ["API Automation Suite"],
-      "resources": [
-        { "type": "flask", "name": "Hybrid Testing Lab", "url": "#" }
-      ]
+      "resources": [{ "type": "flask", "name": "Hybrid Testing Lab", "url": "#" }]
     },
     {
       "id": 9,
@@ -172,14 +294,16 @@
       "schedule": [
         { "day": "Lunes", "topic": "CI/CD Intro", "task": "Entiende el pipeline: Build -> Test." },
         { "day": "Martes", "topic": "Workflows", "task": "Crea archivo .yml para disparar tests." },
-        { "day": "Miércoles", "topic": "Cloud Execution", "task": "Configura tests en múltiples navegadores." },
+        {
+          "day": "Miércoles",
+          "topic": "Cloud Execution",
+          "task": "Configura tests en múltiples navegadores."
+        },
         { "day": "Jueves", "topic": "Artifacts", "task": "Configura descarga de reportes." },
         { "day": "Viernes", "topic": "Cron Jobs", "task": "Programa ejecuciones nocturnas." }
       ],
       "deliverables": ["Pipeline CI/CD Funcional"],
-      "resources": [
-        { "type": "doc", "name": "GitHub Actions Docs", "url": "#" }
-      ]
+      "resources": [{ "type": "doc", "name": "GitHub Actions Docs", "url": "#" }]
     },
     {
       "id": 10,
@@ -190,16 +314,22 @@
       "xp": 1800,
       "objective": "Aprender a testear aplicaciones en dispositivos móviles.",
       "schedule": [
-        { "day": "Lunes", "topic": "Mobile Web vs Native", "task": "Identifica diferencias críticas." },
+        {
+          "day": "Lunes",
+          "topic": "Mobile Web vs Native",
+          "task": "Identifica diferencias críticas."
+        },
         { "day": "Martes", "topic": "Emuladores", "task": "Configura Android Studio local." },
-        { "day": "Miércoles", "topic": "DevTools Mobile", "task": "Inspecciona vista de dispositivo." },
+        {
+          "day": "Miércoles",
+          "topic": "DevTools Mobile",
+          "task": "Inspecciona vista de dispositivo."
+        },
         { "day": "Jueves", "topic": "Gestos", "task": "Define casos para Swipe y Pinch." },
         { "day": "Viernes", "topic": "Cloud Mobile", "task": "Prueba app en BrowserStack." }
       ],
       "deliverables": ["Estrategia Mobile Testing"],
-      "resources": [
-        { "type": "video", "name": "Appium for Beginners", "url": "#" }
-      ]
+      "resources": [{ "type": "video", "name": "Appium for Beginners", "url": "#" }]
     },
     {
       "id": 11,
@@ -217,9 +347,7 @@
         { "day": "Viernes", "topic": "Latency Analysis", "task": "Identifica cuellos de botella." }
       ],
       "deliverables": ["Reporte Lighthouse", "Script K6"],
-      "resources": [
-        { "type": "code", "name": "K6 Load Test Script", "url": "#" }
-      ]
+      "resources": [{ "type": "code", "name": "K6 Load Test Script", "url": "#" }]
     },
     {
       "id": 12,
@@ -230,24 +358,66 @@
       "xp": 3000,
       "objective": "Consolidar todo el aprendizaje en un proyecto de élite.",
       "schedule": [
-        { "day": "Lunes", "topic": "Plan Maestro", "task": "Define el Plan de Pruebas del proyecto." },
+        {
+          "day": "Lunes",
+          "topic": "Plan Maestro",
+          "task": "Define el Plan de Pruebas del proyecto."
+        },
         { "day": "Martes", "topic": "E2E Execution", "task": "Combina API + UI en una suite." },
-        { "day": "Miércoles", "topic": "GitHub README", "task": "Organiza el repo profesionalmente." },
+        {
+          "day": "Miércoles",
+          "topic": "GitHub README",
+          "task": "Organiza el repo profesionalmente."
+        },
         { "day": "Jueves", "topic": "Simulacro Interview", "task": "Prepara respuestas técnicas." },
         { "day": "Viernes", "topic": "Graduación", "task": "Presenta el dashboard final." }
       ],
       "deliverables": ["Portafolio Final QA Engineer"],
-      "resources": [
-        { "type": "flask", "name": "Final Lab Challenge", "url": "#" }
-      ]
+      "resources": [{ "type": "flask", "name": "Final Lab Challenge", "url": "#" }]
     }
   ],
   "tools": [
-    { "category": "api", "name": "JSON Placeholder", "desc": "API falsa para pruebas de frontend.", "url": "https://jsonplaceholder.typicode.com/", "icon": "fa-database" },
-    { "category": "api", "name": "JSON Schema Validator", "desc": "Valida estructuras JSON contra schemas.", "url": "https://www.jsonschemavalidator.net/", "icon": "fa-check-double" },
-    { "category": "automation", "name": "SelectorsHub", "desc": "La herramienta #1 para XPath y CSS Selectors.", "url": "https://selectorshub.com/", "icon": "fa-crosshairs" },
-    { "category": "automation", "name": "Playwright Codegen", "desc": "Genera código grabando tu navegación.", "url": "https://playwright.dev/docs/codegen", "icon": "fa-code" },
-    { "category": "docs", "name": "ISTQB Glossary", "desc": "Términos oficiales de certificación.", "url": "https://glossary.istqb.org/", "icon": "fa-book" },
-    { "category": "docs", "name": "Git Cheat Sheet", "desc": "Comandos esenciales para versionado.", "url": "https://education.github.com/git-cheat-sheet-education.pdf", "icon": "fa-terminal" }
+    {
+      "category": "api",
+      "name": "JSON Placeholder",
+      "desc": "API falsa para pruebas de frontend.",
+      "url": "https://jsonplaceholder.typicode.com/",
+      "icon": "fa-database"
+    },
+    {
+      "category": "api",
+      "name": "JSON Schema Validator",
+      "desc": "Valida estructuras JSON contra schemas.",
+      "url": "https://www.jsonschemavalidator.net/",
+      "icon": "fa-check-double"
+    },
+    {
+      "category": "automation",
+      "name": "SelectorsHub",
+      "desc": "La herramienta #1 para XPath y CSS Selectors.",
+      "url": "https://selectorshub.com/",
+      "icon": "fa-crosshairs"
+    },
+    {
+      "category": "automation",
+      "name": "Playwright Codegen",
+      "desc": "Genera código grabando tu navegación.",
+      "url": "https://playwright.dev/docs/codegen",
+      "icon": "fa-code"
+    },
+    {
+      "category": "docs",
+      "name": "ISTQB Glossary",
+      "desc": "Términos oficiales de certificación.",
+      "url": "https://glossary.istqb.org/",
+      "icon": "fa-book"
+    },
+    {
+      "category": "docs",
+      "name": "Git Cheat Sheet",
+      "desc": "Comandos esenciales para versionado.",
+      "url": "https://education.github.com/git-cheat-sheet-education.pdf",
+      "icon": "fa-terminal"
+    }
   ]
 }

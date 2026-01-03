@@ -4,8 +4,8 @@
  */
 
 export const UIComponents = {
-    templates: {
-        navbar: `
+  templates: {
+    navbar: `
         <nav class="fixed top-0 left-0 w-full glass-panel z-50 px-8 h-16 flex justify-between items-center border-b border-white/5 bg-slate-950/50 backdrop-blur-xl">
             <div class="flex items-center space-x-2">
                 <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black text-white italic shadow-lg shadow-blue-900/40">QA</div>
@@ -24,7 +24,7 @@ export const UIComponents = {
             </div>
         </nav>
         `,
-        footer: `
+    footer: `
         <footer class="relative z-50 mt-20 pt-8 border-t border-white/5 pb-12 px-6 bg-slate-950">
             <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
                 <div class="flex flex-col">
@@ -33,38 +33,41 @@ export const UIComponents = {
                 </div>
             </div>
         </footer>
-        `
-    },
+        `,
+  },
 
-    init() {
-        this.render();
-        this.highlightActiveLink();
-    },
+  init() {
+    this.render();
+    this.highlightActiveLink();
+  },
 
-    render() {
-        // Inyectar Navbar
-        const headerContainer = document.createElement('div');
-        headerContainer.innerHTML = this.templates.navbar;
-        document.body.prepend(headerContainer);
+  render() {
+    // Inyectar Navbar
+    const headerContainer = document.createElement('div');
+    headerContainer.innerHTML = this.templates.navbar;
+    document.body.prepend(headerContainer);
 
-        // Inyectar Footer
-        const footerContainer = document.createElement('div');
-        footerContainer.innerHTML = this.templates.footer;
-        document.body.appendChild(footerContainer);
-    },
+    // Inyectar Footer
+    const footerContainer = document.createElement('div');
+    footerContainer.innerHTML = this.templates.footer;
+    document.body.appendChild(footerContainer);
+  },
 
-    highlightActiveLink() {
-        const currentPath = window.location.pathname;
-        const links = document.querySelectorAll('.nav-item');
+  highlightActiveLink() {
+    const currentPath = window.location.pathname;
+    const links = document.querySelectorAll('.nav-item');
 
-        links.forEach(link => {
-            const linkPath = link.getAttribute('href');
-            // Verificamos si el path actual termina con el href del link
-            // Agregamos lógica para manejar parámetros (como ?topic=...)
-            if (currentPath.includes(linkPath) || (currentPath.endsWith('/') && linkPath === 'index.html')) {
-                link.classList.remove('text-slate-400');
-                link.classList.add('text-white', 'border-b-2', 'border-blue-500', 'pb-1');
-            }
-        });
-    }
+    links.forEach(link => {
+      const linkPath = link.getAttribute('href');
+      // Verificamos si el path actual termina con el href del link
+      // Agregamos lógica para manejar parámetros (como ?topic=...)
+      if (
+        currentPath.includes(linkPath) ||
+        (currentPath.endsWith('/') && linkPath === 'index.html')
+      ) {
+        link.classList.remove('text-slate-400');
+        link.classList.add('text-white', 'border-b-2', 'border-blue-500', 'pb-1');
+      }
+    });
+  },
 };

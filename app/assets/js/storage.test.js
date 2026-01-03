@@ -5,11 +5,11 @@ const localStorageMock = (() => {
   let store = {};
 
   return {
-    getItem: (key) => store[key] || null,
+    getItem: key => store[key] || null,
     setItem: (key, value) => {
       store[key] = value.toString();
     },
-    removeItem: (key) => {
+    removeItem: key => {
       delete store[key];
     },
     clear: () => {
@@ -18,10 +18,10 @@ const localStorageMock = (() => {
     get length() {
       return Object.keys(store).length;
     },
-    key: (index) => {
+    key: index => {
       const keys = Object.keys(store);
       return keys[index] || null;
-    }
+    },
   };
 })();
 
@@ -34,7 +34,7 @@ const KEYS = {
   PROGRESS: 'qa_master_progress',
   SUBTASKS: 'qa_subtask_progress',
   NOTES: 'qa_module_notes',
-  BADGES: 'qa_celebrated_badges'
+  BADGES: 'qa_celebrated_badges',
 };
 
 const StorageService = {
@@ -74,7 +74,7 @@ const StorageService = {
     subProgress[key] = !subProgress[key];
     this.save(KEYS.SUBTASKS, subProgress);
     return subProgress[key];
-  }
+  },
 };
 
 // ==================== TESTS ====================
@@ -106,7 +106,7 @@ describe('StorageService', () => {
 
     it('debería manejar JSON corrupto sin crashear', () => {
       localStorage.setItem(KEYS.PROGRESS, 'invalid-json{');
-      
+
       const result = StorageService.get(KEYS.PROGRESS);
       expect(result).toEqual({});
     });
@@ -115,9 +115,9 @@ describe('StorageService', () => {
   describe('save()', () => {
     it('debería guardar datos correctamente', () => {
       const testData = { module1: true };
-      
+
       const success = StorageService.save(KEYS.PROGRESS, testData);
-      
+
       expect(success).toBe(true);
       const stored = localStorage.getItem(KEYS.PROGRESS);
       expect(stored).toBe(JSON.stringify(testData));
@@ -132,9 +132,9 @@ describe('StorageService', () => {
   describe('toggleProgress()', () => {
     it('debería activar progreso de un módulo', () => {
       const result = StorageService.toggleProgress(1, true);
-      
+
       expect(result).toBe(true);
-      
+
       const progress = StorageService.get(KEYS.PROGRESS);
       expect(progress[1]).toBe(true);
     });
@@ -142,9 +142,9 @@ describe('StorageService', () => {
     it('debería desactivar progreso de un módulo', () => {
       StorageService.toggleProgress(1, true);
       const result = StorageService.toggleProgress(1, false);
-      
+
       expect(result).toBe(false);
-      
+
       const progress = StorageService.get(KEYS.PROGRESS);
       expect(progress[1]).toBe(false);
     });
@@ -153,7 +153,7 @@ describe('StorageService', () => {
       StorageService.toggleProgress(1, true);
       StorageService.toggleProgress(2, true);
       StorageService.toggleProgress(1, false);
-      
+
       const progress = StorageService.get(KEYS.PROGRESS);
       expect(progress[1]).toBe(false);
       expect(progress[2]).toBe(true);
@@ -163,9 +163,9 @@ describe('StorageService', () => {
   describe('toggleSubtask()', () => {
     it('debería activar una subtarea', () => {
       const result = StorageService.toggleSubtask(1, 0);
-      
+
       expect(result).toBe(true);
-      
+
       const subProgress = StorageService.get(KEYS.SUBTASKS);
       expect(subProgress['1-0']).toBe(true);
     });
@@ -173,10 +173,10 @@ describe('StorageService', () => {
     it('debería alternar estado de subtarea (toggle)', () => {
       const first = StorageService.toggleSubtask(1, 0);
       expect(first).toBe(true);
-      
+
       const second = StorageService.toggleSubtask(1, 0);
       expect(second).toBe(false);
-      
+
       const third = StorageService.toggleSubtask(1, 0);
       expect(third).toBe(true);
     });
@@ -185,7 +185,7 @@ describe('StorageService', () => {
       StorageService.toggleSubtask(1, 0);
       StorageService.toggleSubtask(1, 1);
       StorageService.toggleSubtask(2, 0);
-      
+
       const subProgress = StorageService.get(KEYS.SUBTASKS);
       expect(subProgress['1-0']).toBe(true);
       expect(subProgress['1-1']).toBe(true);
@@ -204,10 +204,10 @@ describe('StorageService', () => {
       for (let i = 0; i < 10000; i++) {
         largeData[`key${i}`] = `value${i}`;
       }
-      
+
       const success = StorageService.save('test_large', largeData);
       expect(success).toBe(true);
-      
+
       const retrieved = StorageService.get('test_large');
       expect(Object.keys(retrieved).length).toBe(10000);
     });
