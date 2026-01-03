@@ -4,10 +4,10 @@
   "description": "Plataforma educativa gamificada para QA Engineers",
   "main": "index.html",
   "scripts": {
-    "dev": "echo 'Servidor de desarrollo configurado más adelante'",
-    "build": "echo 'Build configurado más adelante'",
-    "test": "echo 'Tests configurados más adelante'",
-    "lint": "echo 'Linter configurado más adelante'"
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [
     "qa",
