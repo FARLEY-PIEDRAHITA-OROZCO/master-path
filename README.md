@@ -2,9 +2,6 @@
 
 > Plataforma educativa gamificada para convertirse en QA Automation Engineer en 12 semanas
 
-![CI Pipeline badge indicating the current status of the Continuous Integration process for the QA Master Path project. The badge displays the text "CI Pipeline" and visually represents whether the build is passing or failing. This information is crucial for assessing the project's code quality and integration health, ensuring that the application is functioning as intended.](https://github.com/FARLEY-PIEDRAHITA-OROZCO/qa-master-path/workflows/CI%20Pipeline/badge.svg)
-![Coverage badge displaying the percentage of code covered by tests for the QA Master Path project on the main branch. The badge features a graph that visually represents the project's testing effectiveness, indicating how well the code is tested. The text on the badge shows the exact percentage of coverage, providing essential information for assessing code quality and reliability.](https://codecov.io/gh/FARLEY-PIEDRAHITA-OROZCO/qa-master-path/branch/main/graph/badge.svg)
-
 ## 📋 ¿Qué es esto?
 
 Aplicación web educativa que guía a testers manuales en su transformación a QA Automation Engineers mediante:
