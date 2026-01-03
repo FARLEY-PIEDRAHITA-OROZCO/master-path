@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "description": "Plataforma educativa gamificada para QA Engineers",
   "main": "index.html",
+  "type": "module",
   "scripts": {
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "lint": "eslint 'assets/js/**/*.js'",
-    "lint:fix": "eslint 'assets/js/**/*.js' --fix",
+    "lint": "eslint \"app/assets/js/**/*.{js,jsx}\"",
+    "lint:fix": "eslint \"app/assets/js/**/*.{js,jsx}\" --fix",
     "format": "prettier --write 'assets/**/*.{js,css,html,json}'",
     "format:check": "prettier --check 'assets/**/*.{js,css,html,json}'"
   },
