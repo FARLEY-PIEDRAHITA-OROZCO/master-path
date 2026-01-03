@@ -14,12 +14,12 @@ function getBasePath() {
 export function requireAuth() {
   console.log('🔐 [AUTH-GUARD] Verificando autenticación...');
   
-  // Crear un timeout de 5 segundos para evitar loading infinito
+  // Crear un timeout de 8 segundos para evitar loading infinito
   const timeout = new Promise((resolve) => {
     setTimeout(() => {
       console.warn('⚠️ [AUTH-GUARD] Timeout alcanzado - Firebase no responde');
       resolve({ timeout: true });
-    }, 5000);
+    }, 8000);
   });
   
   // Carrera entre la inicialización y el timeout
