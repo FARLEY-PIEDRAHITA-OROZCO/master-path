@@ -30,6 +30,12 @@ class AuthService {
   init() {
     console.log('🔥 [AUTH-SERVICE] Iniciando servicio de autenticación...');
     
+    // OPTIMIZACIÓN: Si ya está inicializado, resolver inmediatamente con el usuario actual
+    if (this.isInitialized) {
+      console.log('⚡ [AUTH-SERVICE] Ya inicializado, retornando usuario actual');
+      return Promise.resolve(this.currentUser);
+    }
+    
     return new Promise((resolve, reject) => {
       try {
         // Timeout de 7 segundos para la inicialización
