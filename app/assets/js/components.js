@@ -104,7 +104,6 @@ export const UIComponents = {
     const menuBtn = document.getElementById('user-menu-btn');
     const dropdown = document.getElementById('user-dropdown');
     const logoutBtn = document.getElementById('logout-btn');
-    const userEmailDisplay = document.getElementById('user-email-display');
 
     if (!menuBtn || !dropdown || !logoutBtn) {
       console.log('[COMPONENTS] User menu elements not found - skipping setup');
@@ -115,6 +114,11 @@ export const UIComponents = {
     menuBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       dropdown.classList.toggle('hidden');
+      
+      // Refresh user info when opening dropdown
+      if (!dropdown.classList.contains('hidden')) {
+        this.loadUserInfo();
+      }
     });
 
     // Close dropdown when clicking outside
@@ -157,14 +161,20 @@ export const UIComponents = {
       }
     });
 
-    // Display user email
-    this.loadUserEmail(userEmailDisplay);
+    // Load user info initially
+    this.loadUserInfo();
   },
 
-  async loadUserEmail(displayElement) {
+  async loadUserInfo() {
+    const nameDisplay = document.getElementById('user-name-display');
+    const emailDisplay = document.getElementById('user-email-display');
+    const rankDisplay = document.getElementById('user-rank-display');
+    const xpDisplay = document.getElementById('user-xp-display');
+
     try {
-      // Importar authService dinámicamente
+      // Importar authService y AppEngine dinámicamente
       const { authService } = await import('./auth-service.js');
+      const { AppEngine } = await import('./app.js');
       
       // Esperar a que authService esté inicializado
       if (!authService.isInitialized) {
@@ -173,16 +183,60 @@ export const UIComponents = {
       
       const user = authService.getCurrentUser();
       
-      if (user && user.email && displayElement) {
-        displayElement.textContent = user.email;
-      } else if (displayElement) {
-        displayElement.textContent = 'Usuario';
+      if (user) {
+        // Mostrar nombre
+        if (nameDisplay) {
+          nameDisplay.textContent = user.displayName || 'Usuario';
+        }
+        
+        // Mostrar email
+        if (emailDisplay) {
+          emailDisplay.textContent = user.email || 'Sin email';
+        }
+        
+        // Obtener estadísticas del usuario
+        try {
+          // Asegurar que AppEngine esté inicializado
+          if (!AppEngine.modules || AppEngine.modules.length === 0) {
+            await AppEngine.init();
+          }
+          
+          const stats = AppEngine.getAnalytics();
+          
+          // Mostrar XP
+          if (xpDisplay) {
+            xpDisplay.textContent = `${stats.xp.toLocaleString()} XP`;
+          }
+          
+          // Calcular y mostrar rango
+          if (rankDisplay) {
+            const ranks = [
+              { min: 10000, name: 'Senior QA Automation' },
+              { min: 5000, name: 'QA Engineer Mid' },
+              { min: 1000, name: 'Technical QA Tester' },
+              { min: 0, name: 'Junior Talent' },
+            ];
+            const currentRank = ranks.find(r => stats.xp >= r.min);
+            rankDisplay.textContent = currentRank ? currentRank.name : 'Junior Talent';
+          }
+        } catch (statsError) {
+          console.warn('[COMPONENTS] Error al cargar estadísticas:', statsError);
+          if (xpDisplay) xpDisplay.textContent = '0 XP';
+          if (rankDisplay) rankDisplay.textContent = 'Junior Talent';
+        }
+      } else {
+        // No hay usuario - valores por defecto
+        if (nameDisplay) nameDisplay.textContent = 'Usuario';
+        if (emailDisplay) emailDisplay.textContent = 'No autenticado';
+        if (xpDisplay) xpDisplay.textContent = '0 XP';
+        if (rankDisplay) rankDisplay.textContent = 'Junior Talent';
       }
     } catch (error) {
-      console.error('❌ [COMPONENTS] Error al cargar email del usuario:', error);
-      if (displayElement) {
-        displayElement.textContent = 'Usuario';
-      }
+      console.error('❌ [COMPONENTS] Error al cargar información del usuario:', error);
+      if (nameDisplay) nameDisplay.textContent = 'Usuario';
+      if (emailDisplay) emailDisplay.textContent = 'Error al cargar';
+      if (xpDisplay) xpDisplay.textContent = '0 XP';
+      if (rankDisplay) rankDisplay.textContent = 'Junior Talent';
     }
   },
 };
