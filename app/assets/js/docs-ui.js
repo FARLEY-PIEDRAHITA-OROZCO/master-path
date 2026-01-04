@@ -10,16 +10,27 @@ const DocsEngine = {
   currentTopic: null,
 
   async init() {
+    console.log('📚 [DOCS] Inicializando sistema de documentación...');
     UIComponents.init();
     try {
       // Cargar manifest.json con metadata
+      console.log('📚 [DOCS] Cargando manifest.json desde /docs/manifest.json');
       const response = await fetch('/docs/manifest.json');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: No se pudo cargar manifest.json`);
+      }
+      
       this.manifest = await response.json();
+      console.log('✅ [DOCS] Manifest cargado:', this.manifest.blocks.length, 'bloques');
       
       this.renderMenu();
+      console.log('✅ [DOCS] Menú renderizado');
+      
       await this.handleNavigation();
+      console.log('✅ [DOCS] Navegación inicializada');
     } catch (e) {
-      console.error('Error cargando documentación:', e);
+      console.error('❌ [DOCS] Error cargando documentación:', e);
       this.showError('Error al cargar la documentación. Por favor, intenta de nuevo.');
     }
   },
