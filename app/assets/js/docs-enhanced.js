@@ -136,11 +136,11 @@ const DocsEngine = {
 
           return `
             <div class="mb-8">
-              <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-3 mb-4">
                 <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">
                   ${block.title}
                 </h4>
-                <span class="text-[9px] px-2 py-1 rounded-full bg-blue-500/10 text-blue-400 font-bold">
+                <span class="px-3 py-1.5 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-400/30 text-blue-300 text-xs font-bold shadow-lg" title="Categoría del bloque">
                   ${block.badge}
                 </span>
               </div>
