@@ -380,8 +380,18 @@ main {
   margin-bottom: 2rem;
 }
 
-/* Mejoras adicionales para el contenido centrado - SOLUCIÓN CORRECTA DEFINITIVA */
-/* El problema: El TOC está fixed en la derecha y ocupa espacio, el contenido debe centrarse entre el sidebar y el TOC */
+/* SOLUCIÓN DEFINITIVA: Centrado del contenido considerando sidebar y TOC */
+/* 
+  Análisis del layout:
+  - Sidebar izquierdo: w-72 (288px) - fixed left
+  - TOC derecho: w-64 (256px) + right-8 (32px) = 288px total - fixed right, solo visible en xl+
+  - Contenido: max-w-3xl (768px) - debe centrarse en el espacio disponible
+  
+  En pantallas xl+:
+  - Espacio ocupado por elementos fixed: 288px (left) + 288px (right) = 576px
+  - El main tiene ml-72 (288px) para compensar el sidebar
+  - Necesitamos compensar también el espacio del TOC en la derecha
+*/
 
 main.ml-72 {
   display: block !important;
@@ -391,37 +401,50 @@ main.ml-72 {
 #doc-content {
   display: block;
   width: 100%;
-  max-width: 48rem !important; /* max-w-3xl = 48rem */
+  max-width: 48rem !important; /* max-w-3xl = 48rem = 768px */
   margin-left: auto !important;
   margin-right: auto !important;
   padding-left: 0;
   padding-right: 0;
 }
 
-/* En pantallas grandes (xl), cuando el TOC es visible, ajustar el centrado */
+/* En pantallas grandes (xl: 1280px+), compensar el espacio del TOC */
 @media (min-width: 1280px) {
   main.ml-72 {
-    /* El TOC ocupa 256px (w-64) + 32px (right-8) = 288px en la derecha */
-    padding-right: 288px;
+    /* Agregar margen derecho para compensar el TOC que ocupa ~288px */
+    margin-right: 288px;
   }
   
+  /* El contenido ahora se centrará en el espacio real disponible */
   #doc-content {
-    /* Ahora el contenido se centrará en el espacio disponible real */
+    max-width: 48rem !important;
     margin-left: auto !important;
     margin-right: auto !important;
   }
-}
-
-#doc-toolbar {
-  max-width: 48rem;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* En pantallas xl, el toolbar también debe considerar el espacio del TOC */
-@media (min-width: 1280px) {
+  
   #doc-toolbar {
-    margin-right: calc(auto + 144px); /* La mitad de 288px para mantener centrado */
+    max-width: 48rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* En pantallas menores a xl, el TOC está oculto, centrado normal */
+@media (max-width: 1279px) {
+  main.ml-72 {
+    margin-right: 0;
+  }
+  
+  #doc-content {
+    max-width: 48rem !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  
+  #doc-toolbar {
+    max-width: 48rem;
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
