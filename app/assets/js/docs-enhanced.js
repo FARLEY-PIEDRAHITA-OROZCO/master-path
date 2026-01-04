@@ -136,7 +136,7 @@ const DocsEngine = {
 
           return `
             <div class="mb-8">
-              <div class="flex items-center gap-3 mb-4">
+              <div class="flex items-baseline gap-2 mb-4">
                 <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">
                   ${block.title}
                 </h4>
