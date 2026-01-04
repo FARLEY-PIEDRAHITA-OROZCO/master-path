@@ -140,7 +140,7 @@ const DocsEngine = {
                 <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">
                   ${block.title}
                 </h4>
-                <span class="px-3 py-1.5 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-400/30 text-blue-300 text-xs font-bold shadow-lg" title="Categoría del bloque">
+                <span class="block-badge" title="${block.badge} - Categoría del bloque">
                   ${block.badge}
                 </span>
               </div>
