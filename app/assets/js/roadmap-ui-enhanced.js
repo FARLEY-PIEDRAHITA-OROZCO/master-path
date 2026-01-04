@@ -117,12 +117,16 @@ function renderRoadmap() {
   const progress = StorageService.get(KEYS.PROGRESS);
   const subProgress = StorageService.get(KEYS.SUBTASKS);
   const notes = StorageService.get(KEYS.NOTES);
+  
+  console.log('🔄 Renderizando roadmap con progreso:', progress);
 
   container.innerHTML = AppEngine.modules
     .map((m, index) => {
       // Determinar estado del módulo
       const state = getModuleState(m, index);
       const isLocked = state === 'locked';
+      
+      console.log(`📦 Módulo ${m.id} (${m.title}): estado = ${state}, index = ${index}`);
       
       // Cálculo de progreso interno del módulo
       const totalTasks = m.schedule.length;
