@@ -78,6 +78,27 @@
             </div>
         </header>
 
+        <!-- Continuar donde lo dejaste -->
+        <section id="continue-section" class="hidden glass-panel p-8 rounded-[3rem] border-2 border-blue-500/30 mb-12 relative overflow-hidden bg-gradient-to-br from-blue-600/10 to-transparent">
+            <div class="absolute top-0 right-0 p-8 opacity-10">
+                <i class="fas fa-arrow-right text-8xl text-blue-500"></i>
+            </div>
+            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div>
+                    <h2 class="text-xs font-black text-blue-400 uppercase tracking-[0.3em] mb-2 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                        Continuar donde lo dejaste
+                    </h2>
+                    <p class="text-2xl font-bold text-white mb-2" id="continue-module-title">Cargando...</p>
+                    <p class="text-sm text-slate-400 italic" id="continue-module-progress">0 de 0 tareas completadas</p>
+                </div>
+                <a href="roadmap.html" id="continue-button" data-testid="continue-sprint-button" class="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-black text-sm uppercase tracking-widest rounded-2xl shadow-xl shadow-blue-600/30 hover:shadow-blue-600/50 transition-all transform hover:scale-105 flex items-center gap-3">
+                    <span>Continuar Sprint</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </section>
+
         <section class="glass-panel p-10 rounded-[3rem] border border-white/5 mb-12 relative overflow-hidden">
             <div class="relative z-10">
                 <div class="flex justify-between items-end mb-6">
@@ -90,6 +111,53 @@
                 <div class="h-4 w-full bg-white/5 rounded-full overflow-hidden border border-white/5 p-1">
                     <div id="global-progress-bar" class="h-full bg-gradient-to-r from-blue-600 to-indigo-500 rounded-full transition-all duration-1000 shadow-[0_0_20px_rgba(37,99,235,0.4)]" style="width: 0%"></div>
                 </div>
+            </div>
+        </section>
+
+        <!-- Estadísticas Expandidas -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <!-- Sprints Completados -->
+            <div class="glass-panel p-6 rounded-[2rem] border border-white/5">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                        <i class="fas fa-check-circle text-emerald-500 text-xl"></i>
+                    </div>
+                    <span class="text-3xl font-black text-white italic" id="completed-count">0</span>
+                </div>
+                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Sprints Completados</p>
+                <p class="text-xs text-slate-600 mt-1" id="completed-percentage">0% del total</p>
+            </div>
+
+            <!-- Tiempo Estimado -->
+            <div class="glass-panel p-6 rounded-[2rem] border border-white/5">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                        <i class="fas fa-clock text-blue-500 text-xl"></i>
+                    </div>
+                    <span class="text-3xl font-black text-white italic" id="time-remaining">0h</span>
+                </div>
+                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Tiempo Restante</p>
+                <p class="text-xs text-slate-600 mt-1" id="time-completed">0h completadas</p>
+            </div>
+
+            <!-- Racha Actual -->
+            <div class="glass-panel p-6 rounded-[2rem] border border-white/5">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center">
+                        <i class="fas fa-fire text-amber-500 text-xl"></i>
+                    </div>
+                    <span class="text-3xl font-black text-white italic" id="streak-count">0</span>
+                </div>
+                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Días de Racha</p>
+                <p class="text-xs text-slate-600 mt-1">Última actividad hoy</p>
+            </div>
+        </section>
+
+        <!-- Progreso por Fase -->
+        <section class="glass-panel p-10 rounded-[3rem] border border-white/5 mb-12">
+            <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] mb-8">Progreso por Fase</h3>
+            <div class="space-y-6" id="phase-progress-container">
+                <!-- Se llenará dinámicamente -->
             </div>
         </section>
 
