@@ -166,7 +166,8 @@ function attachEventListeners() {
     input.onchange = () => {
       const [mId, tIdx] = input.dataset.task.split('-');
       StorageService.toggleSubtask(mId, tIdx);
-      renderRoadmap();
+      // En lugar de re-renderizar todo, solo actualizar el progreso del módulo
+      updateModuleProgress(mId);
     };
   });
 
