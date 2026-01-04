@@ -1,6 +1,6 @@
 import { AppEngine } from './app.js';
 import { UIComponents } from './components.js';
-import { Logger } from './storage.js';
+import { Logger } from './logger.js';
 import { requireAuth } from './auth-guard.js';
 
 // ⚠️ CRÍTICO: Verificar autenticación PRIMERO antes de cargar nada
