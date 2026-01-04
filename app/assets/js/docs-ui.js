@@ -36,13 +36,21 @@ const DocsEngine = {
   },
 
   renderMenu() {
+    console.log('📚 [DOCS] Renderizando menú...');
     const menu = document.getElementById('doc-menu');
     
+    if (!menu) {
+      console.error('❌ [DOCS] Elemento #doc-menu no encontrado');
+      return;
+    }
+    
     if (!this.manifest || !this.manifest.blocks) {
+      console.error('❌ [DOCS] Manifest inválido o sin bloques');
       menu.innerHTML = '<p class="text-red-400">Error: No se pudo cargar el menú</p>';
       return;
     }
 
+    console.log('📚 [DOCS] Generando HTML del menú para', this.manifest.blocks.length, 'bloques');
     menu.innerHTML = this.manifest.blocks
       .map(block => {
         // Skip blocks without docs
