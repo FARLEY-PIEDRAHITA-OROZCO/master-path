@@ -164,10 +164,11 @@ function attachEventListeners() {
   });
 
   document.querySelectorAll('[data-task]').forEach(input => {
-    input.onchange = () => {
+    input.onchange = async () => {
       const [mId, tIdx] = input.dataset.task.split('-');
-      StorageService.toggleSubtask(mId, tIdx);
-      // En lugar de re-renderizar todo, solo actualizar el progreso del módulo
+      // Esperar a que se guarde el estado antes de actualizar la UI
+      await StorageService.toggleSubtask(mId, tIdx);
+      // Ahora actualizar el progreso del módulo
       updateModuleProgress(mId);
     };
   });
