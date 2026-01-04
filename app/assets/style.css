@@ -380,7 +380,9 @@ main {
   margin-bottom: 2rem;
 }
 
-/* Mejoras adicionales para el contenido centrado - SOLUCIÓN AGRESIVA */
+/* Mejoras adicionales para el contenido centrado - SOLUCIÓN CORRECTA DEFINITIVA */
+/* El problema: El TOC está fixed en la derecha y ocupa espacio, el contenido debe centrarse entre el sidebar y el TOC */
+
 main.ml-72 {
   display: block !important;
   position: relative;
@@ -396,10 +398,31 @@ main.ml-72 {
   padding-right: 0;
 }
 
+/* En pantallas grandes (xl), cuando el TOC es visible, ajustar el centrado */
+@media (min-width: 1280px) {
+  main.ml-72 {
+    /* El TOC ocupa 256px (w-64) + 32px (right-8) = 288px en la derecha */
+    padding-right: 288px;
+  }
+  
+  #doc-content {
+    /* Ahora el contenido se centrará en el espacio disponible real */
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
 #doc-toolbar {
   max-width: 48rem;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* En pantallas xl, el toolbar también debe considerar el espacio del TOC */
+@media (min-width: 1280px) {
+  #doc-toolbar {
+    margin-right: calc(auto + 144px); /* La mitad de 288px para mantener centrado */
+  }
 }
 
 /* Asegurar que la tabla de contenidos tenga suficiente espacio inferior */
