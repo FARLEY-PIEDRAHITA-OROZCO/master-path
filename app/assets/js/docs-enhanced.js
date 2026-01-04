@@ -232,12 +232,12 @@ const DocsEngine = {
     const main = document.querySelector('main.ml-72');
     if (!main) return;
     
-    // Insertar TOC flotante
+    // Insertar TOC flotante - Ajustado para no chocar con toolbar
     const toc = document.createElement('div');
     toc.id = 'table-of-contents';
-    toc.className = 'fixed right-8 top-32 w-64 hidden xl:block';
+    toc.className = 'fixed right-8 top-48 w-64 hidden xl:block';
     toc.innerHTML = `
-      <div class="glass-panel rounded-2xl p-6 border border-white/5 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
+      <div class="glass-panel rounded-2xl p-6 border border-white/5 max-h-[calc(100vh-250px)] overflow-y-auto custom-scrollbar">
         <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">En esta página</h4>
         <nav id="toc-links" class="space-y-2"></nav>
       </div>
