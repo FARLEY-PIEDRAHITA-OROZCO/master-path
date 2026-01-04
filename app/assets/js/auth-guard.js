@@ -14,6 +14,13 @@ function getBasePath() {
 export function requireAuth() {
   console.log('🔐 [AUTH-GUARD] Verificando autenticación...');
   
+  // OPTIMIZACIÓN: Si authService ya está inicializado y tiene usuario, ocultar loading inmediatamente
+  if (authService.isInitialized && authService.getCurrentUser()) {
+    console.log('⚡ [AUTH-GUARD] Usuario ya autenticado en cache, carga instantánea');
+    hideAuthLoading();
+    return;
+  }
+  
   // Crear un timeout de 8 segundos para evitar loading infinito
   const timeout = new Promise((resolve) => {
     setTimeout(() => {
