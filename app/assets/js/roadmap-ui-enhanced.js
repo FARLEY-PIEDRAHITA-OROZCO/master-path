@@ -299,7 +299,7 @@ function attachEventListeners() {
   });
 
   document.querySelectorAll('[data-finalize]').forEach(btn => {
-    btn.onclick = () => {
+    btn.onclick = async () => {
       const mId = btn.dataset.finalize;
       const currentStatus = StorageService.get(KEYS.PROGRESS)[mId];
       
@@ -308,7 +308,10 @@ function attachEventListeners() {
         showSprintCompletionCelebration();
       }
       
-      StorageService.toggleProgress(mId, !currentStatus);
+      // Esperar a que se guarde antes de re-renderizar
+      await StorageService.toggleProgress(mId, !currentStatus);
+      
+      // Re-renderizar con datos actualizados
       renderRoadmap();
       updateGlobalProgress();
     };
