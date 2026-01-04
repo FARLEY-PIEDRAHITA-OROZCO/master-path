@@ -229,9 +229,9 @@ export const StorageService = {
    * Alterna el progreso de un módulo
    * @param {number|string} id - ID del módulo
    * @param {boolean} isChecked - Estado del checkbox
-   * @returns {boolean} Nuevo estado
+   * @returns {Promise<boolean>} Nuevo estado
    */
-  toggleProgress(id, isChecked) {
+  async toggleProgress(id, isChecked) {
     try {
       // Validar ID
       if (!Validator.isValidModuleId(id)) {
@@ -242,7 +242,7 @@ export const StorageService = {
       const progress = this.get(KEYS.PROGRESS);
       progress[id] = Boolean(isChecked);
 
-      const saved = this.syncWithFirestore(KEYS.PROGRESS, progress);
+      const saved = await this.syncWithFirestore(KEYS.PROGRESS, progress);
 
       if (saved) {
         Logger.info('Progress toggled', { moduleId: id, isChecked });
