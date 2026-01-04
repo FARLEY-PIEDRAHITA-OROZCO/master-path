@@ -326,7 +326,17 @@ main {
 
 /* Mejoras en el toolbar */
 #doc-toolbar {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  margin-bottom: 2rem;
+}
+
+/* Asegurar que la tabla de contenidos no choque con el toolbar */
+#table-of-contents {
+  transition: top 0.3s ease;
+}
+
+body.focus-mode #table-of-contents {
+  display: none;
 }
 
 /* Hover effect en doc-links del menú */
