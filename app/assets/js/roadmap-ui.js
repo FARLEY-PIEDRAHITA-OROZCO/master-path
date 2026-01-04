@@ -166,8 +166,13 @@ function attachEventListeners() {
   document.querySelectorAll('[data-task]').forEach(input => {
     input.onchange = async () => {
       const [mId, tIdx] = input.dataset.task.split('-');
+      console.log('🔄 Checkbox cambiado:', { moduleId: mId, taskIndex: tIdx, checked: input.checked });
+      
       // Esperar a que se guarde el estado antes de actualizar la UI
       await StorageService.toggleSubtask(mId, tIdx);
+      
+      console.log('💾 Estado guardado, actualizando UI...');
+      
       // Ahora actualizar el progreso del módulo
       updateModuleProgress(mId);
     };
