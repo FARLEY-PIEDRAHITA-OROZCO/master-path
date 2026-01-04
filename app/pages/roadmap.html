@@ -66,6 +66,25 @@
             </p>
         </header>
 
+        <!-- Barra de Progreso Global -->
+        <section class="glass-panel p-8 rounded-[3rem] border border-white/5 mb-12 relative overflow-hidden">
+            <div class="relative z-10">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 class="text-xs font-black text-blue-500 uppercase tracking-[0.3em] mb-2">Tu Progreso Global</h2>
+                        <p class="text-sm text-slate-400 italic" id="completed-modules-text">0 de 0 Sprints</p>
+                    </div>
+                    <span class="text-5xl font-black text-white italic" id="global-progress-text-roadmap" data-testid="global-progress-percentage">0%</span>
+                </div>
+                <div class="h-4 w-full bg-white/5 rounded-full overflow-hidden border border-white/5 p-1">
+                    <div id="global-progress-bar-roadmap" 
+                         data-testid="global-progress-bar"
+                         class="h-full bg-gradient-to-r from-blue-600 to-indigo-500 rounded-full transition-all duration-1000 shadow-[0_0_20px_rgba(37,99,235,0.4)]" 
+                         style="width: 0%"></div>
+                </div>
+            </div>
+        </section>
+
         <section class="mb-16">
             <div class="glass-panel p-8 rounded-[2.5rem] border border-white/5 bg-gradient-to-br from-blue-600/5 to-transparent relative overflow-hidden">
                 <div class="absolute top-0 right-0 p-8 opacity-10">
