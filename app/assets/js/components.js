@@ -92,4 +92,91 @@ export const UIComponents = {
       }
     });
   },
+
+  setupUserMenu() {
+    // Toggle dropdown menu
+    const menuBtn = document.getElementById('user-menu-btn');
+    const dropdown = document.getElementById('user-dropdown');
+    const logoutBtn = document.getElementById('logout-btn');
+    const userEmailDisplay = document.getElementById('user-email-display');
+
+    if (!menuBtn || !dropdown || !logoutBtn) {
+      console.log('[COMPONENTS] User menu elements not found - skipping setup');
+      return;
+    }
+
+    // Toggle dropdown on click
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdown.classList.toggle('hidden');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!menuBtn.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.add('hidden');
+      }
+    });
+
+    // Logout functionality
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        // Importar authService dinámicamente
+        const { authService } = await import('./auth-service.js');
+        
+        console.log('🚪 [COMPONENTS] Cerrando sesión...');
+        
+        // Mostrar loading
+        logoutBtn.innerHTML = '<i class="fas fa-circle-notch animate-spin"></i> Cerrando sesión...';
+        logoutBtn.disabled = true;
+        
+        // Cerrar sesión
+        const result = await authService.logout();
+        
+        if (result.success) {
+          console.log('✅ [COMPONENTS] Sesión cerrada exitosamente');
+          // Redirigir a login
+          window.location.href = '/app/pages/auth.html';
+        } else {
+          console.error('❌ [COMPONENTS] Error al cerrar sesión:', result.error);
+          alert('Error al cerrar sesión. Por favor intenta de nuevo.');
+          logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Cerrar Sesión';
+          logoutBtn.disabled = false;
+        }
+      } catch (error) {
+        console.error('❌ [COMPONENTS] Error crítico en logout:', error);
+        alert('Error al cerrar sesión. Por favor intenta de nuevo.');
+        logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Cerrar Sesión';
+        logoutBtn.disabled = false;
+      }
+    });
+
+    // Display user email
+    this.loadUserEmail(userEmailDisplay);
+  },
+
+  async loadUserEmail(displayElement) {
+    try {
+      // Importar authService dinámicamente
+      const { authService } = await import('./auth-service.js');
+      
+      // Esperar a que authService esté inicializado
+      if (!authService.isInitialized) {
+        await authService.init();
+      }
+      
+      const user = authService.getCurrentUser();
+      
+      if (user && user.email && displayElement) {
+        displayElement.textContent = user.email;
+      } else if (displayElement) {
+        displayElement.textContent = 'Usuario';
+      }
+    } catch (error) {
+      console.error('❌ [COMPONENTS] Error al cargar email del usuario:', error);
+      if (displayElement) {
+        displayElement.textContent = 'Usuario';
+      }
+    }
+  },
 };
