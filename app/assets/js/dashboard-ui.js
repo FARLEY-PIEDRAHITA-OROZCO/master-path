@@ -52,7 +52,192 @@ function refreshDashboard() {
     rankText.className = `${currentRank.color} font-bold uppercase tracking-widest`;
   }
 
+  // FASE 2: Nuevas funcionalidades
+  updateContinueSection();
+  updateExpandedStats();
+  updatePhaseProgress();
   updateBadgesUI();
+}
+
+/**
+ * FASE 2: Actualiza la sección "Continuar donde lo dejaste"
+ */
+function updateContinueSection() {
+  const continueSection = document.getElementById('continue-section');
+  const currentModule = getCurrentModule();
+  
+  if (!currentModule) {
+    // No hay módulo en progreso, ocultar sección
+    if (continueSection) {
+      continueSection.classList.add('hidden');
+    }
+    return;
+  }
+  
+  // Mostrar sección
+  if (continueSection) {
+    continueSection.classList.remove('hidden');
+    
+    // Actualizar información del módulo
+    const titleEl = document.getElementById('continue-module-title');
+    const progressEl = document.getElementById('continue-module-progress');
+    const buttonEl = document.getElementById('continue-button');
+    
+    if (titleEl) {
+      titleEl.textContent = currentModule.title;
+    }
+    
+    if (progressEl) {
+      const subProgress = StorageService.get(KEYS.SUBTASKS);
+      const totalTasks = currentModule.schedule.length;
+      const completedTasks = currentModule.schedule.filter((_, i) => 
+        subProgress[`${currentModule.id}-${i}`]
+      ).length;
+      progressEl.textContent = `${completedTasks} de ${totalTasks} tareas completadas`;
+    }
+    
+    // Scroll al módulo al hacer click
+    if (buttonEl) {
+      buttonEl.onclick = (e) => {
+        e.preventDefault();
+        window.location.href = `roadmap.html?scroll=${currentModule.id}`;
+      };
+    }
+  }
+}
+
+/**
+ * Obtiene el módulo activo actual (en progreso)
+ */
+function getCurrentModule() {
+  const progress = StorageService.get(KEYS.PROGRESS);
+  const subProgress = StorageService.get(KEYS.SUBTASKS);
+  
+  // Buscar el primer módulo no completado con tareas en progreso
+  for (let i = 0; i < AppEngine.modules.length; i++) {
+    const module = AppEngine.modules[i];
+    
+    // Si está completado, saltar
+    if (progress[module.id]) continue;
+    
+    // Verificar si tiene tareas en progreso
+    const totalTasks = module.schedule.length;
+    const completedTasks = module.schedule.filter((_, idx) => 
+      subProgress[`${module.id}-${idx}`]
+    ).length;
+    
+    // Si tiene al menos una tarea completada, es el módulo activo
+    if (completedTasks > 0) {
+      return module;
+    }
+    
+    // Si es el primer módulo no completado sin tareas, también es candidato
+    if (i === 0 || progress[AppEngine.modules[i - 1].id]) {
+      return module;
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * FASE 2: Actualiza las estadísticas expandidas
+ */
+function updateExpandedStats() {
+  const progress = StorageService.get(KEYS.PROGRESS);
+  const completedModules = Object.values(progress).filter(v => v === true).length;
+  const totalModules = AppEngine.modules.length;
+  
+  // Sprints completados
+  const completedCountEl = document.getElementById('completed-count');
+  const completedPercentageEl = document.getElementById('completed-percentage');
+  if (completedCountEl) {
+    animateNumber(completedCountEl, completedModules, '');
+  }
+  if (completedPercentageEl) {
+    const percentage = Math.round((completedModules / totalModules) * 100);
+    completedPercentageEl.textContent = `${percentage}% del total`;
+  }
+  
+  // Tiempo estimado
+  const timeRemainingEl = document.getElementById('time-remaining');
+  const timeCompletedEl = document.getElementById('time-completed');
+  if (timeRemainingEl && timeCompletedEl) {
+    let totalHours = 0;
+    let completedHours = 0;
+    
+    AppEngine.modules.forEach(m => {
+      const hours = parseInt(m.duration.replace('h', ''));
+      totalHours += hours;
+      if (progress[m.id]) {
+        completedHours += hours;
+      }
+    });
+    
+    const remainingHours = totalHours - completedHours;
+    timeRemainingEl.textContent = `${remainingHours}h`;
+    timeCompletedEl.textContent = `${completedHours}h completadas`;
+  }
+  
+  // Racha (simulada por ahora)
+  const streakCountEl = document.getElementById('streak-count');
+  if (streakCountEl) {
+    // Por ahora, calculamos racha basada en actividad
+    const streak = completedModules > 0 ? Math.min(completedModules * 2, 30) : 0;
+    animateNumber(streakCountEl, streak, '');
+  }
+}
+
+/**
+ * FASE 2: Actualiza el progreso por fase
+ */
+function updatePhaseProgress() {
+  const container = document.getElementById('phase-progress-container');
+  if (!container) return;
+  
+  const progress = StorageService.get(KEYS.PROGRESS);
+  
+  // Agrupar módulos por fase
+  const phases = {
+    'Core': { modules: [], color: 'amber', icon: 'fa-shield-halved' },
+    'Technical': { modules: [], color: 'blue', icon: 'fa-code-branch' },
+    'Automation': { modules: [], color: 'emerald', icon: 'fa-robot' },
+    'Expert': { modules: [], color: 'purple', icon: 'fa-crown' }
+  };
+  
+  AppEngine.modules.forEach(m => {
+    if (phases[m.phase]) {
+      phases[m.phase].modules.push(m);
+    }
+  });
+  
+  // Renderizar cada fase
+  container.innerHTML = Object.entries(phases).map(([phaseName, phaseData]) => {
+    const totalModules = phaseData.modules.length;
+    const completedModules = phaseData.modules.filter(m => progress[m.id]).length;
+    const percentage = totalModules > 0 ? Math.round((completedModules / totalModules) * 100) : 0;
+    
+    return `
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-${phaseData.color}-500/20 flex items-center justify-center">
+              <i class="fas ${phaseData.icon} text-${phaseData.color}-500"></i>
+            </div>
+            <div>
+              <p class="text-sm font-bold text-white">${phaseName}</p>
+              <p class="text-[10px] text-slate-500">${completedModules} de ${totalModules} sprints</p>
+            </div>
+          </div>
+          <span class="text-xl font-black text-white italic">${percentage}%</span>
+        </div>
+        <div class="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+          <div class="h-full bg-gradient-to-r from-${phaseData.color}-600 to-${phaseData.color}-400 rounded-full transition-all duration-1000" 
+               style="width: ${percentage}%"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
 /**
