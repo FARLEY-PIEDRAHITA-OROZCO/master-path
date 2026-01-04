@@ -330,9 +330,32 @@ main {
   margin-bottom: 2rem;
 }
 
-/* Asegurar que la tabla de contenidos no choque con el toolbar */
+/* Mejoras adicionales para el contenido centrado */
+#doc-content {
+  display: block;
+  width: 100%;
+}
+
+/* Asegurar que el main tenga el layout correcto */
+main.ml-72 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+main.ml-72 > * {
+  width: 100%;
+  max-width: 48rem; /* max-w-3xl = 48rem */
+}
+
+/* Asegurar que la tabla de contenidos tenga suficiente espacio inferior */
 #table-of-contents {
   transition: top 0.3s ease;
+  z-index: 30;
+}
+
+#table-of-contents .glass-panel {
+  margin-bottom: 2rem;
 }
 
 body.focus-mode #table-of-contents {
