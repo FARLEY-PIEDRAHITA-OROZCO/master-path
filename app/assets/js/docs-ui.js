@@ -112,7 +112,7 @@ const DocsEngine = {
       `;
 
       // Cargar el archivo .md
-      const mdPath = `/app/docs/content/${doc.file}`;
+      const mdPath = `/docs/content/${doc.file}`;
       const response = await fetch(mdPath);
       
       if (!response.ok) {
