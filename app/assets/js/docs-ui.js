@@ -118,7 +118,13 @@ const DocsEngine = {
   },
 
   async loadAndRenderDocument(doc) {
+    console.log('📚 [DOCS] Cargando documento:', doc.id, '-', doc.title);
     const container = document.getElementById('doc-content');
+    
+    if (!container) {
+      console.error('❌ [DOCS] Elemento #doc-content no encontrado');
+      return;
+    }
     
     try {
       // Mostrar loading
@@ -132,6 +138,7 @@ const DocsEngine = {
 
       // Cargar el archivo .md
       const mdPath = `/docs/content/${doc.file}`;
+      console.log('📚 [DOCS] Fetch desde:', mdPath);
       const response = await fetch(mdPath);
       
       if (!response.ok) {
@@ -139,12 +146,14 @@ const DocsEngine = {
       }
       
       const markdownContent = await response.text();
+      console.log('✅ [DOCS] Documento cargado:', markdownContent.length, 'caracteres');
       
       // Renderizar el documento
       this.renderArticle(doc, markdownContent);
+      console.log('✅ [DOCS] Documento renderizado exitosamente');
       
     } catch (error) {
-      console.error('Error cargando documento:', error);
+      console.error('❌ [DOCS] Error cargando documento:', error);
       container.innerHTML = `
         <div class="text-center py-12">
           <i class="fas fa-exclamation-triangle text-yellow-500 text-4xl mb-4"></i>
