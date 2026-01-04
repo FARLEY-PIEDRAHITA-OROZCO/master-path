@@ -53,7 +53,7 @@ Los servicios ahora están corriendo con supervisor:
 ### AHORA:
 - ✅ **App preview funciona correctamente**
 - ✅ Accesible desde preview de Emergent
-- ✅ URL del preview: https://docs-alignment-fix.preview.emergentagent.com
+- ✅ URL del preview: https://learning-progress-4.preview.emergentagent.com
 - ✅ Redirige correctamente al login
 - ✅ Firebase funciona correctamente
 
