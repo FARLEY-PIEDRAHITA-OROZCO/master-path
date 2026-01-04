@@ -53,7 +53,7 @@ Los servicios ahora están corriendo con supervisor:
 ### AHORA:
 - ✅ **App preview funciona correctamente**
 - ✅ Accesible desde preview de Emergent
-- ✅ URL del preview: https://roadmap-progress-6.preview.emergentagent.com
+- ✅ URL del preview: https://login-return-1.preview.emergentagent.com
 - ✅ Redirige correctamente al login
 - ✅ Firebase funciona correctamente
 
