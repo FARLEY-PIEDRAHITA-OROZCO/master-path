@@ -166,6 +166,7 @@ const DocsEngine = {
   },
 
   renderArticle(doc, markdownContent) {
+    console.log('📚 [DOCS] Renderizando artículo:', doc.title);
     const container = document.getElementById('doc-content');
     
     // Configurar marked para mejor rendering
@@ -183,6 +184,9 @@ const DocsEngine = {
       ? marked.parse(markdownContent)
       : markdownContent;
 
+    console.log('📚 [DOCS] HTML generado:', htmlContent.length, 'caracteres');
+    
+    // Remover la opacidad y mostrar el contenido
     container.classList.remove('opacity-0');
     container.innerHTML = `
       <div class="mb-12">
@@ -208,6 +212,8 @@ const DocsEngine = {
       ` : ''}
     `;
 
+    console.log('✅ [DOCS] Artículo renderizado y visible');
+    
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
