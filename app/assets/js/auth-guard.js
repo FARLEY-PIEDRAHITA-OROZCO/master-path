@@ -106,6 +106,25 @@ export function redirectIfAuthenticated() {
 }
 
 /**
+ * Oculta el overlay de loading INSTANTÁNEAMENTE sin transiciones
+ * Usado cuando auth.currentUser ya está disponible
+ */
+function hideAuthLoadingInstantly() {
+  const loadingEl = document.getElementById('auth-loading');
+  const contentEl = document.getElementById('main-content');
+  
+  if (loadingEl) {
+    loadingEl.style.display = 'none';
+  }
+  
+  if (contentEl) {
+    contentEl.style.display = 'block';
+  }
+  
+  console.log('⚡ [AUTH-GUARD] Contenido mostrado instantáneamente');
+}
+
+/**
  * Oculta el overlay de loading y muestra el contenido
  */
 function hideAuthLoading() {
