@@ -195,3 +195,35 @@ function toggleExpand(id) {
   content.classList.toggle('hidden');
   icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
 }
+
+/**
+ * Actualiza solo el progreso de un módulo específico sin re-renderizar todo
+ * @param {string} moduleId - ID del módulo a actualizar
+ */
+function updateModuleProgress(moduleId) {
+  const subProgress = StorageService.get(KEYS.SUBTASKS);
+  const module = AppEngine.modules.find(m => m.id == moduleId);
+  
+  if (!module) {
+    console.error('Módulo no encontrado:', moduleId);
+    return;
+  }
+
+  // Calcular el progreso actualizado
+  const totalTasks = module.schedule.length;
+  const completedTasks = module.schedule.filter((_, i) => subProgress[`${moduleId}-${i}`]).length;
+  const percentage = Math.round((completedTasks / totalTasks) * 100) || 0;
+  const strokeDash = 251.2 - (251.2 * percentage) / 100;
+
+  // Actualizar el anillo de progreso (SVG)
+  const progressRing = document.querySelector(`#content-${moduleId}`).closest('.glass-panel').querySelector('.progress-ring-circle');
+  if (progressRing) {
+    progressRing.style.strokeDashoffset = strokeDash;
+  }
+
+  // Actualizar el texto del porcentaje
+  const percentageText = document.querySelector(`#content-${moduleId}`).closest('.glass-panel').querySelector('.text-\\[11px\\].font-black.text-white.italic');
+  if (percentageText) {
+    percentageText.textContent = `${percentage}%`;
+  }
+}
