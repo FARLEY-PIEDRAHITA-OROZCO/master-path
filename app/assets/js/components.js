@@ -60,6 +60,7 @@ export const UIComponents = {
   init() {
     this.render();
     this.highlightActiveLink();
+    this.setupUserMenu();
   },
 
   render() {
