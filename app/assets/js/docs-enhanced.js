@@ -553,14 +553,21 @@ const DocsEngine = {
       `;
     }).join('');
     
-    // Smooth scroll en TOC links
+    // Smooth scroll en TOC links con offset correcto
     tocLinks.querySelectorAll('.toc-link').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
         const targetId = link.getAttribute('data-heading-id');
         const target = document.getElementById(targetId);
         if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          // Calcular offset: navbar (64px) + toolbar (60px) + padding (20px)
+          const offset = 144;
+          const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - offset;
+          
+          window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+          });
         }
       });
     });
