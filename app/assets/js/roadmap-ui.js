@@ -211,21 +211,38 @@ function updateModuleProgress(moduleId) {
     return;
   }
 
+  // Log para debug
+  console.log('📊 Actualizando progreso del módulo:', moduleId);
+  console.log('Estado actual de subtareas:', subProgress);
+
   // Calcular el progreso actualizado
   const totalTasks = module.schedule.length;
-  const completedTasks = module.schedule.filter((_, i) => subProgress[`${moduleId}-${i}`]).length;
+  const completedTasks = module.schedule.filter((_, i) => {
+    const key = `${moduleId}-${i}`;
+    const isCompleted = subProgress[key];
+    console.log(`Tarea ${i} (${key}): ${isCompleted ? '✅' : '❌'}`);
+    return isCompleted;
+  }).length;
   const percentage = Math.round((completedTasks / totalTasks) * 100) || 0;
   const strokeDash = 251.2 - (251.2 * percentage) / 100;
+
+  console.log(`Total: ${totalTasks}, Completadas: ${completedTasks}, Porcentaje: ${percentage}%`);
 
   // Actualizar el anillo de progreso (SVG) usando el ID específico
   const progressRing = document.getElementById(`progress-ring-${moduleId}`);
   if (progressRing) {
     progressRing.style.strokeDashoffset = strokeDash;
+    console.log('✅ Anillo de progreso actualizado');
+  } else {
+    console.error('❌ No se encontró el anillo de progreso con ID:', `progress-ring-${moduleId}`);
   }
 
   // Actualizar el texto del porcentaje usando el ID específico
   const percentageText = document.getElementById(`progress-text-${moduleId}`);
   if (percentageText) {
     percentageText.textContent = `${percentage}%`;
+    console.log('✅ Texto de porcentaje actualizado');
+  } else {
+    console.error('❌ No se encontró el texto de porcentaje con ID:', `progress-text-${moduleId}`);
   }
 }
