@@ -371,7 +371,7 @@ const DocsEngine = {
       <article class="doc-article">
         <header class="mb-12">
           <div class="flex items-center gap-3 mb-4">
-            <span class="px-3 py-1 rounded-lg bg-blue-500/10 text-blue-400 text-[10px] font-black uppercase tracking-widest">
+            <span class="block-badge" title="${doc.blockTitle}">
               ${doc.blockTitle}
             </span>
             ${this.bookmarks.includes(doc.id) ? 
