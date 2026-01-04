@@ -216,14 +216,14 @@ function updateModuleProgress(moduleId) {
   const percentage = Math.round((completedTasks / totalTasks) * 100) || 0;
   const strokeDash = 251.2 - (251.2 * percentage) / 100;
 
-  // Actualizar el anillo de progreso (SVG)
-  const progressRing = document.querySelector(`#content-${moduleId}`).closest('.glass-panel').querySelector('.progress-ring-circle');
+  // Actualizar el anillo de progreso (SVG) usando el ID específico
+  const progressRing = document.getElementById(`progress-ring-${moduleId}`);
   if (progressRing) {
     progressRing.style.strokeDashoffset = strokeDash;
   }
 
-  // Actualizar el texto del porcentaje
-  const percentageText = document.querySelector(`#content-${moduleId}`).closest('.glass-panel').querySelector('.text-\\[11px\\].font-black.text-white.italic');
+  // Actualizar el texto del porcentaje usando el ID específico
+  const percentageText = document.getElementById(`progress-text-${moduleId}`);
   if (percentageText) {
     percentageText.textContent = `${percentage}%`;
   }
