@@ -71,6 +71,7 @@ body {
   margin-bottom: 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding-bottom: 0.5rem;
+  scroll-margin-top: 100px;
 }
 
 .markdown-content h3 {
@@ -79,6 +80,7 @@ body {
   color: #e5e7eb;
   margin-top: 2rem;
   margin-bottom: 0.75rem;
+  scroll-margin-top: 100px;
 }
 
 .markdown-content h4 {
@@ -247,6 +249,190 @@ body {
 
 .markdown-content code[class*="language-"] {
   color: #e5e7eb;
+}
+
+/* === ESTILOS MEJORADOS PARA DOCUMENTACIÓN === */
+
+/* Animación de fade-in para documentos */
+.doc-article {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hover effect en links de TOC */
+.toc-link {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.toc-link:hover {
+  transform: translateX(4px);
+}
+
+.toc-link::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 0;
+  background: #3b82f6;
+  border-radius: 2px;
+  transition: height 0.2s ease;
+}
+
+.toc-link:hover::before {
+  height: 100%;
+}
+
+/* Botones de navegación mejorados */
+.nav-doc-btn {
+  transform: scale(1);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.nav-doc-btn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
+}
+
+/* Barra de progreso de lectura */
+#reading-progress-bar {
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+/* Animación de focus para inputs */
+#doc-search:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Smooth transitions para modo focus */
+aside,
+#table-of-contents,
+main {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Mejoras en el toolbar */
+#doc-toolbar {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover effect en doc-links del menú */
+.doc-link {
+  position: relative;
+}
+
+.doc-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background: #3b82f6;
+  transition: width 0.3s ease;
+}
+
+.doc-link:hover::after {
+  width: 100%;
+}
+
+/* Estilos para marcadores */
+.bookmark-icon {
+  transition: all 0.2s ease;
+}
+
+.bookmark-icon:hover {
+  transform: scale(1.2);
+}
+
+/* Mejoras en blockquotes */
+.markdown-content blockquote {
+  position: relative;
+  overflow: hidden;
+}
+
+.markdown-content blockquote::before {
+  content: '"';
+  position: absolute;
+  top: -10px;
+  left: 10px;
+  font-size: 4rem;
+  color: rgba(59, 130, 246, 0.1);
+  font-family: Georgia, serif;
+}
+
+/* Code blocks con efecto de hover */
+.markdown-content pre {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.markdown-content pre:hover {
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+/* Estilos para emojis y badges */
+.markdown-content h2:has(i),
+.markdown-content h3:has(i) {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1280px) {
+  #table-of-contents {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  #doc-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .nav-doc-btn {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* Animación para breadcrumbs */
+#breadcrumbs a {
+  transition: all 0.2s ease;
+}
+
+#breadcrumbs a:hover {
+  transform: translateY(-2px);
+}
+
+/* Loading states mejorados */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 /* assets/style.css */
