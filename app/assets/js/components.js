@@ -32,9 +32,15 @@ export const UIComponents = {
                     </button>
                     
                     <!-- Dropdown Menu -->
-                    <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 glass-panel rounded-2xl border border-white/5 shadow-xl overflow-hidden">
-                        <div class="p-3 border-b border-white/5">
-                            <p id="user-email-display" class="text-xs text-slate-400 truncate">Cargando...</p>
+                    <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-64 glass-panel rounded-2xl border border-white/5 shadow-xl overflow-hidden">
+                        <div class="p-4 border-b border-white/5">
+                            <p id="user-name-display" class="text-sm font-bold text-white mb-1 truncate">Cargando...</p>
+                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2" id="user-rank-display">Cargando rango...</p>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-star text-blue-500 text-xs"></i>
+                                <p class="text-xs text-slate-400" id="user-xp-display">0 XP</p>
+                            </div>
+                            <p id="user-email-display" class="text-[10px] text-slate-500 mt-2 truncate">Cargando email...</p>
                         </div>
                         <button id="logout-btn" class="w-full px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-red-400 hover:bg-red-500/10 transition-colors flex items-center gap-2" data-testid="logout-button">
                             <i class="fas fa-sign-out-alt"></i>
