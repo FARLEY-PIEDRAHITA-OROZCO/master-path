@@ -6,88 +6,194 @@ import { requireAuth } from './auth-guard.js';
 requireAuth();
 
 const DocsEngine = {
-  data: null,
+  manifest: null,
+  currentTopic: null,
 
   async init() {
     UIComponents.init();
     try {
-      const response = await fetch('/app/assets/data/docs.json');
-      this.data = await response.json();
+      // Cargar manifest.json con metadata
+      const response = await fetch('/app/docs/manifest.json');
+      this.manifest = await response.json();
+      
       this.renderMenu();
-      this.handleNavigation();
+      await this.handleNavigation();
     } catch (e) {
-      console.error('Error cargando Docs:', e);
+      console.error('Error cargando documentación:', e);
+      this.showError('Error al cargar la documentación. Por favor, intenta de nuevo.');
     }
   },
 
   renderMenu() {
     const menu = document.getElementById('doc-menu');
-    menu.innerHTML = this.data.blocks
-      .map(
-        block => `
-            <div>
-                <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">${block.title}</h4>
-                <ul class="space-y-2 border-l border-white/5 ml-2">
-                    ${block.topics
-                      .map(
-                        topic => `
-                        <li>
-                            <a href="?topic=${topic.id}" 
-                               class="block py-2 px-4 text-sm hover:text-blue-400 transition-all border-l border-transparent hover:border-blue-500 -ml-[1px]"
-                               data-topic-link="${topic.id}">
-                               ${topic.title}
-                            </a>
-                        </li>
-                    `
-                      )
-                      .join('')}
-                </ul>
-            </div>
-        `
-      )
+    
+    if (!this.manifest || !this.manifest.blocks) {
+      menu.innerHTML = '<p class="text-red-400">Error: No se pudo cargar el menú</p>';
+      return;
+    }
+
+    menu.innerHTML = this.manifest.blocks
+      .map(block => {
+        // Skip blocks without docs
+        if (!block.docs || block.docs.length === 0) {
+          return '';
+        }
+
+        return `
+          <div>
+            <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">
+              ${block.title}
+            </h4>
+            <ul class="space-y-2 border-l border-white/5 ml-2">
+              ${block.docs
+                .map(doc => `
+                  <li>
+                    <a href="?topic=${doc.id}" 
+                       class="block py-2 px-4 text-sm hover:text-blue-400 transition-all border-l border-transparent hover:border-blue-500 -ml-[1px]"
+                       data-topic-link="${doc.id}">
+                       ${doc.title}
+                    </a>
+                  </li>
+                `)
+                .join('')}
+            </ul>
+          </div>
+        `;
+      })
       .join('');
   },
 
-  handleNavigation() {
+  async handleNavigation() {
     // 1. Obtener el tema de la URL (?topic=...)
     const params = new URLSearchParams(window.location.search);
-    const topicId = params.get('topic') || this.data.blocks[0].topics[0].id;
+    const topicId = params.get('topic');
 
-    // 2. Buscar el contenido
-    let foundTopic = null;
-    this.data.blocks.forEach(b => {
-      const t = b.topics.find(topic => topic.id === topicId);
-      if (t) foundTopic = t;
-    });
+    // 2. Si no hay topic, usar el primero disponible
+    let selectedDoc = null;
+    
+    if (topicId) {
+      // Buscar el documento por ID
+      for (const block of this.manifest.blocks) {
+        if (block.docs) {
+          selectedDoc = block.docs.find(doc => doc.id === topicId);
+          if (selectedDoc) break;
+        }
+      }
+    }
+    
+    // Si no se encontró o no hay topicId, usar el primero
+    if (!selectedDoc) {
+      for (const block of this.manifest.blocks) {
+        if (block.docs && block.docs.length > 0) {
+          selectedDoc = block.docs[0];
+          break;
+        }
+      }
+    }
 
-    if (foundTopic) this.renderArticle(foundTopic);
+    if (selectedDoc) {
+      await this.loadAndRenderDocument(selectedDoc);
+    } else {
+      this.showError('No hay documentos disponibles');
+    }
   },
 
-  renderArticle(topic) {
+  async loadAndRenderDocument(doc) {
     const container = document.getElementById('doc-content');
-    container.classList.remove('opacity-0');
+    
+    try {
+      // Mostrar loading
+      container.innerHTML = `
+        <div class="animate-pulse space-y-4">
+          <div class="h-8 bg-white/5 rounded w-3/4"></div>
+          <div class="h-4 bg-white/5 rounded w-full"></div>
+          <div class="h-4 bg-white/5 rounded w-5/6"></div>
+        </div>
+      `;
 
-    container.innerHTML = `
-            <div class="mb-12">
-                <span class="text-blue-500 text-[10px] font-black uppercase tracking-[0.3em]">Documentación Técnica</span>
-                <h1 class="text-4xl font-black text-white mt-2 mb-6 italic uppercase tracking-tighter">${topic.title}</h1>
-                <div class="prose prose-invert prose-blue max-w-none text-slate-400 leading-relaxed">
-                    ${marked.parse(topic.content)} 
-                </div>
-            </div>
-            
-            ${
-              topic.evidence
-                ? `
-                <div class="mt-12 p-8 rounded-3xl bg-blue-600/5 border border-blue-500/20">
-                    <h5 class="text-white font-bold text-sm mb-2"><i class="fas fa-folder-open mr-2 text-blue-500"></i> Evidencia Requerida</h5>
-                    <p class="text-xs text-slate-400 italic">${topic.evidence}</p>
-                </div>
-            `
-                : ''
-            }
-        `;
+      // Cargar el archivo .md
+      const mdPath = `/app/docs/content/${doc.file}`;
+      const response = await fetch(mdPath);
+      
+      if (!response.ok) {
+        throw new Error(`No se pudo cargar el documento: ${response.status}`);
+      }
+      
+      const markdownContent = await response.text();
+      
+      // Renderizar el documento
+      this.renderArticle(doc, markdownContent);
+      
+    } catch (error) {
+      console.error('Error cargando documento:', error);
+      container.innerHTML = `
+        <div class="text-center py-12">
+          <i class="fas fa-exclamation-triangle text-yellow-500 text-4xl mb-4"></i>
+          <h3 class="text-xl font-bold text-white mb-2">Error al cargar documento</h3>
+          <p class="text-slate-400 text-sm">${error.message}</p>
+          <p class="text-slate-600 text-xs mt-2">Archivo: ${doc.file}</p>
+        </div>
+      `;
+    }
   },
+
+  renderArticle(doc, markdownContent) {
+    const container = document.getElementById('doc-content');
+    
+    // Configurar marked para mejor rendering
+    if (typeof marked !== 'undefined' && marked.setOptions) {
+      marked.setOptions({
+        breaks: true,
+        gfm: true,
+        headerIds: true,
+        mangle: false
+      });
+    }
+    
+    // Convertir markdown a HTML
+    const htmlContent = typeof marked !== 'undefined' && marked.parse 
+      ? marked.parse(markdownContent)
+      : markdownContent;
+
+    container.classList.remove('opacity-0');
+    container.innerHTML = `
+      <div class="mb-12">
+        <span class="text-blue-500 text-[10px] font-black uppercase tracking-[0.3em]">
+          Documentación Técnica
+        </span>
+        <h1 class="text-4xl font-black text-white mt-2 mb-6 italic uppercase tracking-tighter">
+          ${doc.title}
+        </h1>
+        <div class="prose prose-invert prose-blue max-w-none text-slate-400 leading-relaxed markdown-content">
+          ${htmlContent}
+        </div>
+      </div>
+      
+      ${doc.evidence ? `
+        <div class="mt-12 p-8 rounded-3xl bg-blue-600/5 border border-blue-500/20">
+          <h5 class="text-white font-bold text-sm mb-2">
+            <i class="fas fa-folder-open mr-2 text-blue-500"></i> 
+            Evidencia Requerida
+          </h5>
+          <p class="text-xs text-slate-400 italic">${doc.evidence}</p>
+        </div>
+      ` : ''}
+    `;
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  showError(message) {
+    const container = document.getElementById('doc-content');
+    container.innerHTML = `
+      <div class="text-center py-12">
+        <i class="fas fa-exclamation-circle text-red-500 text-4xl mb-4"></i>
+        <h3 class="text-xl font-bold text-white mb-2">Error</h3>
+        <p class="text-slate-400">${message}</p>
+      </div>
+    `;
+  }
 };
 
 document.addEventListener('DOMContentLoaded', () => DocsEngine.init());
