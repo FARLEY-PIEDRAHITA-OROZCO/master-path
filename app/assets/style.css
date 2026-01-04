@@ -71,7 +71,7 @@ body {
   margin-bottom: 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding-bottom: 0.5rem;
-  scroll-margin-top: 100px;
+  scroll-margin-top: 150px;
 }
 
 .markdown-content h3 {
@@ -80,7 +80,7 @@ body {
   color: #e5e7eb;
   margin-top: 2rem;
   margin-bottom: 0.75rem;
-  scroll-margin-top: 100px;
+  scroll-margin-top: 150px;
 }
 
 .markdown-content h4 {
