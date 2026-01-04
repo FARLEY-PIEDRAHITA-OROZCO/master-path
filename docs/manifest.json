@@ -22,6 +22,12 @@
           "title": "Agile QA & Scrum",
           "file": "01-fundamentos/agile-qa.md",
           "evidence": "Checklist de DoD aplicado a un Sprint de ejemplo."
+        },
+        {
+          "id": "ejemplo-imagenes",
+          "title": "📸 Ejemplo: Cómo Incluir Imágenes",
+          "file": "01-fundamentos/ejemplo-imagenes.md",
+          "evidence": "Documento de referencia - no requiere evidencia."
         }
       ]
     },
