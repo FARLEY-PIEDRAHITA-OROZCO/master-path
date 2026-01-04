@@ -35,7 +35,7 @@ function renderRoadmap() {
       const strokeDash = 251.2 - (251.2 * percentage) / 100;
 
       return `
-        <div class="glass-panel rounded-[3rem] border border-white/5 overflow-hidden transition-all duration-500 hover:border-blue-500/20">
+        <div class="glass-panel rounded-[3rem] border border-white/5 overflow-hidden transition-all duration-500 hover:border-blue-500/20" data-module="${m.id}">
             <div class="p-8 flex flex-col md:flex-row md:items-center justify-between bg-white/[0.01] gap-6">
                 <div class="flex items-center gap-8">
                     <div class="relative w-20 h-20 flex items-center justify-center">
@@ -43,11 +43,12 @@ function renderRoadmap() {
                             <circle cx="40" cy="40" r="32" stroke="currentColor" stroke-width="5" fill="transparent" class="text-slate-900" />
                             <circle cx="40" cy="40" r="32" stroke="currentColor" stroke-width="5" fill="transparent" 
                                     class="text-blue-500 progress-ring-circle"
+                                    id="progress-ring-${m.id}"
                                     stroke-dasharray="251.2"
                                     stroke-dashoffset="${strokeDash}"
                                     stroke-linecap="round" />
                         </svg>
-                        <span class="absolute text-[11px] font-black text-white italic">${percentage}%</span>
+                        <span class="absolute text-[11px] font-black text-white italic" id="progress-text-${m.id}">${percentage}%</span>
                     </div>
                     <div>
                         <div class="flex items-center gap-3 mb-2">
@@ -163,10 +164,17 @@ function attachEventListeners() {
   });
 
   document.querySelectorAll('[data-task]').forEach(input => {
-    input.onchange = () => {
+    input.onchange = async () => {
       const [mId, tIdx] = input.dataset.task.split('-');
-      StorageService.toggleSubtask(mId, tIdx);
-      renderRoadmap();
+      console.log('🔄 Checkbox cambiado:', { moduleId: mId, taskIndex: tIdx, checked: input.checked });
+      
+      // Esperar a que se guarde el estado antes de actualizar la UI
+      await StorageService.toggleSubtask(mId, tIdx);
+      
+      console.log('💾 Estado guardado, actualizando UI...');
+      
+      // Ahora actualizar el progreso del módulo
+      updateModuleProgress(mId);
     };
   });
 
@@ -193,4 +201,53 @@ function toggleExpand(id) {
   const icon = document.getElementById(`icon-${id}`);
   content.classList.toggle('hidden');
   icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+}
+
+/**
+ * Actualiza solo el progreso de un módulo específico sin re-renderizar todo
+ * @param {string} moduleId - ID del módulo a actualizar
+ */
+function updateModuleProgress(moduleId) {
+  const subProgress = StorageService.get(KEYS.SUBTASKS);
+  const module = AppEngine.modules.find(m => m.id == moduleId);
+  
+  if (!module) {
+    console.error('Módulo no encontrado:', moduleId);
+    return;
+  }
+
+  // Log para debug
+  console.log('📊 Actualizando progreso del módulo:', moduleId);
+  console.log('Estado actual de subtareas:', subProgress);
+
+  // Calcular el progreso actualizado
+  const totalTasks = module.schedule.length;
+  const completedTasks = module.schedule.filter((_, i) => {
+    const key = `${moduleId}-${i}`;
+    const isCompleted = subProgress[key];
+    console.log(`Tarea ${i} (${key}): ${isCompleted ? '✅' : '❌'}`);
+    return isCompleted;
+  }).length;
+  const percentage = Math.round((completedTasks / totalTasks) * 100) || 0;
+  const strokeDash = 251.2 - (251.2 * percentage) / 100;
+
+  console.log(`Total: ${totalTasks}, Completadas: ${completedTasks}, Porcentaje: ${percentage}%`);
+
+  // Actualizar el anillo de progreso (SVG) usando el ID específico
+  const progressRing = document.getElementById(`progress-ring-${moduleId}`);
+  if (progressRing) {
+    progressRing.style.strokeDashoffset = strokeDash;
+    console.log('✅ Anillo de progreso actualizado');
+  } else {
+    console.error('❌ No se encontró el anillo de progreso con ID:', `progress-ring-${moduleId}`);
+  }
+
+  // Actualizar el texto del porcentaje usando el ID específico
+  const percentageText = document.getElementById(`progress-text-${moduleId}`);
+  if (percentageText) {
+    percentageText.textContent = `${percentage}%`;
+    console.log('✅ Texto de porcentaje actualizado');
+  } else {
+    console.error('❌ No se encontró el texto de porcentaje con ID:', `progress-text-${moduleId}`);
+  }
 }

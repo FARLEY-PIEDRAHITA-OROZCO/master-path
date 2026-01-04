@@ -1,4 +1,5 @@
 import { authService } from './auth-service.js';
+import { auth } from './firebase-config.js';
 
 /**
  * Obtiene la ruta base del proyecto (simplificada)
@@ -13,6 +14,18 @@ function getBasePath() {
  */
 export function requireAuth() {
   console.log('🔐 [AUTH-GUARD] Verificando autenticación...');
+  
+  // OPTIMIZACIÓN CRÍTICA: Verificar si Firebase Auth ya tiene un usuario cacheado
+  // auth.currentUser está disponible INMEDIATAMENTE si el usuario está autenticado
+  if (auth.currentUser) {
+    console.log('⚡ [AUTH-GUARD] Usuario ya autenticado (Firebase cache), ocultando loading inmediatamente');
+    hideAuthLoadingInstantly();
+    // Inicializar authService en segundo plano sin bloquear la UI
+    authService.init().catch(err => console.error('Error en init en segundo plano:', err));
+    return;
+  }
+  
+  console.log('🔄 [AUTH-GUARD] Usuario no en cache, esperando verificación...');
   
   // Crear un timeout de 8 segundos para evitar loading infinito
   const timeout = new Promise((resolve) => {
@@ -93,9 +106,10 @@ export function redirectIfAuthenticated() {
 }
 
 /**
- * Oculta el overlay de loading y muestra el contenido
+ * Oculta el overlay de loading INSTANTÁNEAMENTE sin transiciones
+ * Usado cuando auth.currentUser ya está disponible
  */
-function hideAuthLoading() {
+function hideAuthLoadingInstantly() {
   const loadingEl = document.getElementById('auth-loading');
   const contentEl = document.getElementById('main-content');
   
@@ -105,6 +119,37 @@ function hideAuthLoading() {
   
   if (contentEl) {
     contentEl.style.display = 'block';
+  }
+  
+  console.log('⚡ [AUTH-GUARD] Contenido mostrado instantáneamente');
+}
+
+/**
+ * Oculta el overlay de loading y muestra el contenido
+ */
+function hideAuthLoading() {
+  const loadingEl = document.getElementById('auth-loading');
+  const contentEl = document.getElementById('main-content');
+  
+  if (loadingEl) {
+    // Agregar transición suave
+    loadingEl.style.opacity = '0';
+    loadingEl.style.transition = 'opacity 0.2s ease';
+    
+    // Ocultar completamente después de la transición
+    setTimeout(() => {
+      loadingEl.style.display = 'none';
+    }, 200);
+  }
+  
+  if (contentEl) {
+    contentEl.style.display = 'block';
+    // Fade in del contenido
+    contentEl.style.opacity = '0';
+    setTimeout(() => {
+      contentEl.style.transition = 'opacity 0.3s ease';
+      contentEl.style.opacity = '1';
+    }, 10);
   }
   
   console.log('✅ [AUTH-GUARD] Contenido principal mostrado');

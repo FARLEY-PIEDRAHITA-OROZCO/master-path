@@ -259,22 +259,22 @@ export const StorageService = {
    * Alterna el estado de una subtarea
    * @param {number|string} moduleId - ID del módulo
    * @param {number|string} taskIndex - Índice de la tarea
-   * @returns {boolean} Nuevo estado
+   * @returns {Promise<boolean>} Nuevo estado
    */
-  toggleSubtask(moduleId, taskIndex) {
+  async toggleSubtask(moduleId, taskIndex) {
     try {
       const subProgress = this.get(KEYS.SUBTASKS);
       const key = `${moduleId}-${taskIndex}`;
 
       subProgress[key] = !subProgress[key];
+      const newState = subProgress[key];
 
-      const saved = this.syncWithFirestore(KEYS.SUBTASKS, subProgress);
+      // Esperar a que se guarde antes de continuar
+      await this.syncWithFirestore(KEYS.SUBTASKS, subProgress);
 
-      if (saved) {
-        Logger.info('Subtask toggled', { moduleId, taskIndex, newState: subProgress[key] });
-      }
+      Logger.info('Subtask toggled', { moduleId, taskIndex, newState });
 
-      return subProgress[key];
+      return newState;
     } catch (error) {
       Logger.error('Error toggling subtask', { moduleId, taskIndex, error });
       return false;
