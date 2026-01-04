@@ -179,10 +179,10 @@ const DocsEngine = {
     const main = document.querySelector('main.ml-72');
     if (!main) return;
     
-    // Insertar toolbar antes del contenido
+    // Insertar toolbar antes del contenido - Optimizado para mejor posicionamiento
     const toolbar = document.createElement('div');
     toolbar.id = 'doc-toolbar';
-    toolbar.className = 'sticky top-20 z-40 mb-6 flex items-center justify-between gap-4 bg-slate-950/80 backdrop-blur-xl border border-white/5 rounded-2xl px-6 py-3';
+    toolbar.className = 'sticky top-16 z-40 mb-6 flex items-center justify-between gap-4 bg-slate-950/90 backdrop-blur-xl border border-white/5 rounded-2xl px-6 py-3 shadow-lg';
     toolbar.innerHTML = `
       <!-- Breadcrumbs -->
       <div id="breadcrumbs" class="flex items-center gap-2 text-xs">
