@@ -59,7 +59,10 @@ function getModuleState(module, index) {
   }
   
   // Si es el primer módulo o el anterior está completado, está disponible
-  if (index === 0 || progress[AppEngine.modules[index - 1].id]) {
+  const previousModuleCompleted = index === 0 || progress[AppEngine.modules[index - 1].id];
+  console.log(`  🔍 Módulo ${module.id}: index=${index}, previousCompleted=${previousModuleCompleted}`);
+  
+  if (previousModuleCompleted) {
     // Verificar si tiene tareas en progreso
     const totalTasks = module.schedule.length;
     const completedTasks = module.schedule.filter((_, i) => subProgress[`${module.id}-${i}`]).length;
