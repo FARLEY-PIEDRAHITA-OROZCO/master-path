@@ -13,7 +13,7 @@ const DocsEngine = {
     UIComponents.init();
     try {
       // Cargar manifest.json con metadata
-      const response = await fetch('/app/docs/manifest.json');
+      const response = await fetch('/docs/manifest.json');
       this.manifest = await response.json();
       
       this.renderMenu();
