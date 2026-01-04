@@ -107,11 +107,24 @@ function hideAuthLoading() {
   const contentEl = document.getElementById('main-content');
   
   if (loadingEl) {
-    loadingEl.style.display = 'none';
+    // Agregar transición suave
+    loadingEl.style.opacity = '0';
+    loadingEl.style.transition = 'opacity 0.2s ease';
+    
+    // Ocultar completamente después de la transición
+    setTimeout(() => {
+      loadingEl.style.display = 'none';
+    }, 200);
   }
   
   if (contentEl) {
     contentEl.style.display = 'block';
+    // Fade in del contenido
+    contentEl.style.opacity = '0';
+    setTimeout(() => {
+      contentEl.style.transition = 'opacity 0.3s ease';
+      contentEl.style.opacity = '1';
+    }, 10);
   }
   
   console.log('✅ [AUTH-GUARD] Contenido principal mostrado');
