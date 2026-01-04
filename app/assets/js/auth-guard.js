@@ -15,20 +15,11 @@ function getBasePath() {
 export function requireAuth() {
   console.log('🔐 [AUTH-GUARD] Verificando autenticación...');
   
-  // OPTIMIZACIÓN: Ocultar loading inmediatamente y mostrar contenido
-  // Solo mostrar loading si la verificación tarda más de 150ms
-  let loadingTimeout = setTimeout(() => {
-    const loadingEl = document.getElementById('auth-loading');
-    if (loadingEl) {
-      loadingEl.style.display = 'flex';
-    }
-  }, 150);
-  
   // OPTIMIZACIÓN CRÍTICA: Verificar si Firebase Auth ya tiene un usuario cacheado
+  // auth.currentUser está disponible INMEDIATAMENTE si el usuario está autenticado
   if (auth.currentUser) {
-    console.log('⚡ [AUTH-GUARD] Usuario ya autenticado (Firebase cache), carga instantánea');
-    clearTimeout(loadingTimeout);
-    hideAuthLoading();
+    console.log('⚡ [AUTH-GUARD] Usuario ya autenticado (Firebase cache), ocultando loading inmediatamente');
+    hideAuthLoadingInstantly();
     // Inicializar authService en segundo plano sin bloquear la UI
     authService.init().catch(err => console.error('Error en init en segundo plano:', err));
     return;
@@ -49,8 +40,6 @@ export function requireAuth() {
     authService.init().then(user => ({ user, timeout: false })),
     timeout
   ]).then((result) => {
-    clearTimeout(loadingTimeout);
-    
     if (result.timeout) {
       // Timeout alcanzado - mostrar error y permitir continuar en modo desarrollo
       console.error('❌ [AUTH-GUARD] Firebase no responde. Iniciando modo desarrollo...');
@@ -73,7 +62,6 @@ export function requireAuth() {
       hideAuthLoading();
     }
   }).catch((error) => {
-    clearTimeout(loadingTimeout);
     console.error('❌ [AUTH-GUARD] Error en verificación:', error);
     showAuthError('Error al verificar autenticación: ' + error.message);
     
