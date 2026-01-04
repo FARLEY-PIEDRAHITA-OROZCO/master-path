@@ -1,0 +1,41 @@
+{
+  "blocks": [
+    {
+      "id": "fundamentos",
+      "title": "Bloque 1: Fundamentos Obligatorios",
+      "badge": "La Base",
+      "docs": [
+        {
+          "id": "sdlc-stlc",
+          "title": "Ciclos de Vida: SDLC & STLC",
+          "file": "01-fundamentos/sdlc-stlc.md",
+          "evidence": "Diagrama de flujo de estados de un Bug y comparativa de ciclos."
+        },
+        {
+          "id": "defect-management",
+          "title": "Gestión de Defectos",
+          "file": "01-fundamentos/defect-management.md",
+          "evidence": "2 Reportes de bug documentados con estándar profesional."
+        },
+        {
+          "id": "agile-qa",
+          "title": "Agile QA & Scrum",
+          "file": "01-fundamentos/agile-qa.md",
+          "evidence": "Checklist de DoD aplicado a un Sprint de ejemplo."
+        }
+      ]
+    },
+    {
+      "id": "technical",
+      "title": "Bloque 2: Habilidades Técnicas",
+      "badge": "Tech Skills",
+      "docs": []
+    },
+    {
+      "id": "automation",
+      "title": "Bloque 3: Automatización",
+      "badge": "Automation",
+      "docs": []
+    }
+  ]
+}
