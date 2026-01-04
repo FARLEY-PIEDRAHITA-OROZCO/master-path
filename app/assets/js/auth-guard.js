@@ -1,4 +1,5 @@
 import { authService } from './auth-service.js';
+import { auth } from './firebase-config.js';
 
 /**
  * Obtiene la ruta base del proyecto (simplificada)
@@ -14,12 +15,17 @@ function getBasePath() {
 export function requireAuth() {
   console.log('🔐 [AUTH-GUARD] Verificando autenticación...');
   
-  // OPTIMIZACIÓN: Si authService ya está inicializado y tiene usuario, ocultar loading inmediatamente
-  if (authService.isInitialized && authService.getCurrentUser()) {
-    console.log('⚡ [AUTH-GUARD] Usuario ya autenticado en cache, carga instantánea');
+  // OPTIMIZACIÓN CRÍTICA: Verificar si Firebase Auth ya tiene un usuario cacheado
+  // auth.currentUser está disponible inmediatamente si el usuario está autenticado
+  if (auth.currentUser) {
+    console.log('⚡ [AUTH-GUARD] Usuario ya autenticado (Firebase cache), carga instantánea');
     hideAuthLoading();
+    // Inicializar authService en segundo plano sin bloquear la UI
+    authService.init().catch(err => console.error('Error en init en segundo plano:', err));
     return;
   }
+  
+  console.log('🔄 [AUTH-GUARD] Usuario no en cache, esperando verificación...');
   
   // Crear un timeout de 8 segundos para evitar loading infinito
   const timeout = new Promise((resolve) => {
