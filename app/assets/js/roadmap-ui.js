@@ -35,7 +35,7 @@ function renderRoadmap() {
       const strokeDash = 251.2 - (251.2 * percentage) / 100;
 
       return `
-        <div class="glass-panel rounded-[3rem] border border-white/5 overflow-hidden transition-all duration-500 hover:border-blue-500/20">
+        <div class="glass-panel rounded-[3rem] border border-white/5 overflow-hidden transition-all duration-500 hover:border-blue-500/20" data-module="${m.id}">
             <div class="p-8 flex flex-col md:flex-row md:items-center justify-between bg-white/[0.01] gap-6">
                 <div class="flex items-center gap-8">
                     <div class="relative w-20 h-20 flex items-center justify-center">
@@ -43,11 +43,12 @@ function renderRoadmap() {
                             <circle cx="40" cy="40" r="32" stroke="currentColor" stroke-width="5" fill="transparent" class="text-slate-900" />
                             <circle cx="40" cy="40" r="32" stroke="currentColor" stroke-width="5" fill="transparent" 
                                     class="text-blue-500 progress-ring-circle"
+                                    id="progress-ring-${m.id}"
                                     stroke-dasharray="251.2"
                                     stroke-dashoffset="${strokeDash}"
                                     stroke-linecap="round" />
                         </svg>
-                        <span class="absolute text-[11px] font-black text-white italic">${percentage}%</span>
+                        <span class="absolute text-[11px] font-black text-white italic" id="progress-text-${m.id}">${percentage}%</span>
                     </div>
                     <div>
                         <div class="flex items-center gap-3 mb-2">
