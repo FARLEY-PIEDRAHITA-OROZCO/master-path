@@ -25,13 +25,32 @@ class TokenManager {
    */
   static saveTokens(accessToken, refreshToken) {
     try {
+      console.log('💾 [TOKEN-MANAGER] Intentando guardar tokens...', {
+        tokenKey: this.TOKEN_KEY,
+        hasAccessToken: !!accessToken,
+        hasRefreshToken: !!refreshToken,
+        accessTokenLength: accessToken ? accessToken.length : 0
+      });
+      
       localStorage.setItem(this.TOKEN_KEY, accessToken);
+      console.log('✅ [TOKEN-MANAGER] Access token guardado');
+      
       if (refreshToken) {
         localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
+        console.log('✅ [TOKEN-MANAGER] Refresh token guardado');
       }
+      
+      // Verificar inmediatamente
+      const saved = localStorage.getItem(this.TOKEN_KEY);
+      console.log('🔍 [TOKEN-MANAGER] Verificación:', {
+        tokenGuardado: !!saved,
+        coincide: saved === accessToken
+      });
+      
       Logger.info('Tokens saved successfully');
       return true;
     } catch (error) {
+      console.error('❌ [TOKEN-MANAGER] Error al guardar tokens:', error);
       Logger.error('Failed to save tokens', { error: error.message });
       return false;
     }
