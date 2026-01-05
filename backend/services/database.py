@@ -66,7 +66,7 @@ async def create_indexes():
     """
     Crear índices en las colecciones
     """
-    if not motor_db:
+    if motor_db is None:
         return
     
     try:
