@@ -51,10 +51,7 @@ class AuthService:
             "email": user_data.email,
             "display_name": user_data.display_name,
             "password_hash": password_hash,
-            "photo_url": None,
             "auth_provider": "email",
-            "google_id": None,
-            "firebase_uid": None,
             "created_at": datetime.utcnow(),
             "last_active": datetime.utcnow(),
             "email_verified": False,
@@ -75,6 +72,11 @@ class AuthService:
             "migrated_from_firebase": False,
             "migration_date": None
         }
+        
+        # Campos opcionales (solo agregar si tienen valor)
+        if hasattr(user_data, 'photo_url') and user_data.photo_url:
+            user_doc["photo_url"] = user_data.photo_url
+        # NO incluir google_id, firebase_uid si son None (para respetar índice sparse)
         
         # Insertar usuario en la base de datos
         result = await db.users.insert_one(user_doc)
