@@ -336,6 +336,140 @@ function renderRoadmap() {
   attachEventListeners();
 }
 
+// Mapa para almacenar los timers de debounce de cada módulo
+const noteDebounceTimers = {};
+
+/**
+ * Guarda una nota con feedback visual
+ * @param {string} moduleId - ID del módulo
+ * @param {string} content - Contenido de la nota
+ * @param {boolean} showFeedback - Mostrar feedback visual
+ */
+function saveNote(moduleId, content, showFeedback = true) {
+  const notes = StorageService.get(KEYS.NOTES);
+  notes[moduleId] = content;
+  StorageService.save(KEYS.NOTES, notes);
+  
+  if (showFeedback) {
+    updateSaveStatus(moduleId, 'saved');
+    updateLastSavedTime(moduleId);
+  }
+}
+
+/**
+ * Actualiza el estado de guardado visual
+ * @param {string} moduleId - ID del módulo
+ * @param {string} status - Estado: 'saving', 'saved', 'error', 'idle'
+ */
+function updateSaveStatus(moduleId, status) {
+  const statusElement = document.getElementById(`save-status-${moduleId}`);
+  if (!statusElement) return;
+  
+  const statusText = statusElement.querySelector('[data-testid^="save-status-text"]');
+  const icon = statusElement.querySelector('i');
+  
+  switch(status) {
+    case 'saving':
+      statusElement.className = 'text-[8px] font-bold text-blue-500 italic flex items-center gap-1 animate-pulse';
+      if (icon) icon.className = 'fas fa-circle-notch fa-spin text-[6px]';
+      if (statusText) statusText.textContent = 'Guardando...';
+      break;
+    case 'saved':
+      statusElement.className = 'text-[8px] font-bold text-emerald-500 italic flex items-center gap-1';
+      if (icon) icon.className = 'fas fa-check-circle text-[6px]';
+      if (statusText) statusText.textContent = 'Guardado';
+      // Volver a idle después de 2 segundos
+      setTimeout(() => updateSaveStatus(moduleId, 'idle'), 2000);
+      break;
+    case 'error':
+      statusElement.className = 'text-[8px] font-bold text-red-500 italic flex items-center gap-1';
+      if (icon) icon.className = 'fas fa-exclamation-circle text-[6px]';
+      if (statusText) statusText.textContent = 'Error';
+      break;
+    case 'idle':
+    default:
+      statusElement.className = 'text-[8px] font-bold text-slate-600 italic flex items-center gap-1';
+      if (icon) icon.className = 'fas fa-circle text-[6px]';
+      if (statusText) statusText.textContent = 'Sin cambios';
+      break;
+  }
+}
+
+/**
+ * Actualiza el timestamp de última modificación
+ * @param {string} moduleId - ID del módulo
+ */
+function updateLastSavedTime(moduleId) {
+  const lastSavedElement = document.getElementById(`last-saved-${moduleId}`);
+  if (!lastSavedElement) return;
+  
+  const now = new Date();
+  const timeString = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  lastSavedElement.textContent = `Guardado ${timeString}`;
+  lastSavedElement.classList.remove('hidden');
+}
+
+/**
+ * Actualiza los contadores de caracteres y palabras
+ * @param {string} moduleId - ID del módulo
+ * @param {string} content - Contenido del texto
+ */
+function updateCharCount(moduleId, content) {
+  const charCountElement = document.getElementById(`char-count-${moduleId}`);
+  const wordCountElement = document.getElementById(`word-count-${moduleId}`);
+  
+  if (charCountElement) {
+    const charCount = content.length;
+    charCountElement.textContent = `${charCount} caracter${charCount !== 1 ? 'es' : ''}`;
+  }
+  
+  if (wordCountElement) {
+    const words = content.trim().split(/\s+/).filter(w => w.length > 0);
+    const wordCount = words.length;
+    wordCountElement.textContent = `${wordCount} palabra${wordCount !== 1 ? 's' : ''}`;
+  }
+}
+
+/**
+ * Copia el contenido de la nota al portapapeles
+ * @param {string} moduleId - ID del módulo
+ */
+async function copyNoteToClipboard(moduleId) {
+  const textarea = document.querySelector(`[data-module-note="${moduleId}"]`);
+  if (!textarea) return;
+  
+  try {
+    await navigator.clipboard.writeText(textarea.value);
+    showToast('📋 Notas copiadas al portapapeles', 'success', 2000);
+  } catch (err) {
+    console.error('Error al copiar:', err);
+    showToast('❌ Error al copiar al portapapeles', 'error', 2000);
+  }
+}
+
+/**
+ * Limpia las notas con confirmación
+ * @param {string} moduleId - ID del módulo
+ */
+function clearNote(moduleId) {
+  const textarea = document.querySelector(`[data-module-note="${moduleId}"]`);
+  if (!textarea) return;
+  
+  // Si no hay contenido, no hacer nada
+  if (!textarea.value.trim()) {
+    showToast('ℹ️ No hay notas para limpiar', 'info', 2000);
+    return;
+  }
+  
+  // Confirmación
+  if (confirm('⚠️ ¿Estás seguro de que deseas eliminar todas las notas de este sprint?\n\nEsta acción no se puede deshacer.')) {
+    textarea.value = '';
+    saveNote(moduleId, '', true);
+    updateCharCount(moduleId, '');
+    showToast('🗑️ Notas eliminadas correctamente', 'info', 2000);
+  }
+}
+
 function attachEventListeners() {
   // Delegación de eventos para optimizar memoria
   document.querySelectorAll('[data-expand]').forEach(btn => {
@@ -386,12 +520,77 @@ function attachEventListeners() {
     };
   });
 
+  // ========== NUEVOS EVENT LISTENERS PARA EL EDITOR DE NOTAS ==========
+  
+  // Editor de notas con auto-guardado debounced
   document.querySelectorAll('[data-module-note]').forEach(txt => {
-    txt.onchange = () => {
-      const notes = StorageService.get(KEYS.NOTES);
-      notes[txt.dataset.moduleNote] = txt.value;
-      StorageService.save(KEYS.NOTES, notes);
+    const moduleId = txt.dataset.moduleNote;
+    
+    // Inicializar contadores al cargar
+    updateCharCount(moduleId, txt.value);
+    
+    // Input event para actualizar contadores en tiempo real
+    txt.addEventListener('input', () => {
+      const content = txt.value;
+      updateCharCount(moduleId, content);
+      
+      // Mostrar estado "guardando"
+      updateSaveStatus(moduleId, 'saving');
+      
+      // Limpiar timer anterior si existe
+      if (noteDebounceTimers[moduleId]) {
+        clearTimeout(noteDebounceTimers[moduleId]);
+      }
+      
+      // Auto-guardar después de 1.5 segundos sin escribir
+      noteDebounceTimers[moduleId] = setTimeout(() => {
+        saveNote(moduleId, content, true);
+      }, 1500);
+    });
+    
+    // Atajo de teclado Ctrl+S para guardar manual
+    txt.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        const content = txt.value;
+        
+        // Limpiar debounce si existe
+        if (noteDebounceTimers[moduleId]) {
+          clearTimeout(noteDebounceTimers[moduleId]);
+        }
+        
+        updateSaveStatus(moduleId, 'saving');
+        setTimeout(() => {
+          saveNote(moduleId, content, true);
+          showToast('💾 Notas guardadas manualmente', 'success', 2000);
+        }, 300);
+      }
+    });
+  });
+  
+  // Botón de guardar manual
+  document.querySelectorAll('[data-save-note]').forEach(btn => {
+    btn.onclick = () => {
+      const moduleId = btn.dataset.saveNote;
+      const textarea = document.querySelector(`[data-module-note="${moduleId}"]`);
+      if (!textarea) return;
+      
+      updateSaveStatus(moduleId, 'saving');
+      setTimeout(() => {
+        saveNote(moduleId, textarea.value, true);
+        showToast('💾 Notas guardadas correctamente', 'success', 2000);
+      }, 300);
     };
+  });
+  
+  // Botón de copiar
+  document.querySelectorAll('[data-copy-note]').forEach(btn => {
+    btn.onclick = () => copyNoteToClipboard(btn.dataset.copyNote);
+  });
+  
+  // Botón de limpiar
+  document.querySelectorAll('[data-clear-note]').forEach(btn => {
+    btn.onclick = () => clearNote(btn.dataset.clearNote);
   });
 }
 
