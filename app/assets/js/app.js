@@ -42,4 +42,29 @@ export const AppEngine = {
       expert: p[10] && p[11] && p[12],
     };
   },
+
+  /**
+   * Obtiene todos los módulos con su estado de completado
+   */
+  getAllModules() {
+    const progress = StorageService.get(KEYS.PROGRESS);
+    const subtasks = StorageService.get(KEYS.SUBTASK_PROGRESS);
+    
+    return this.modules.map(module => {
+      const moduleProgress = progress[module.id] || false;
+      
+      // Obtener tareas del módulo
+      const tasks = module.schedule ? module.schedule.map((task, index) => ({
+        id: `${module.id}-${index}`,
+        title: task,
+        isComplete: subtasks[`${module.id}-${index}`] || false
+      })) : [];
+      
+      return {
+        ...module,
+        isComplete: moduleProgress,
+        tasks: tasks
+      };
+    });
+  },
 };
