@@ -2,7 +2,8 @@
  * MAIN ENGINE - QA MASTER PATH
  * Responsabilidad: Coordinar datos, lógica de negocio y UI.
  */
-import { StorageService, KEYS } from './storage.js';
+import { StorageService } from './storage-unified.js';
+import { KEYS } from './storage-service-v2.js';
 
 export const AppEngine = {
   data: null,
