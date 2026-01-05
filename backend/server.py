@@ -27,14 +27,20 @@ app = FastAPI(
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8000")
 FRONTEND_DEV_URL = os.getenv("FRONTEND_DEV_URL", "http://localhost:3000")
 
+# Lista de orígenes permitidos para desarrollo local
+allowed_origins = [
+    FRONTEND_URL,
+    FRONTEND_DEV_URL,
+    "http://localhost:8000",
+    "http://localhost:3000",
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1:5500",  # VSCode Live Server
+    "http://192.168.56.1:8000",  # VirtualBox/VM
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        FRONTEND_URL,
-        FRONTEND_DEV_URL,
-        "http://localhost:8000",
-        "http://localhost:3000",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
