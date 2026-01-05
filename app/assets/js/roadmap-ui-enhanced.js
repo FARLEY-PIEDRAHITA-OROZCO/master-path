@@ -230,38 +230,38 @@ function renderRoadmap() {
                                 </div>
                                 
                                 <!-- Footer del Editor -->
-                                <div class="px-5 py-3 border-t border-white/5 flex items-center justify-between bg-black/20">
-                                    <div class="flex items-center gap-4">
-                                        <span id="char-count-${m.id}" class="text-[9px] font-bold text-slate-600" data-testid="char-count-${m.id}">
+                                <div class="px-4 py-2.5 border-t border-white/5 flex flex-wrap items-center justify-between gap-2 bg-black/20">
+                                    <div class="flex items-center gap-3">
+                                        <span id="char-count-${m.id}" class="text-[9px] font-bold text-slate-600 whitespace-nowrap" data-testid="char-count-${m.id}">
                                             0 caracteres
                                         </span>
-                                        <span id="word-count-${m.id}" class="text-[9px] font-bold text-slate-700">
+                                        <span id="word-count-${m.id}" class="text-[9px] font-bold text-slate-700 whitespace-nowrap">
                                             0 palabras
                                         </span>
                                     </div>
-                                    <div class="flex items-center gap-2">
+                                    <div class="flex items-center gap-1.5 flex-wrap">
                                         <button 
                                             data-copy-note="${m.id}"
                                             data-testid="copy-note-btn-${m.id}"
-                                            class="px-3 py-1.5 bg-slate-800/50 hover:bg-slate-800 border border-white/5 rounded-xl text-[9px] font-bold text-slate-400 hover:text-blue-400 transition-all flex items-center gap-1.5 group"
+                                            class="px-2 py-1 bg-slate-800/50 hover:bg-slate-800 border border-white/5 rounded-lg text-[8px] font-bold text-slate-400 hover:text-blue-400 transition-all flex items-center gap-1 group whitespace-nowrap"
                                             title="Copiar al portapapeles">
-                                            <i class="fas fa-copy text-[8px] group-hover:scale-110 transition-transform"></i>
+                                            <i class="fas fa-copy text-[7px] group-hover:scale-110 transition-transform"></i>
                                             Copiar
                                         </button>
                                         <button 
                                             data-save-note="${m.id}"
                                             data-testid="save-note-btn-${m.id}"
-                                            class="px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-xl text-[9px] font-bold text-blue-400 hover:text-blue-300 transition-all flex items-center gap-1.5 group"
+                                            class="px-2 py-1 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-lg text-[8px] font-bold text-blue-400 hover:text-blue-300 transition-all flex items-center gap-1 group whitespace-nowrap"
                                             title="Guardar (Ctrl+S)">
-                                            <i class="fas fa-save text-[8px] group-hover:scale-110 transition-transform"></i>
+                                            <i class="fas fa-save text-[7px] group-hover:scale-110 transition-transform"></i>
                                             Guardar
                                         </button>
                                         <button 
                                             data-clear-note="${m.id}"
                                             data-testid="clear-note-btn-${m.id}"
-                                            class="px-3 py-1.5 bg-red-900/20 hover:bg-red-900/30 border border-red-500/20 rounded-xl text-[9px] font-bold text-red-400 hover:text-red-300 transition-all flex items-center gap-1.5 group"
+                                            class="px-2 py-1 bg-red-900/20 hover:bg-red-900/30 border border-red-500/20 rounded-lg text-[8px] font-bold text-red-400 hover:text-red-300 transition-all flex items-center gap-1 group whitespace-nowrap"
                                             title="Limpiar notas">
-                                            <i class="fas fa-trash text-[8px] group-hover:scale-110 transition-transform"></i>
+                                            <i class="fas fa-trash text-[7px] group-hover:scale-110 transition-transform"></i>
                                             Limpiar
                                         </button>
                                     </div>
