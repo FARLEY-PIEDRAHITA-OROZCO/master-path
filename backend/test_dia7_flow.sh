@@ -35,7 +35,7 @@ REGISTER_RESPONSE=$(curl -s -X POST $BACKEND_URL/auth/register \
   -d '{
     "email": "'$EMAIL'",
     "password": "'$PASSWORD'",
-    "displayName": "'$DISPLAY_NAME'"
+    "display_name": "'$DISPLAY_NAME'"
   }')
 
 # Verificar si el registro fue exitoso
