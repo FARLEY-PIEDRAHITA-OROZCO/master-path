@@ -1,7 +1,7 @@
 import { AppEngine } from './app.js';
 import { StorageService, KEYS } from './storage.js';
 import { UIComponents } from './components.js';
-import { requireAuth } from './auth-guard.js';
+import { requireAuth } from './auth-guard-v2.js';
 
 // ⚠️ CRÍTICO: Verificar autenticación PRIMERO antes de cargar nada
 requireAuth();
