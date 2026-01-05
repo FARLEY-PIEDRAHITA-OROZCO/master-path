@@ -18,9 +18,10 @@ export async function requireAuth() {
     // Obtener el servicio de autenticación según configuración
     const authService = await getAuthService();
     
-    // Crear timeout de 8 segundos
+    // Crear timeout de 8 segundos con ID para poder cancelarlo
+    let timeoutId;
     const timeout = new Promise((resolve) => {
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         console.warn('⚠️ [AUTH-GUARD] Timeout alcanzado');
         resolve({ timeout: true });
       }, 8000);
@@ -28,9 +29,16 @@ export async function requireAuth() {
     
     // Carrera entre inicialización y timeout
     const result = await Promise.race([
-      authService.init().then(user => ({ user, timeout: false })),
+      authService.init().then(user => {
+        // ✅ Cancelar timeout si init() termina primero
+        clearTimeout(timeoutId);
+        return { user, timeout: false };
+      }),
       timeout
     ]);
+    
+    // ✅ Asegurar que el timeout esté cancelado en todos los casos
+    clearTimeout(timeoutId);
     
     if (result.timeout) {
       // Timeout - mostrar error
