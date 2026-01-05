@@ -1,8 +1,8 @@
-# FastAPI Core
-fastapi==0.109.0
+# FastAPI Core (ACTUALIZADAS - Enero 2026)
+fastapi==0.115.12
 uvicorn[standard]==0.27.0
-pydantic==2.5.3
-pydantic-settings==2.1.0
+pydantic==2.10.4
+pydantic-settings==2.7.1
 
 # Database
 pymongo==4.6.1
