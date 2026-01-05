@@ -117,13 +117,20 @@ if (elements.formLogin) {
   elements.formLogin.addEventListener('submit', async (e) => {
     e.preventDefault();
     
+    console.log('📝 [AUTH-UI] Formulario de login enviado');
+    console.log('🔍 [AUTH-UI] authService disponible:', !!authService);
+    
     if (!authService) {
+      console.error('❌ [AUTH-UI] authService es null!');
       showMessage('Servicio de autenticación no disponible', 'error');
       return;
     }
     
     const email = elements.loginEmail.value.trim();
     const password = elements.loginPassword.value;
+
+    console.log('📧 [AUTH-UI] Email:', email);
+    console.log('🔑 [AUTH-UI] Password length:', password.length);
 
     // Validación básica
     if (!email || !password) {
@@ -141,9 +148,13 @@ if (elements.formLogin) {
     showMessage('Iniciando sesión...', 'info');
     disableForm(elements.formLogin);
 
+    console.log('🚀 [AUTH-UI] Llamando a authService.login...');
+
     try {
       // Intentar login
       const result = await authService.login(email, password);
+
+      console.log('📬 [AUTH-UI] Resultado de login:', result);
 
       if (result.success) {
         showMessage('¡Bienvenido de vuelta!', 'success');
@@ -151,6 +162,8 @@ if (elements.formLogin) {
         // Redirigir al dashboard o a la página solicitada
         const params = new URLSearchParams(window.location.search);
         const redirect = params.get('redirect') || '/app/pages/dashboard.html';
+        
+        console.log('🔀 [AUTH-UI] Redirigiendo a:', redirect);
         
         setTimeout(() => {
           window.location.href = redirect;
@@ -160,11 +173,14 @@ if (elements.formLogin) {
         enableForm(elements.formLogin);
       }
     } catch (error) {
-      console.error('Error en login:', error);
+      console.error('❌ [AUTH-UI] Error en login:', error);
       showMessage('Error inesperado al iniciar sesión', 'error');
       enableForm(elements.formLogin);
     }
   });
+  console.log('✅ [AUTH-UI] Event listener de login registrado');
+} else {
+  console.error('❌ [AUTH-UI] No se encontró el formulario de login');
 }
 
 // Register Form
