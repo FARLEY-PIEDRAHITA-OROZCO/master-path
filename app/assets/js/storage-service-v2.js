@@ -318,9 +318,9 @@ export const StorageServiceV2 = {
       if (this.isAuthenticated()) {
         try {
           await this.apiClient.put('/subtask', {
-            moduleId: String(moduleId),
-            taskIndex: String(taskIndex),
-            isCompleted: newState
+            module_id: String(moduleId),
+            task_index: parseInt(taskIndex, 10),
+            is_completed: newState
           });
           
           this.updateLastSync();
