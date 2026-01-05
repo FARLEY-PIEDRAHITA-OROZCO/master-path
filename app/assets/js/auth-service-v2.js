@@ -247,6 +247,7 @@ class AuthServiceV2 {
         console.log('👤 [AUTH-SERVICE-V2] No hay token, usuario no autenticado');
         this.currentUser = null;
         this.isInitialized = true;
+        this.notifyAuthChange(); // Notificar que no hay usuario
         return null;
       }
 
@@ -260,6 +261,7 @@ class AuthServiceV2 {
           TokenManager.clearTokens();
           this.currentUser = null;
           this.isInitialized = true;
+          this.notifyAuthChange(); // Notificar que no hay usuario
           return null;
         }
       }
