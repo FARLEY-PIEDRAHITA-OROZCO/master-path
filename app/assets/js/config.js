@@ -8,20 +8,25 @@ function getBackendURL() {
   // Si estamos en el navegador
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
+    
+    // Preview de Emergent (*.preview.emergentagent.com)
+    if (hostname.includes('preview.emergentagent.com') || hostname.includes('emergentagent.com')) {
+      // En preview, el backend está en el mismo dominio en /api
+      return `${protocol}//${hostname}/api`;
+    }
     
     // Desarrollo local (Live Server, http-server, etc.)
     if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168')) {
-      // Intentar primero con el mismo puerto del frontend reemplazado por 8001
-      // O usar la URL completa de Emergent si está disponible
       return 'http://localhost:8001/api';
     }
     
-    // Producción o contenedor
-    return 'http://localhost:8001/api';
+    // Default: mismo dominio
+    return '/api';
   }
   
   // Default
-  return 'http://localhost:8001/api';
+  return '/api';
 }
 
 // Configurar la URL del backend
