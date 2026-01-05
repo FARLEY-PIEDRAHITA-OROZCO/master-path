@@ -77,19 +77,21 @@ async def create_indexes():
         users_collection = motor_db.users
         
         # Email único
-        await users_collection.create_index("email", unique=True)
+        await users_collection.create_index([("email", 1)], unique=True)
         
-        # Google ID único (sparse porque no todos los usuarios lo tienen)
+        # Google ID único y sparse (permite múltiples null)
+        # IMPORTANTE: sparse=True permite que múltiples documentos tengan google_id=null
         await users_collection.create_index(
-            "google_id",
+            [("google_id", 1)],
             unique=True,
-            sparse=True
+            sparse=True,
+            background=True
         )
         
         # Índices para búsquedas
-        await users_collection.create_index("created_at")
-        await users_collection.create_index("last_active")
-        await users_collection.create_index("auth_provider")
+        await users_collection.create_index([("created_at", 1)])
+        await users_collection.create_index([("last_active", 1)])
+        await users_collection.create_index([("auth_provider", 1)])
         
         print("✅ Índices MongoDB creados correctamente")
         
