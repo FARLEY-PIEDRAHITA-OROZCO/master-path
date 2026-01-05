@@ -94,7 +94,7 @@ async def health_check():
     try:
         # Verificar conexión MongoDB
         from services.database import motor_client
-        if motor_client:
+        if motor_client is not None:
             await motor_client.admin.command('ping')
             db_status = "connected"
         else:
@@ -117,8 +117,8 @@ async def status():
     from services.database import motor_db
     
     try:
-        collections = await motor_db.list_collection_names() if motor_db else []
-        users_count = await motor_db.users.count_documents({}) if motor_db else 0
+        collections = await motor_db.list_collection_names() if motor_db is not None else []
+        users_count = await motor_db.users.count_documents({}) if motor_db is not None else 0
         
         return {
             "status": "operational",
