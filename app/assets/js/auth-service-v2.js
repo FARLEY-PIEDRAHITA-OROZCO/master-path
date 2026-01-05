@@ -358,13 +358,24 @@ class AuthServiceV2 {
 
       // Guardar tokens y usuario
       const { access_token, refresh_token, user } = result.data;
+      
+      console.log('🔐 [AUTH-SERVICE-V2] Guardando tokens...', {
+        hasAccessToken: !!access_token,
+        hasRefreshToken: !!refresh_token,
+        hasUser: !!user
+      });
+      
       TokenManager.saveTokens(access_token, refresh_token);
       TokenManager.saveUser(user);
+      
+      // Verificar que se guardaron correctamente
+      const savedToken = TokenManager.getAccessToken();
+      console.log('✅ [AUTH-SERVICE-V2] Token guardado:', savedToken ? 'SÍ' : 'NO');
       
       this.currentUser = user;
       this.notifyAuthChange();
 
-      Logger.success('Login successful', { id: user.id });
+      Logger.success('Login successful', { id: user.id, email: user.email });
 
       return {
         success: true,
