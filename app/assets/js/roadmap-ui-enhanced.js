@@ -201,10 +201,72 @@ function renderRoadmap() {
                             </div>
                         </div>
                         <div class="space-y-3">
-                            <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Editor de Notas</h4>
-                            <textarea data-module-note="${m.id}" 
-                                      placeholder="Escribe tus hallazgos clave..."
-                                      class="w-full h-40 bg-white/[0.02] border border-white/5 rounded-3xl p-5 text-xs text-slate-300 focus:border-blue-500/50 outline-none transition resize-none leading-relaxed">${notes[m.id] || ''}</textarea>
+                            <div class="bg-gradient-to-br from-slate-900/50 to-slate-950/50 rounded-3xl border border-white/5 overflow-hidden">
+                                <!-- Header del Editor -->
+                                <div class="px-5 py-3 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-pen text-blue-500 text-xs"></i>
+                                        <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Editor de Notas</h4>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span id="save-status-${m.id}" class="text-[8px] font-bold text-slate-600 italic flex items-center gap-1">
+                                            <i class="fas fa-circle text-[6px]"></i>
+                                            <span data-testid="save-status-text-${m.id}">Sin cambios</span>
+                                        </span>
+                                        <span id="last-saved-${m.id}" class="text-[8px] text-slate-700 italic hidden" data-testid="last-saved-${m.id}"></span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Área de Texto -->
+                                <div class="relative">
+                                    <textarea 
+                                        data-module-note="${m.id}"
+                                        data-testid="note-editor-${m.id}"
+                                        placeholder="📝 Escribe tus hallazgos clave, aprendizajes importantes y notas técnicas aquí...
+
+💡 Tip: Usa Ctrl+S para guardar manualmente o simplemente escribe y se guardará automáticamente."
+                                        class="w-full h-48 bg-transparent border-none p-5 text-xs text-slate-300 focus:outline-none resize-none leading-relaxed placeholder:text-slate-700 placeholder:italic"
+                                    >${notes[m.id] || ''}</textarea>
+                                </div>
+                                
+                                <!-- Footer del Editor -->
+                                <div class="px-5 py-3 border-t border-white/5 flex items-center justify-between bg-black/20">
+                                    <div class="flex items-center gap-4">
+                                        <span id="char-count-${m.id}" class="text-[9px] font-bold text-slate-600" data-testid="char-count-${m.id}">
+                                            0 caracteres
+                                        </span>
+                                        <span id="word-count-${m.id}" class="text-[9px] font-bold text-slate-700">
+                                            0 palabras
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button 
+                                            data-copy-note="${m.id}"
+                                            data-testid="copy-note-btn-${m.id}"
+                                            class="px-3 py-1.5 bg-slate-800/50 hover:bg-slate-800 border border-white/5 rounded-xl text-[9px] font-bold text-slate-400 hover:text-blue-400 transition-all flex items-center gap-1.5 group"
+                                            title="Copiar al portapapeles">
+                                            <i class="fas fa-copy text-[8px] group-hover:scale-110 transition-transform"></i>
+                                            Copiar
+                                        </button>
+                                        <button 
+                                            data-save-note="${m.id}"
+                                            data-testid="save-note-btn-${m.id}"
+                                            class="px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-xl text-[9px] font-bold text-blue-400 hover:text-blue-300 transition-all flex items-center gap-1.5 group"
+                                            title="Guardar (Ctrl+S)">
+                                            <i class="fas fa-save text-[8px] group-hover:scale-110 transition-transform"></i>
+                                            Guardar
+                                        </button>
+                                        <button 
+                                            data-clear-note="${m.id}"
+                                            data-testid="clear-note-btn-${m.id}"
+                                            class="px-3 py-1.5 bg-red-900/20 hover:bg-red-900/30 border border-red-500/20 rounded-xl text-[9px] font-bold text-red-400 hover:text-red-300 transition-all flex items-center gap-1.5 group"
+                                            title="Limpiar notas">
+                                            <i class="fas fa-trash text-[8px] group-hover:scale-110 transition-transform"></i>
+                                            Limpiar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
