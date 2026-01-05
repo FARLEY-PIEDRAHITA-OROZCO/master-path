@@ -66,12 +66,15 @@ async def create_indexes():
     """
     Crear índices en las colecciones
     """
+    global motor_db
+    
     if motor_db is None:
+        print("⚠️ motor_db es None, no se pueden crear índices")
         return
     
     try:
         # Índices en colección users
-        users_collection = motor_db["users"]
+        users_collection = motor_db.users
         
         # Email único
         await users_collection.create_index("email", unique=True)
