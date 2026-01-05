@@ -158,25 +158,20 @@
 
 ## 📅 PRÓXIMOS PASOS
 
-### Día 3: Autenticación Backend
-- [ ] Implementar services/auth_service.py
-- [ ] Implementar services/jwt_service.py
-- [ ] Implementar utils/password.py (bcrypt)
-- [ ] Implementar routes/auth.py
-- [ ] Testing de endpoints
+### ✅ Día 3: Autenticación Backend - COMPLETADO
+- [x] Implementar services/auth_service.py
+- [x] Implementar services/jwt_service.py
+- [x] Implementar utils/password.py (bcrypt)
+- [x] Implementar routes/auth.py
+- [x] Implementar middleware/auth_middleware.py
+- [x] Testing de endpoints
 
-### Día 3: Autenticación Backend
-- [ ] Implementar services/auth_service.py
-- [ ] Implementar services/jwt_service.py
-- [ ] Implementar utils/password.py (bcrypt)
-- [ ] Implementar routes/auth.py
-- [ ] Testing de endpoints
-
-### Día 4: Endpoints de Usuario y Progreso
-- [ ] Implementar routes/user.py
-- [ ] Implementar routes/progress.py
-- [ ] Implementar middleware/auth_middleware.py
-- [ ] Testing de todos los endpoints
+### ✅ Día 4: Endpoints de Usuario y Progreso - COMPLETADO
+- [x] Implementar routes/user.py
+- [x] Implementar routes/progress.py
+- [x] Testing de todos los endpoints
+- [x] Fix de índice google_id sparse
+- [x] Documentar API (Swagger auto-generado)
 
 ### Día 5: Testing Backend Completo
 - [ ] Tests unitarios
