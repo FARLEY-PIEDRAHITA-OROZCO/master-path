@@ -147,12 +147,11 @@ async def status():
         )
 
 
-# TODO: Importar rutas cuando estén implementadas
-from routes import auth_router
-app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
-# from routes import user, progress
-# app.include_router(user.router, prefix="/api/user", tags=["user"])
-# app.include_router(progress.router, prefix="/api/progress", tags=["progress"])
+# Importar y registrar rutas
+from routes import auth_router, user_router, progress_router
+app.include_router(auth_router, prefix="/api/auth", tags=["Autenticación"])
+app.include_router(user_router, prefix="/api/user", tags=["Usuario"])
+app.include_router(progress_router, prefix="/api/progress", tags=["Progreso"])
 
 
 if __name__ == "__main__":
