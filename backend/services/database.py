@@ -122,8 +122,10 @@ async def test_connection():
     """
     Probar conexión a MongoDB
     """
+    global motor_db, motor_client
+    
     try:
-        if not motor_db:
+        if motor_db is None:
             await connect_to_mongo()
         
         # Ping
