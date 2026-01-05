@@ -131,8 +131,9 @@ export const UIComponents = {
     // Logout functionality
     logoutBtn.addEventListener('click', async () => {
       try {
-        // Importar authService dinámicamente
-        const { authService } = await import('./auth-service.js');
+        // Importar authService correcto según configuración
+        const { getAuthService } = await import('./auth-config.js');
+        const authService = await getAuthService();
         
         console.log('🚪 [COMPONENTS] Cerrando sesión...');
         
@@ -145,8 +146,16 @@ export const UIComponents = {
         
         if (result.success) {
           console.log('✅ [COMPONENTS] Sesión cerrada exitosamente');
-          // Redirigir a login
-          window.location.href = '/app/pages/auth.html';
+          
+          // Limpiar localStorage completamente
+          localStorage.removeItem('qa_access_token');
+          localStorage.removeItem('qa_refresh_token');
+          localStorage.removeItem('qa_current_user');
+          
+          console.log('🧹 [COMPONENTS] LocalStorage limpiado');
+          
+          // Redirigir a login con flag para evitar auto-login
+          window.location.href = '/app/pages/auth.html?logout=true';
         } else {
           console.error('❌ [COMPONENTS] Error al cerrar sesión:', result.error);
           alert('Error al cerrar sesión. Por favor intenta de nuevo.');
@@ -172,8 +181,9 @@ export const UIComponents = {
     const xpDisplay = document.getElementById('user-xp-display');
 
     try {
-      // Importar authService y AppEngine dinámicamente
-      const { authService } = await import('./auth-service.js');
+      // Importar authService correcto según configuración
+      const { getAuthService } = await import('./auth-config.js');
+      const authService = await getAuthService();
       const { AppEngine } = await import('./app.js');
       
       // Esperar a que authService esté inicializado
