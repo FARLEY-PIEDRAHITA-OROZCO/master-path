@@ -70,6 +70,13 @@ export async function requireAuth() {
 export async function redirectIfAuthenticated() {
   console.log('🔓 [AUTH-GUARD] Verificando si ya está autenticado...');
   
+  // Si hay un parámetro logout=true, no hacer nada (permitir mostrar login)
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('logout') === 'true') {
+    console.log('🚪 [AUTH-GUARD] Logout detectado, mostrando página de login...');
+    return;
+  }
+  
   try {
     const authService = await getAuthService();
     
