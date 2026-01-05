@@ -379,6 +379,12 @@ class AuthServiceV2 {
         password
       });
 
+      console.log('🌐 [AUTH-SERVICE-V2] Respuesta del backend:', {
+        success: result.success,
+        hasData: !!result.data,
+        dataKeys: result.data ? Object.keys(result.data) : []
+      });
+
       if (!result.success) {
         return {
           success: false,
@@ -389,18 +395,21 @@ class AuthServiceV2 {
       // Guardar tokens y usuario
       const { access_token, refresh_token, user } = result.data;
       
-      console.log('🔐 [AUTH-SERVICE-V2] Guardando tokens...', {
+      console.log('🔐 [AUTH-SERVICE-V2] Datos extraídos:', {
         hasAccessToken: !!access_token,
         hasRefreshToken: !!refresh_token,
-        hasUser: !!user
+        hasUser: !!user,
+        accessTokenPreview: access_token ? access_token.substring(0, 20) + '...' : 'null'
       });
       
-      TokenManager.saveTokens(access_token, refresh_token);
+      const saveResult = TokenManager.saveTokens(access_token, refresh_token);
+      console.log('💾 [AUTH-SERVICE-V2] Resultado de guardar tokens:', saveResult);
+      
       TokenManager.saveUser(user);
       
       // Verificar que se guardaron correctamente
       const savedToken = TokenManager.getAccessToken();
-      console.log('✅ [AUTH-SERVICE-V2] Token guardado:', savedToken ? 'SÍ' : 'NO');
+      console.log('✅ [AUTH-SERVICE-V2] Verificación final - Token en localStorage:', savedToken ? 'SÍ (' + savedToken.substring(0, 20) + '...)' : 'NO');
       
       this.currentUser = user;
       this.notifyAuthChange();
