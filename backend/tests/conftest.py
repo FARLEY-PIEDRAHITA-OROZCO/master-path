@@ -46,11 +46,13 @@ async def test_db():
     client.close()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def test_client():
     """
     Fixture para cliente HTTP de prueba
     """
+    import sys
+    sys.path.insert(0, '/app/backend')
     from server import app
     
     async with AsyncClient(app=app, base_url="http://test") as client:
