@@ -1,5 +1,6 @@
 import { AppEngine } from './app.js';
-import { StorageService, KEYS } from './storage.js';
+import { StorageService } from './storage-unified.js';
+import { KEYS } from './storage-service-v2.js';
 import { UIComponents } from './components.js';
 import { requireAuth } from './auth-guard-v2.js';
 
