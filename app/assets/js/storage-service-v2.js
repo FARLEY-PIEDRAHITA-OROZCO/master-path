@@ -283,8 +283,8 @@ export const StorageServiceV2 = {
       if (this.isAuthenticated()) {
         try {
           await this.apiClient.put('/module', {
-            moduleId: String(id),
-            isCompleted: Boolean(isChecked)
+            module_id: String(id),
+            is_completed: Boolean(isChecked)
           });
           
           this.updateLastSync();
@@ -358,8 +358,8 @@ export const StorageServiceV2 = {
       if (this.isAuthenticated()) {
         try {
           await this.apiClient.put('/note', {
-            moduleId: String(moduleId),
-            noteText: sanitized
+            module_id: String(moduleId),
+            note_text: sanitized
           });
           
           this.updateLastSync();
@@ -407,7 +407,7 @@ export const StorageServiceV2 = {
       // Sincronizar con backend si está autenticado
       if (this.isAuthenticated()) {
         try {
-          await this.apiClient.post('/badge', { badgeName });
+          await this.apiClient.post('/badge', { badge_name: badgeName });
           this.updateLastSync();
           Logger.success('Badge synced with backend', { badgeName });
         } catch (error) {
