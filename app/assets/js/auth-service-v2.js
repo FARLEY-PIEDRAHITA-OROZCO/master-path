@@ -465,12 +465,22 @@ class AuthServiceV2 {
    */
   async logout() {
     try {
+      console.log('🚪 [AUTH-SERVICE-V2] Iniciando logout...');
+      
       // Intentar notificar al backend (no crítico si falla)
-      await APIClient.post('/auth/logout').catch(() => {});
+      await APIClient.post('/auth/logout').catch(() => {
+        console.log('⚠️ [AUTH-SERVICE-V2] No se pudo notificar al backend (no crítico)');
+      });
 
       // Limpiar tokens y usuario
       TokenManager.clearTokens();
       this.currentUser = null;
+      this.isInitialized = false; // Importante: marcar como no inicializado
+      
+      console.log('🧹 [AUTH-SERVICE-V2] Tokens limpiados');
+      console.log('👤 [AUTH-SERVICE-V2] Usuario reseteado');
+      
+      // Notificar a los listeners
       this.notifyAuthChange();
 
       Logger.success('Logout successful');
