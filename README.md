@@ -107,7 +107,6 @@ Linting:   ESLint + Prettier
 │       │
 │       ├── data/                 # Archivos de datos
 │       │   ├── modules.json      # 12 módulos del curso
-│       │   └── docs.json         # Artículos técnicos
 │       │
 │       └── style.css             # Estilos globales
 │
