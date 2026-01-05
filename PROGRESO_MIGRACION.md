@@ -346,15 +346,15 @@
 
 ## 📊 Métricas
 
-- **Días completados:** 5/13 (38.5%) 🎯
-- **Archivos creados:** 26+
+- **Días completados:** 6/13 (46.2%) 🎯
+- **Archivos creados:** 29+ (backend) + 3+ (frontend)
 - **Modelos implementados:** 18
 - **Validadores implementados:** 10
 - **Endpoints funcionando:** 20 ✅ (100% validados)
-- **Tests ejecutados:** 91+ tests (60 unitarios automatizados + 20 integración manual + 11 adicionales)
-- **Success rate:** 100% (endpoints funcionando)
-- **Lines of code:** ~3,500+
-- **Bugs encontrados y resueltos:** 4/4
+- **Tests ejecutados:** 95+ tests (60 unitarios + 20 integración manual + 15 adicionales)
+- **Success rate:** 100% (endpoints + auth flow)
+- **Lines of code:** ~4,700+ (backend: 3,500+ | frontend: 1,200+)
+- **Bugs encontrados y resueltos:** 8/8
 
 ---
 
