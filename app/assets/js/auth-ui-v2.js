@@ -39,6 +39,7 @@ async function initAuthUI() {
   
   // Cargar el servicio de autenticación según configuración
   authService = await getAuthService();
+  console.log('✅ [AUTH-UI] AuthService cargado:', !!authService);
   
   // Verificar si ya está autenticado
   await redirectIfAuthenticated();
@@ -59,7 +60,101 @@ async function initAuthUI() {
     }
   }
   
+  // Registrar event listeners DESPUÉS de cargar authService
+  setupEventListeners();
+  
   console.log('✅ [AUTH-UI] Interfaz lista');
+}
+
+// Función separada para configurar event listeners
+function setupEventListeners() {
+  console.log('🔧 [AUTH-UI] Configurando event listeners...');
+  
+  // Login Form
+  if (elements.formLogin) {
+    console.log('📝 [AUTH-UI] Formulario login encontrado, agregando listener...');
+    
+    elements.formLogin.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      console.log('📝 [AUTH-UI] Formulario de login enviado');
+      console.log('🔍 [AUTH-UI] authService disponible:', !!authService);
+      
+      if (!authService) {
+        console.error('❌ [AUTH-UI] authService es null!');
+        showMessage('Servicio de autenticación no disponible', 'error');
+        return;
+      }
+      
+      const email = elements.loginEmail.value.trim();
+      const password = elements.loginPassword.value;
+
+      console.log('📧 [AUTH-UI] Email:', email);
+      console.log('🔑 [AUTH-UI] Password length:', password.length);
+
+      // Validación básica
+      if (!email || !password) {
+        showMessage('Por favor completa todos los campos', 'error');
+        return;
+      }
+
+      // Validación de email
+      if (!isValidEmail(email)) {
+        showMessage('Email inválido', 'error');
+        return;
+      }
+
+      // Mostrar loading
+      showMessage('Iniciando sesión...', 'info');
+      disableForm(elements.formLogin);
+
+      console.log('🚀 [AUTH-UI] Llamando a authService.login...');
+
+      try {
+        // Intentar login
+        const result = await authService.login(email, password);
+
+        console.log('📬 [AUTH-UI] Resultado de login:', result);
+
+        if (result.success) {
+          showMessage('¡Bienvenido de vuelta!', 'success');
+          
+          // Redirigir al dashboard o a la página solicitada
+          const params = new URLSearchParams(window.location.search);
+          const redirect = params.get('redirect') || '/app/pages/dashboard.html';
+          
+          console.log('🔀 [AUTH-UI] Redirigiendo a:', redirect);
+          
+          setTimeout(() => {
+            window.location.href = redirect;
+          }, 1000);
+        } else {
+          showMessage(result.error || 'Error al iniciar sesión', 'error');
+          enableForm(elements.formLogin);
+        }
+      } catch (error) {
+        console.error('❌ [AUTH-UI] Error en login:', error);
+        showMessage('Error inesperado al iniciar sesión', 'error');
+        enableForm(elements.formLogin);
+      }
+    }, { capture: true });
+    
+    console.log('✅ [AUTH-UI] Event listener de login registrado');
+  } else {
+    console.error('❌ [AUTH-UI] No se encontró el formulario de login');
+  }
+  
+  // Register Form
+  if (elements.formRegister) {
+    console.log('📝 [AUTH-UI] Formulario registro encontrado, agregando listener...');
+    setupRegisterListener();
+  }
+  
+  // Google Button
+  if (elements.btnGoogle) {
+    setupGoogleListener();
+  }
 }
 
 // Inicializar cuando se carga la página
