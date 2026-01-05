@@ -30,7 +30,7 @@ async def connect_to_mongo():
     global motor_client, motor_db
     
     try:
-        print(f"🔌 Conectando a MongoDB: {MONGO_URL}")
+        print(f"Conectando a MongoDB: {MONGO_URL}")
         motor_client = AsyncIOMotorClient(
             MONGO_URL,
             serverSelectionTimeoutMS=5000,
@@ -44,11 +44,11 @@ async def connect_to_mongo():
         # Crear índices
         await create_indexes()
         
-        print(f"✅ MongoDB conectado exitosamente: {MONGO_DB_NAME}")
+        print(f"MongoDB conectado exitosamente: {MONGO_DB_NAME}")
         return motor_db
         
     except Exception as e:
-        print(f"❌ Error conectando a MongoDB: {e}")
+        print(f"Error conectando a MongoDB: {e}")
         raise
 
 
@@ -59,7 +59,7 @@ async def close_mongo_connection():
     global motor_client
     if motor_client:
         motor_client.close()
-        print("🔌 Conexión MongoDB cerrada")
+        print("Conexión MongoDB cerrada")
 
 
 async def create_indexes():
@@ -69,7 +69,7 @@ async def create_indexes():
     global motor_db
     
     if motor_db is None:
-        print("⚠️ motor_db es None, no se pueden crear índices")
+        print("motor_db es None, no se pueden crear índices")
         return
     
     try:
@@ -93,10 +93,10 @@ async def create_indexes():
         await users_collection.create_index([("last_active", 1)])
         await users_collection.create_index([("auth_provider", 1)])
         
-        print("✅ Índices MongoDB creados correctamente")
+        print("Índices MongoDB creados correctamente")
         
     except Exception as e:
-        print(f"⚠️ Error creando índices: {e}")
+        print(f"Error creando índices: {e}")
 
 
 def get_database():
@@ -137,16 +137,16 @@ async def test_connection():
         server_info = await motor_client.server_info()
         
         print("\n" + "="*50)
-        print("✅ TEST DE CONEXIÓN MONGODB")
+        print("TEST DE CONEXIÓN MONGODB")
         print("="*50)
-        print(f"📍 URL: {MONGO_URL}")
-        print(f"📊 Base de datos: {MONGO_DB_NAME}")
-        print(f"🏷️ Versión MongoDB: {server_info.get('version')}")
-        print(f"📋 Colecciones: {await motor_db.list_collection_names()}")
+        print(f"URL: {MONGO_URL}")
+        print(f"Base de datos: {MONGO_DB_NAME}")
+        print(f"Versión MongoDB: {server_info.get('version')}")
+        print(f"Colecciones: {await motor_db.list_collection_names()}")
         print("="*50 + "\n")
         
         return True
         
     except Exception as e:
-        print(f"\n❌ ERROR EN TEST DE CONEXIÓN: {e}\n")
+        print(f"\n ERROR EN TEST DE CONEXIÓN: {e}\n")
         return False

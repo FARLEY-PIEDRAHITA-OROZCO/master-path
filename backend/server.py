@@ -54,7 +54,7 @@ async def startup_event():
     Ejecutar al iniciar la aplicación
     """
     print("\n" + "="*60)
-    print("🚀 QA MASTER PATH BACKEND - INICIANDO")
+    print("QA MASTER PATH BACKEND - INICIANDO")
     print("="*60)
     
     # Conectar a MongoDB
@@ -63,8 +63,8 @@ async def startup_event():
     # Test de conexión
     await test_connection()
     
-    print("✅ Backend iniciado correctamente")
-    print("📍 Docs: http://localhost:8001/api/docs")
+    print("Backend iniciado correctamente")
+    print("Docs: http://localhost:8001/api/docs")
     print("="*60 + "\n")
 
 
@@ -75,7 +75,7 @@ async def shutdown_event():
     """
     print("\n🔌 Cerrando conexión a MongoDB...")
     await close_mongo_connection()
-    print("👋 Backend cerrado correctamente\n")
+    print("Backend cerrado correctamente\n")
 
 
 # Rutas básicas
