@@ -1,68 +1,166 @@
-# Sistema de Documentación - QA Master Path
+# 📚 Guías Técnicas - QA Master Path
 
-## 📚 Estructura de Archivos
+Esta carpeta contiene documentación técnica detallada para desarrolladores y colaboradores del proyecto.
+
+---
+
+## 📑 Índice de Documentos
+
+### 1. [**ESTRUCTURA_PROYECTO.md**](./ESTRUCTURA_PROYECTO.md)
+**Descripción**: Organización detallada de archivos y directorios del proyecto.
+
+**Contenido**:
+- Estructura de carpetas `/app/pages/` y `/app/assets/`
+- Rutas y URLs de la aplicación
+- Flujo de autenticación
+- Organización de archivos JavaScript
+- Mejores prácticas de estructura
+
+**Para quién**: Desarrolladores nuevos, arquitectos, code reviewers
+
+---
+
+### 2. [**DOCS_ARQUITECTURA.md**](./DOCS_ARQUITECTURA.md)
+**Descripción**: Arquitectura técnica completa de la aplicación.
+
+**Contenido**:
+- Patrón de diseño modular
+- Ciclo de vida de la aplicación
+- Descripción de módulos JavaScript (storage.js, app.js, etc.)
+- Modelo de datos (modules.json, docs.json, LocalStorage schema)
+- Sistema de estilos (Tailwind + CSS custom)
+- Dependencias externas
+- Limitaciones conocidas y soluciones propuestas
+
+**Para quién**: Arquitectos de software, desarrolladores avanzados
+
+---
+
+### 3. [**FIREBASE_AUTH_SETUP.md**](./FIREBASE_AUTH_SETUP.md)
+**Descripción**: Guía completa de configuración de Firebase Authentication.
+
+**Contenido**:
+- Configuración paso a paso de Firebase
+- Implementación de autenticación (Email/Password y Google)
+- Resolución de dependencias circulares
+- Troubleshooting de errores comunes
+- Configuración de reglas de Firestore
+- Testing de autenticación
+
+**Para quién**: Developers implementando auth, DevOps, nuevos colaboradores
+
+---
+
+## 🚀 Inicio Rápido
+
+### Para Desarrolladores Nuevos
+
+**Lectura recomendada en orden**:
+
+1. Leer [`../README.md`](../README.md) (visión general del proyecto)
+2. Leer [`ESTRUCTURA_PROYECTO.md`](./ESTRUCTURA_PROYECTO.md) (entender organización)
+3. Leer [`DOCS_ARQUITECTURA.md`](./DOCS_ARQUITECTURA.md) (entender arquitectura)
+4. Si vas a trabajar con auth: leer [`FIREBASE_AUTH_SETUP.md`](./FIREBASE_AUTH_SETUP.md)
+
+### Para Configurar el Proyecto
+
+```bash
+# 1. Clonar repositorio
+git clone https://github.com/tu-usuario/qa-master-path.git
+cd qa-master-path
+
+# 2. Instalar dependencias
+npm install
+
+# 3. Configurar Firebase (ver FIREBASE_AUTH_SETUP.md)
+# Editar app/assets/js/firebase-config.js con tus credenciales
+
+# 4. Iniciar servidor de desarrollo
+npm run dev
+
+# 5. Abrir http://localhost:8000
+```
+
+---
+
+## 🔧 Scripts Útiles
+
+```bash
+# Desarrollo
+npm run dev              # Servidor de desarrollo
+
+# Testing
+npm test                 # Tests en modo watch
+npm run test:coverage    # Reporte de cobertura
+
+# Linting
+npm run lint             # Verificar código
+npm run lint:fix         # Corregir automáticamente
+
+# Formateo
+npm run format           # Formatear todo el código
+```
+
+---
+
+## 📝 Sistema de Documentación (Knowledge Base)
+
+### ¿Qué es?
+
+El sistema de documentación es la **Knowledge Base** interna de la aplicación, donde se publican artículos técnicos en formato Markdown.
+
+### Estructura
 
 ```
 /app/docs/
-├── manifest.json          # Índice de documentos (metadata)
-├── images/                # Imágenes compartidas entre todos los docs
+├── manifest.json          # Índice de todos los documentos
+├── images/                # Imágenes compartidas
 │   ├── logo.png
-│   └── banner.jpg
-└── content/              # Documentos en Markdown
+│   └── diagrams/
+└── content/              # Archivos Markdown organizados por bloque
     ├── 01-fundamentos/
     │   ├── sdlc-stlc.md
-    │   ├── defect-management.md
-    │   └── agile-qa.md
+    │   └── defect-management.md
     ├── 02-technical/
     │   └── sql-basics.md
     └── 03-automation/
         └── playwright-intro.md
 ```
 
-## ➕ Cómo Agregar un Nuevo Documento
+### Agregar Nuevo Documento
 
-### Paso 1: Crear el archivo .md
-
-Crea tu archivo en la carpeta correspondiente:
+#### Paso 1: Crear archivo Markdown
 
 ```bash
-# Ejemplo: Nuevo documento sobre Postman
+# Ejemplo: Nuevo artículo sobre Postman
 touch /app/docs/content/02-technical/postman-api.md
 ```
 
-### Paso 2: Escribir el contenido en Markdown puro
+#### Paso 2: Escribir contenido en Markdown
 
 ```markdown
-# Título del Documento
+# Postman & API Testing
 
 ## Introducción
 
-Escribe tu contenido aquí en **Markdown puro**.
+Postman es una herramienta para...
 
-- Lista 1
-- Lista 2
+## Conceptos Clave
 
-## Sección 2
+- **Collections**: Grupos de requests
+- **Environments**: Variables de entorno
+- **Tests**: Scripts de validación
 
-Más contenido...
-
-### Subsección
-
-Código de ejemplo:
+## Ejemplos
 
 ```javascript
-const test = 'Hello World';
-console.log(test);
+pm.test("Status code is 200", function () {
+    pm.response.to.have.status(200);
+});
+```
 ```
 
-## Incluir Imágenes
-
-![Descripción de la imagen](/app/docs/images/mi-imagen.png)
-```
-
-### Paso 3: Registrar en manifest.json
-
-Edita `/app/docs/manifest.json` y agrega tu documento:
+#### Paso 3: Registrar en manifest.json
 
 ```json
 {
@@ -83,27 +181,27 @@ Edita `/app/docs/manifest.json` y agrega tu documento:
 }
 ```
 
-## 🖼️ Cómo Usar Imágenes
+#### Paso 4: Verificar en la app
 
-### Opción 1: Imágenes en carpeta compartida
+1. Ir a http://localhost:8000/app/pages/knowledge-base.html
+2. Buscar tu artículo en el sidebar
+3. Verificar que se renderiza correctamente
 
-1. Sube tu imagen a `/app/docs/images/`
-2. Reférenciala en tu .md:
+---
+
+## 🖼️ Uso de Imágenes
+
+### Opción 1: Carpeta compartida
 
 ```markdown
 ![Diagrama SDLC](/app/docs/images/sdlc-diagram.png)
 ```
 
-### Opción 2: Imágenes por bloque (organización)
-
-1. Crea subcarpeta `images` en el bloque:
+### Opción 2: Carpeta por bloque
 
 ```bash
 mkdir /app/docs/content/01-fundamentos/images
 ```
-
-2. Sube tu imagen ahí
-3. Reférenciala con ruta relativa:
 
 ```markdown
 ![Bug Lifecycle](./images/bug-lifecycle.png)
@@ -115,193 +213,98 @@ mkdir /app/docs/content/01-fundamentos/images
 ![Testing Pyramid](https://example.com/pyramid.png)
 ```
 
+---
+
 ## 🎨 Sintaxis Markdown Soportada
 
-### Títulos
+La aplicación usa **Marked.js** que soporta:
+
+### Básicos
 
 ```markdown
-# H1 - Título Principal
-## H2 - Sección
-### H3 - Subsección
-```
+# H1
+## H2
+### H3
 
-### Texto
-
-```markdown
 **Negrita**
 *Itálica*
 `código inline`
 ~~Tachado~~
+
+- Lista desordenada
+1. Lista ordenada
+
+[Link](https://example.com)
+![Imagen](ruta/imagen.png)
 ```
 
-### Listas
+### Avanzados
 
 ```markdown
-- Item 1
-- Item 2
-  - Sub-item
+> Cita en bloque
 
-1. Numerada
-2. Ordenada
-```
-
-### Links
-
-```markdown
-[Texto del link](https://example.com)
-[Link a otro doc](./otro-documento.md)
-```
-
-### Imágenes
-
-```markdown
-![Alt text](ruta/imagen.png)
-![Con título](imagen.jpg "Título al hover")
-```
-
-### Bloques de Código
-
-```markdown
-```javascript
-const hello = 'world';
-console.log(hello);
-```
-```
-
-### Citas
-
-```markdown
-> Esto es una cita
-> - Autor
-```
-
-### Tablas
-
-```markdown
 | Columna 1 | Columna 2 |
-|-----------|----------|
-| Valor 1   | Valor 2  |
+|-----------|-----------|
+| Valor 1   | Valor 2   |
+
+```javascript
+const code = "bloques de código";
 ```
 
-### Separadores
-
-```markdown
 ---
-***
-```
 
-### Emojis
+## 🐛 Troubleshooting
 
-```markdown
-:rocket: :fire: :check: → 🚀 🔥 ✅
-```
-
-## 🔧 Herramientas Recomendadas
-
-### Editores con Preview
-
-- **VS Code** (extensión: Markdown Preview Enhanced)
-- **Obsidian** (perfecto para documentación)
-- **Typora** (WYSIWYG markdown)
-- **Mark Text** (open source)
-
-### Verificación
+### El servidor no inicia
 
 ```bash
-# Verificar sintaxis markdown
-npx markdownlint /app/docs/content/**/*.md
+# Verificar puerto ocupado
+lsof -i :8000
+
+# Usar puerto diferente
+npx http-server -p 3000
 ```
 
-## ⚡ Workflow Rápido
+### Firebase no conecta
+
+1. Verificar credenciales en `firebase-config.js`
+2. Verificar Import Maps en HTML
+3. Ver consola del navegador para errores específicos
+4. Consultar [`FIREBASE_AUTH_SETUP.md`](./FIREBASE_AUTH_SETUP.md)
+
+### Tests fallan
 
 ```bash
-# 1. Crear nuevo documento
-code /app/docs/content/02-technical/nuevo-doc.md
+# Limpiar cache
+rm -rf node_modules
+npm install
 
-# 2. Escribir en markdown con preview en VS Code
-# (Ctrl + Shift + V para ver preview)
-
-# 3. Agregar al manifest
-code /app/docs/manifest.json
-
-# 4. Refrescar la página - ¡ya está disponible!
+# Verificar versiones
+node --version  # Debe ser 18+
+npm --version   # Debe ser 9+
 ```
-
-## 👁️ Vista Previa Local
-
-Para ver cómo se verá tu documento:
-
-1. Abre `http://localhost:8000/app/pages/knowledge-base.html`
-2. Navega a tu documento desde el menú lateral
-3. El markdown se renderiza automáticamente
-
-## 📝 Ejemplo Completo
-
-**Archivo**: `/app/docs/content/02-technical/ejemplo.md`
-
-```markdown
-# Mi Documento de Ejemplo
-
-## Introducción
-
-Este es un ejemplo de cómo escribir documentación.
-
-## Conceptos Clave
-
-- **Testing**: Validación de software
-- **QA**: Quality Assurance
-- **Automation**: Pruebas automatizadas
-
-## Diagrama
-
-![Proceso de Testing](/app/docs/images/testing-process.png)
-
-## Código de Ejemplo
-
-```python
-def test_login():
-    assert login('user', 'pass') == True
-```
-
-## Referencias
-
-- [Documentación oficial](https://example.com)
-- [Tutorial avanzado](./tutorial-avanzado.md)
 
 ---
 
-### 💡 Tip
+## 📞 Soporte
 
-Recuerda actualizar el `manifest.json` después de crear tu documento.
-```
+Si encuentras problemas o tienes preguntas:
 
-## ❓ FAQ
-
-**Q: ¿Puedo usar HTML en los archivos .md?**  
-A: Sí, Markdown soporta HTML embebido.
-
-**Q: ¿Cómo organizo muchos documentos?**  
-A: Usa subcarpetas dentro de cada bloque.
-
-**Q: ¿Puedo editar desde GitHub directamente?**  
-A: ¡Sí! GitHub tiene un editor markdown integrado.
-
-**Q: ¿Cómo embed videos?**  
-A: Usa HTML:
-```html
-<video src="/app/docs/videos/demo.mp4" controls></video>
-```
-
-## 🚀 Beneficios de este Sistema
-
-✅ **Rápido**: Escribe en .md puro, sin escapar caracteres  
-✅ **Git-friendly**: Diffs claros en control de versiones  
-✅ **Escalable**: Agregar docs = crear archivo  
-✅ **Herramientas Pro**: Usa cualquier editor markdown  
-✅ **Imágenes**: Soporte completo con rutas relativas o absolutas  
-✅ **Portable**: Los .md son legibles en cualquier plataforma
+1. **Revisa la documentación relevante** en esta carpeta
+2. **Busca en issues del repositorio** (si es público)
+3. **Contacta al autor** vía email: frlpiedrahita@gmail.com
 
 ---
 
-**Última actualización**: Enero 2025  
-**Mantenido por**: QA Master Path Team
+## 🤝 Contribuir a la Documentación
+
+¿Encontraste algo unclear o desactualizado?
+
+1. Edita el documento correspondiente
+2. Asegúrate de que los ejemplos funcionen
+3. Sigue el mismo formato y tono
+4. Crea un Pull Request con descripción clara
+
+---
+
+**Última actualización**: Enero 2025
