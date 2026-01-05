@@ -208,9 +208,17 @@ class AuthServiceV2 {
   async init() {
     console.log('🔐 [AUTH-SERVICE-V2] Iniciando servicio de autenticación...');
 
-    if (this.isInitialized) {
-      console.log('⚡ [AUTH-SERVICE-V2] Ya inicializado, retornando usuario actual');
-      return this.currentUser;
+    // Si ya está inicializado Y hay un currentUser, retornar
+    // Pero siempre verificar que el token siga siendo válido
+    if (this.isInitialized && this.currentUser) {
+      const token = TokenManager.getAccessToken();
+      if (token && !TokenManager.isTokenExpired(token)) {
+        console.log('⚡ [AUTH-SERVICE-V2] Ya inicializado con usuario válido');
+        return this.currentUser;
+      }
+      // Si el token expiró o no existe, reinicializar
+      console.log('🔄 [AUTH-SERVICE-V2] Token cambió, reinicializando...');
+      this.isInitialized = false;
     }
 
     try {
@@ -218,6 +226,7 @@ class AuthServiceV2 {
 
       if (!token) {
         console.log('👤 [AUTH-SERVICE-V2] No hay token, usuario no autenticado');
+        this.currentUser = null;
         this.isInitialized = true;
         return null;
       }
@@ -230,6 +239,7 @@ class AuthServiceV2 {
         if (!refreshed) {
           console.log('❌ [AUTH-SERVICE-V2] No se pudo refrescar el token');
           TokenManager.clearTokens();
+          this.currentUser = null;
           this.isInitialized = true;
           return null;
         }
@@ -259,6 +269,7 @@ class AuthServiceV2 {
 
     } catch (error) {
       console.error('❌ [AUTH-SERVICE-V2] Error en inicialización:', error);
+      this.currentUser = null;
       this.isInitialized = true;
       return null;
     }
