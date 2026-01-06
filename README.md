@@ -1,24 +1,24 @@
 # 🎯 QA Master Path
 
-> Plataforma educativa gamificada para convertirse en QA Automation Engineer en 12 semanas
+> Plataforma educativa gamificada fullstack para convertirse en QA Automation Engineer en 12 semanas
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Status: Active](https://img.shields.io/badge/Status-Active-success)](https://github.com)
+[![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green.svg)](https://fastapi.tiangolo.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-7.0-success.svg)](https://www.mongodb.com/)
 
 ---
 
 ## 📋 Descripción
 
-**QA Master Path** es una aplicación web educativa que guía a testers manuales en su transformación a QA Automation Engineers mediante un sistema progresivo de 12 módulos, gamificación con XP y badges, y un roadmap interactivo con tareas diarias.
-
-### ✨ Características Principales
+**QA Master Path** es una aplicación web fullstack que guía a testers manuales en su transformación a QA Automation Engineers mediante:
 
 - 📚 **12 Módulos Progresivos**: Desde SDLC hasta CI/CD y Performance Testing
 - 🎮 **Sistema de Gamificación**: XP, rankings dinámicos y 4 badges desbloqueables
-- 🗺️ **Roadmap Interactivo**: Visualización de progreso con tareas diarias y sprints
+- 🗺️ **Roadmap Interactivo**: Visualización de progreso con tareas diarias
 - 📝 **Editor de Notas**: Sistema completo con auto-guardado y sincronización
-- 🔒 **Autenticación Firebase**: Login con email/password y Google OAuth
-- ☁️ **Sincronización en la Nube**: Progreso guardado en Firestore
+- 🔒 **Autenticación JWT**: Sistema de autenticación seguro con cookies httpOnly
+- ☁️ **Backend Propio**: API REST completa con FastAPI + MongoDB
 - 🎨 **Diseño Moderno**: Interfaz oscura con Tailwind CSS y efectos glassmorphism
 - 📖 **Base de Conocimientos**: Documentación técnica integrada con Markdown
 
@@ -30,44 +30,61 @@
 
 ```
 Frontend:  Vanilla JavaScript (ES6 Modules) + Tailwind CSS
-Auth:      Firebase Authentication
-Database:  Cloud Firestore + LocalStorage (backup)
-Hosting:   Static hosting compatible (GitHub Pages, Netlify, Vercel)
-Testing:   Vitest + jsdom
+Backend:   FastAPI (Python 3.11) + MongoDB
+Auth:      JWT (httpOnly cookies) + bcrypt
+Database:  MongoDB 7.0 (Motor async driver)
+Hosting:   Static frontend + FastAPI backend
+Testing:   Vitest (frontend) + pytest (backend)
 Linting:   ESLint + Prettier
 ```
 
-### Patrón de Diseño
+### Arquitectura General
 
 ```
-┌─────────────────────────────────────────┐
-│           SPA Architecture              │
-├─────────────────────────────────────────┤
-│  UI Layer                               │
-│  ├─ pages/*.html (5 páginas)            │
-│  └─ Tailwind CSS + Custom Styles       │
-├─────────────────────────────────────────┤
-│  Presentation Layer                     │
-│  ├─ dashboard-ui.js                     │
-│  ├─ roadmap-ui-enhanced.js              │
-│  ├─ docs-enhanced.js                    │
-│  └─ auth-ui.js                          │
-├─────────────────────────────────────────┤
-│  Business Logic                         │
-│  ├─ app.js (AppEngine)                  │
-│  ├─ auth-service.js                     │
-│  └─ components.js                       │
-├─────────────────────────────────────────┤
-│  Data Layer                             │
-│  ├─ storage.js (StorageService)         │
-│  ├─ LocalStorage API                    │
-│  └─ Firestore sync                      │
-├─────────────────────────────────────────┤
-│  External Services                      │
-│  ├─ Firebase Auth                       │
-│  ├─ Cloud Firestore                     │
-│  └─ JSON Data Files                     │
-└─────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                    FULLSTACK APPLICATION                     │
+├─────────────────────────────────────────────────────────────┤
+│  Frontend (Vanilla JS)                                       │
+│  ├─ pages/*.html (5 páginas)                                │
+│  ├─ auth-service-v2.js (JWT authentication)                 │
+│  ├─ storage-service-v2.js (API sync)                        │
+│  ├─ dashboard-ui.js, roadmap-ui.js, etc.                    │
+│  └─ Tailwind CSS + Custom Styles                            │
+├─────────────────────────────────────────────────────────────┤
+│  Backend API (FastAPI)                                       │
+│  ├─ /api/auth/* (register, login, logout, refresh)         │
+│  ├─ /api/user/* (profile, settings, stats)                 │
+│  ├─ /api/progress/* (modules, subtasks, notes, sync)       │
+│  ├─ JWT middleware (auth protection)                        │
+│  └─ MongoDB async operations (Motor)                        │
+├─────────────────────────────────────────────────────────────┤
+│  Database (MongoDB)                                          │
+│  ├─ users collection (auth + profile + progress)           │
+│  ├─ Embedded progress data (modules, subtasks, notes)      │
+│  └─ Indexed fields (email, google_id, created_at)          │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Flujo de Autenticación
+
+```
+1. Usuario completa formulario de login/registro
+   ↓
+2. Frontend (auth-service-v2.js) valida inputs
+   ↓
+3. POST /api/auth/login con credenciales
+   ↓
+4. Backend verifica con MongoDB + bcrypt
+   ↓
+5. Backend genera JWT tokens (access + refresh)
+   ↓
+6. Backend establece cookies httpOnly seguras
+   ↓
+7. Frontend redirige a dashboard
+   ↓
+8. auth-guard-v2.js protege rutas privadas
+   ↓
+9. ✅ Usuario autenticado con acceso completo
 ```
 
 ---
@@ -76,55 +93,65 @@ Linting:   ESLint + Prettier
 
 ```
 /app/
-├── index.html                    # Punto de entrada (redirige a dashboard)
-├── README.md                     # Este archivo
-├── package.json                  # Dependencias y scripts
-├── eslint.config.js              # Configuración ESLint
-├── .prettierrc.json              # Configuración Prettier
+├── backend/                      # Backend FastAPI
+│   ├── server.py                 # Punto de entrada FastAPI
+│   ├── requirements.txt          # Dependencias Python
+│   ├── models/                   # Modelos Pydantic
+│   │   ├── user.py               # Modelos de usuario
+│   │   └── progress.py           # Modelos de progreso
+│   ├── routes/                   # Endpoints API
+│   │   ├── auth.py               # Autenticación (6 endpoints)
+│   │   ├── user.py               # Usuario (5 endpoints)
+│   │   └── progress.py           # Progreso (9 endpoints)
+│   ├── services/                 # Lógica de negocio
+│   │   ├── database.py           # Conexión MongoDB
+│   │   ├── auth_service.py       # Lógica de autenticación
+│   │   └── jwt_service.py        # Manejo de JWT
+│   ├── middleware/               # Middleware personalizado
+│   │   └── auth_middleware.py    # Verificación de JWT
+│   └── utils/                    # Utilidades
+│       ├── password.py           # Hashing bcrypt
+│       └── validators.py         # Validaciones
 │
-├── app/                          # Aplicación principal
+├── app/                          # Frontend
 │   ├── pages/                    # Páginas HTML
 │   │   ├── auth.html             # Login/Registro
 │   │   ├── dashboard.html        # Dashboard principal
 │   │   ├── roadmap.html          # Vista de módulos
-│   │   ├── toolbox.html          # Herramientas y recursos
-│   │   └── knowledge-base.html   # Documentación técnica
-│   │
+│   │   ├── toolbox.html          # Herramientas
+│   │   └── knowledge-base.html   # Documentación
 │   └── assets/                   # Recursos estáticos
 │       ├── js/                   # Módulos JavaScript
-│       │   ├── app.js            # Motor de la aplicación
-│       │   ├── storage.js        # Persistencia de datos
-│       │   ├── components.js     # Componentes compartidos
-│       │   ├── firebase-config.js# Configuración Firebase
-│       │   ├── auth-service.js   # Servicio de autenticación
-│       │   ├── auth-guard.js     # Protección de rutas
-│       │   ├── auth-ui.js        # UI de autenticación
-│       │   ├── dashboard-ui.js   # Controlador del dashboard
-│       │   ├── roadmap-ui-enhanced.js  # Controlador del roadmap
-│       │   ├── docs-enhanced.js  # Controlador de documentación
-│       │   ├── toolbox-ui.js     # Controlador de herramientas
-│       │   └── logger.js         # Sistema de logs
-│       │
+│       │   ├── config.js         # Configuración global
+│       │   ├── auth-service-v2.js      # Servicio autenticación
+│       │   ├── auth-guard-v2.js        # Protección de rutas
+│       │   ├── auth-ui-v2.js           # UI autenticación
+│       │   ├── storage-service-v2.js   # Persistencia + API sync
+│       │   ├── dashboard-ui.js         # Controlador dashboard
+│       │   ├── roadmap-ui-enhanced.js  # Controlador roadmap
+│       │   ├── docs-enhanced.js        # Controlador docs
+│       │   └── app.js                  # Motor de aplicación
 │       ├── data/                 # Archivos de datos
-│       │   ├── modules.json      # 12 módulos del curso
-│       │
+│       │   └── modules.json      # 12 módulos del curso
 │       └── style.css             # Estilos globales
 │
 ├── docs/                         # Documentación del proyecto
 │   ├── manifest.json             # Índice de documentos
 │   ├── images/                   # Imágenes compartidas
 │   └── content/                  # Contenido en Markdown
+│       └── 01-fundamentos/
 │
 ├── guides/                       # Guías técnicas
-│   ├── README.md                 # Guía del sistema de docs
+│   ├── README.md                 # Índice de guías
 │   ├── ESTRUCTURA_PROYECTO.md    # Detalles de estructura
-│   ├── DOCS_ARQUITECTURA.md      # Arquitectura técnica
-│   └── FIREBASE_AUTH_SETUP.md    # Guía de configuración Firebase
+│   └── DOCS_ARQUITECTURA.md      # Arquitectura técnica
 │
-└── tests/                        # Tests automatizados
-    └── unit/                     # Tests unitarios
-        ├── app.test.js
-        └── storage.test.js
+├── tests/                        # Tests automatizados
+│   └── unit/                     # Tests unitarios
+│
+├── package.json                  # Dependencias frontend
+├── index.html                    # Punto de entrada
+└── README.md                     # Este archivo
 ```
 
 ---
@@ -133,45 +160,211 @@ Linting:   ESLint + Prettier
 
 ### Prerrequisitos
 
-- Node.js 18+ y npm
-- Cuenta de Firebase (gratis)
+- **Python 3.11+** y pip
+- **Node.js 18+** y npm
+- **MongoDB 7.0+** instalado y corriendo
 - Navegador moderno con soporte ES6
 
 ### Instalación
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/tu-usuario/qa-master-path.git
+git clone https://github.com/FARLEY-PIEDRAHITA-OROZCO/qa-master-path.git
 cd qa-master-path
 
-# 2. Instalar dependencias
+# 2. Instalar dependencias del backend
+cd backend
+pip install -r requirements.txt
+
+# 3. Configurar variables de entorno
+cp .env.example .env
+# Editar .env con tus configuraciones (ver sección Variables de Entorno)
+
+# 4. Instalar dependencias del frontend
+cd ..
 npm install
 
-# 3. Configurar Firebase
-# - Crea un proyecto en https://console.firebase.google.com
-# - Habilita Authentication (Email/Password y Google)
-# - Habilita Firestore Database
-# - Copia las credenciales a app/assets/js/firebase-config.js
-
-# 4. Iniciar servidor de desarrollo
-npm run dev
-
-# 5. Abrir en el navegador
-# http://localhost:8000
+# 5. Verificar que MongoDB esté corriendo
+# Windows: net start MongoDB
+# Mac: brew services start mongodb-community
+# Linux: sudo systemctl start mongod
 ```
 
-### Scripts Disponibles
+### Variables de Entorno
+
+Crear archivo `/app/backend/.env`:
+
+```env
+# JWT Configuration
+JWT_SECRET=tu_secret_key_super_seguro_de_256_bits
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+REFRESH_TOKEN_EXPIRE_DAYS=7
+
+# MongoDB Configuration
+MONGO_URL=mongodb://localhost:27017/
+MONGO_DB_NAME=qa_master_path
+
+# Cookie Configuration
+COOKIE_DOMAIN=localhost
+COOKIE_SECURE=False
+COOKIE_SAMESITE=lax
+COOKIE_HTTPONLY=True
+COOKIE_MAX_AGE=604800
+
+# CORS Configuration
+FRONTEND_URL=http://localhost:8000
+FRONTEND_DEV_URL=http://localhost:3000
+
+# Environment
+ENVIRONMENT=development
+DEBUG=True
+```
+
+**⚠️ IMPORTANTE**: Genera un JWT_SECRET seguro con:
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+### Ejecutar la Aplicación
+
+#### Opción 1: Con Supervisor (Recomendado en producción)
 
 ```bash
-npm run dev            # Inicia servidor de desarrollo (puerto 8000)
-npm start              # Alias de npm run dev
-npm test               # Ejecuta tests con Vitest
-npm run test:ui        # Ejecuta tests con interfaz visual
-npm run test:coverage  # Genera reporte de cobertura
-npm run lint           # Ejecuta ESLint
-npm run lint:fix       # Corrige problemas de linting automáticamente
-npm run format         # Formatea código con Prettier
-npm run format:check   # Verifica formato sin modificar
+# Iniciar todos los servicios
+sudo supervisorctl restart all
+
+# Verificar estado
+sudo supervisorctl status
+
+# Ver logs
+sudo supervisorctl tail -f backend
+sudo supervisorctl tail -f frontend
+```
+
+#### Opción 2: Manualmente (Desarrollo local)
+
+**Terminal 1 - Backend:**
+```bash
+cd /app/backend
+uvicorn server:app --reload --host 0.0.0.0 --port 8001
+```
+
+**Terminal 2 - Frontend:**
+```bash
+cd /app
+npm run dev
+# o directamente: npx http-server -p 8000 -c-1
+```
+
+**Terminal 3 - MongoDB** (si no está como servicio):
+```bash
+mongod --dbpath /path/to/data
+```
+
+### Acceder a la Aplicación
+
+- **Frontend**: http://localhost:8000
+- **API Backend**: http://localhost:8001
+- **API Docs (Swagger)**: http://localhost:8001/api/docs
+- **API Redoc**: http://localhost:8001/api/redoc
+
+---
+
+## 📊 API Endpoints
+
+### Autenticación (`/api/auth/`)
+
+| Método | Endpoint | Descripción | Auth |
+|--------|----------|-------------|------|
+| POST | `/api/auth/register` | Registrar nuevo usuario | No |
+| POST | `/api/auth/login` | Iniciar sesión | No |
+| POST | `/api/auth/refresh` | Refrescar access token | Cookie |
+| POST | `/api/auth/logout` | Cerrar sesión | Cookie |
+| GET | `/api/auth/me` | Obtener usuario actual | Sí |
+| GET | `/api/auth/verify` | Verificar sesión | Cookie |
+
+### Usuario (`/api/user/`)
+
+| Método | Endpoint | Descripción | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/user/me` | Obtener perfil | Sí |
+| PUT | `/api/user/me` | Actualizar perfil | Sí |
+| PUT | `/api/user/me/settings` | Actualizar configuración | Sí |
+| DELETE | `/api/user/me` | Desactivar cuenta | Sí |
+| GET | `/api/user/stats` | Estadísticas del usuario | Sí |
+
+### Progreso (`/api/progress/`)
+
+| Método | Endpoint | Descripción | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/progress` | Obtener progreso completo | Sí |
+| PUT | `/api/progress/module` | Actualizar módulo | Sí |
+| PUT | `/api/progress/subtask` | Actualizar subtarea | Sí |
+| PUT | `/api/progress/note` | Actualizar nota | Sí |
+| POST | `/api/progress/badge` | Agregar badge | Sí |
+| POST | `/api/progress/xp` | Agregar XP | Sí |
+| POST | `/api/progress/sync` | Sincronización completa | Sí |
+| GET | `/api/progress/stats` | Estadísticas de progreso | Sí |
+| DELETE | `/api/progress` | Resetear progreso | Sí |
+
+**Total: 20 endpoints funcionando** ✅
+
+---
+
+## 💾 Sistema de Persistencia
+
+### MongoDB Schema
+
+```javascript
+// Colección: users
+{
+  _id: ObjectId,
+  email: string (único, indexed),
+  password_hash: string,
+  display_name: string,
+  photo_url: string | null,
+  auth_provider: "email" | "google",
+  created_at: ISODate,
+  last_active: ISODate,
+  email_verified: boolean,
+  is_active: boolean,
+  
+  // Progreso embebido
+  progress: {
+    modules: {
+      "1": true,
+      "2": false
+    },
+    subtasks: {
+      "1-0": true,
+      "1-1": false
+    },
+    notes: {
+      "1": "Mis notas del módulo 1"
+    },
+    badges: ["core", "technical"],
+    xp: 150,
+    last_sync: ISODate
+  },
+  
+  settings: {
+    notifications: boolean,
+    theme: string,
+    language: string
+  }
+}
+```
+
+### Índices MongoDB
+
+```javascript
+// Índices creados automáticamente al iniciar
+email (unique)
+google_id (unique, sparse)
+created_at
+last_active
+auth_provider
 ```
 
 ---
@@ -180,88 +373,49 @@ npm run format:check   # Verifica formato sin modificar
 
 ### 📊 Dashboard
 
-- **Barra de progreso global**: Visualización del avance general
-- **XP acumulado**: Sistema de puntos con rankings dinámicos
-- **4 Badges desbloqueables**:
+- Barra de progreso global
+- XP acumulado con rankings dinámicos
+- 4 Badges desbloqueables:
   - 🏆 Core Master (Módulos 1-2)
   - 🥷 Tech Ninja (Módulos 3-5)
   - ✈️ Auto Pilot (Módulos 6-9)
   - 👑 QA Expert (Módulos 10-12)
-- **Celebraciones con confetti**: Al completar sprints y desbloquear badges
+- Celebraciones con confetti
 
 ### 🗺️ Roadmap
 
-- **12 Módulos expandibles**: Cada uno con objetivo, cronograma y recursos
-- **Progress ring por módulo**: Indicador visual del avance
-- **Tareas diarias con checkboxes**: Tracking granular del progreso
-- **Editor de notas completo**:
-  - Auto-guardado inteligente (1.5s debounce)
-  - Contador de caracteres y palabras
-  - Atajos de teclado (Ctrl+S para guardar)
-  - Copiar y limpiar notas
-  - Sincronización con Firestore
-- **Estados visuales diferenciados**:
-  - 🔒 Locked (bloqueado hasta completar anterior)
-  - ⚪ Pending (disponible, sin iniciar)
-  - 🔵 Active (en progreso)
-  - ✅ Completed (completado)
-- **Botón "Cerrar Sprint"**: Reclama XP al completar un módulo
+- 12 Módulos expandibles
+- Progress ring por módulo
+- Tareas diarias con checkboxes
+- Editor de notas completo:
+  - Auto-guardado (1.5s debounce)
+  - Sincronización con backend
+  - Contador de caracteres
+  - Atajos de teclado (Ctrl+S)
+- Estados: Locked, Pending, Active, Completed
+- Botón "Cerrar Sprint" para reclamar XP
 
 ### 🔧 Toolbox
 
-- **Herramientas categorizadas**:
+- Herramientas categorizadas:
   - API Testing (Postman, JSON Placeholder)
   - Automation (SelectorsHub, Playwright Codegen)
   - Documentation (ISTQB, Git Cheat Sheet)
-- **Links a recursos externos**
 
 ### 📖 Knowledge Base
 
-- **Sistema de documentación navegable**:
-  - Sidebar con navegación por bloques
-  - Renderizado de Markdown a HTML
-  - Artículos técnicos sobre SDLC, SQL, Playwright, etc.
+- Sistema de documentación navegable
+- Renderizado de Markdown a HTML
+- Artículos técnicos sobre SDLC, SQL, Playwright, etc.
 
 ### 🔐 Autenticación
 
-- **Login con Email/Password**
-- **Login con Google OAuth**
-- **Recuperación de contraseña**
-- **Protección de rutas**: Páginas requieren autenticación
-- **Sincronización automática**: Progreso guardado en la nube
-
----
-
-## 💾 Sistema de Persistencia
-
-### LocalStorage (Backup Local)
-
-```javascript
-// Keys utilizados
-qa_master_progress      // {1: true, 2: false, ...} - Módulos completados
-qa_subtask_progress     // {"1-0": true, ...} - Tareas individuales
-qa_module_notes         // {1: "mis notas", ...} - Notas por módulo
-qa_celebrated_badges    // ["core", "technical"] - Badges ya celebrados
-```
-
-### Cloud Firestore (Sincronización)
-
-```javascript
-// Colección: users/{uid}
-{
-  email: string,
-  displayName: string,
-  createdAt: timestamp,
-  lastActive: timestamp,
-  progress: object,
-  subtasks: object,
-  notes: object,
-  badges: array,
-  xp: number
-}
-```
-
-**Estrategia**: LocalStorage como cache + Firestore como fuente de verdad
+- Login con Email/Password
+- Registro de usuarios
+- Cookies httpOnly seguras
+- Refresh tokens automático
+- Protección de rutas
+- Sincronización automática de progreso
 
 ---
 
@@ -308,7 +462,7 @@ qa_celebrated_badges    // ["core", "technical"] - Badges ya celebrados
 
 ## 🧪 Testing
 
-### Ejecutar Tests
+### Frontend Tests
 
 ```bash
 # Tests en modo watch
@@ -324,138 +478,112 @@ npm run test:ui
 npm run test:coverage
 ```
 
-### Estructura de Tests
+### Backend Tests
 
+```bash
+cd backend
+
+# Ejecutar todos los tests
+pytest
+
+# Tests con cobertura
+pytest --cov=. --cov-report=html
+
+# Tests específicos
+pytest tests/test_auth.py -v
 ```
-/app/tests/
-└── unit/
-    ├── app.test.js         # Tests del AppEngine
-    └── storage.test.js     # Tests del StorageService
+
+### Scripts Disponibles
+
+```bash
+# Frontend
+npm run dev            # Inicia servidor de desarrollo (puerto 8000)
+npm start              # Alias de npm run dev
+npm test               # Ejecuta tests con Vitest
+npm run lint           # Ejecuta ESLint
+npm run lint:fix       # Corrige problemas de linting
+npm run format         # Formatea código con Prettier
+
+# Backend
+cd backend
+uvicorn server:app --reload    # Servidor de desarrollo
+pytest                         # Ejecutar tests
+black .                        # Formatear código
 ```
 
 ---
 
-## 🔧 Configuración de Firebase
+## 🔒 Seguridad
 
-Ver guía completa en: [`guides/FIREBASE_AUTH_SETUP.md`](./guides/FIREBASE_AUTH_SETUP.md)
+### Implementado ✅
 
-### Pasos Rápidos
+| Aspecto | Estado | Detalles |
+|---------|--------|----------|
+| Password Hashing | ✅ SEGURO | Bcrypt con 12 rounds |
+| JWT Signing | ✅ SEGURO | HS256 con secret fuerte |
+| Token Expiration | ✅ CONFIGURADO | 60 min access, 7 días refresh |
+| httpOnly Cookies | ✅ ACTIVO | Cookies no accesibles por JavaScript |
+| CORS Configuration | ✅ CONFIGURADO | Orígenes permitidos definidos |
+| Input Validation | ✅ ACTIVO | Pydantic models + frontend validation |
+| Error Handling | ✅ ROBUSTO | Try-catch en todos los endpoints |
 
-1. **Crear proyecto en Firebase Console**
-2. **Habilitar Authentication** (Email/Password + Google)
-3. **Crear Firestore Database** (modo test inicialmente)
-4. **Copiar credenciales** a `app/assets/js/firebase-config.js`:
+### Recomendaciones para Producción ⚠️
 
-```javascript
-const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "tu-proyecto.firebaseapp.com",
-  projectId: "tu-proyecto",
-  storageBucket: "tu-proyecto.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abc123"
-};
-```
-
-5. **Configurar reglas de Firestore**:
-
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-  }
-}
-```
+1. **Generar nuevo JWT_SECRET**: Usar secret único y fuerte
+2. **Implementar HTTPS**: SSL/TLS obligatorio
+3. **Rate Limiting**: Limitar intentos de login
+4. **Logs a archivo**: No solo consola
+5. **Backup MongoDB**: Estrategia de respaldo regular
+6. **Monitoring**: Uptime y alertas
 
 ---
 
-## 🚀 Despliegue
+## 🐛 Troubleshooting
 
-### GitHub Pages
-
-```bash
-# 1. Commit y push
-git add .
-git commit -m "Prepare for deployment"
-git push origin main
-
-# 2. Configurar en GitHub
-# Settings > Pages > Source: main branch / root
-
-# Tu app estará en:
-# https://tu-usuario.github.io/qa-master-path/
-```
-
-### Netlify
+### Backend no inicia
 
 ```bash
-# 1. Conectar repositorio en Netlify
-# 2. Build command: (vacío - es estático)
-# 3. Publish directory: .
+# Verificar dependencias
+pip install -r requirements.txt
 
-# Despliegue automático en cada push
+# Verificar que MongoDB esté corriendo
+# Windows: net start MongoDB
+# Mac: brew services status mongodb-community
+# Linux: sudo systemctl status mongod
+
+# Ver logs de backend
+sudo supervisorctl tail backend
 ```
 
-### Vercel
+### Error de conexión MongoDB
 
 ```bash
-# 1. Instalar Vercel CLI
-npm i -g vercel
+# Verificar que MongoDB esté corriendo
+mongosh --eval "db.version()"
 
-# 2. Desplegar
-vercel
-
-# Seguir instrucciones interactivas
+# Verificar MONGO_URL en .env
+cat backend/.env | grep MONGO_URL
 ```
 
----
+### Frontend no se conecta al backend
 
-## 🛠️ Desarrollo
+1. Verificar que backend esté corriendo en puerto 8001
+2. Verificar CORS en `backend/server.py`
+3. Revisar consola del navegador (F12)
+4. Verificar `BACKEND_URL` en `app/assets/js/config.js`
 
-### Agregar Nueva Página
+### Error de autenticación
 
-1. Crear HTML en `/app/pages/nueva-pagina.html`
-2. Crear controlador en `/app/assets/js/nueva-pagina-ui.js`
-3. Si requiere auth, agregar:
-   ```javascript
-   import { requireAuth } from './auth-guard.js';
-   requireAuth();
-   ```
-4. Agregar link en navbar (components.js)
+```bash
+# Verificar que JWT_SECRET esté configurado
+cat backend/.env | grep JWT_SECRET
 
-### Agregar Nuevo Módulo
+# Limpiar cookies del navegador
+# DevTools (F12) > Application > Cookies > Eliminar todo
 
-1. Editar `/app/assets/data/modules.json`
-2. Agregar objeto con estructura:
-   ```json
-   {
-     "id": 13,
-     "phase": "Advanced",
-     "title": "Nuevo Módulo",
-     "duration": "10h",
-     "xp": 2000,
-     "objective": "...",
-     "schedule": [...],
-     "deliverables": [...],
-     "resources": [...]
-   }
-   ```
-
-### Agregar Artículo a Knowledge Base
-
-1. Crear archivo Markdown en `/app/docs/content/`
-2. Registrar en `/app/docs/manifest.json`:
-   ```json
-   {
-     "id": "nuevo-articulo",
-     "title": "Mi Artículo",
-     "file": "ruta/al/archivo.md",
-     "evidence": "Descripción"
-   }
-   ```
+# Verificar logs del backend
+sudo supervisorctl tail backend
+```
 
 ---
 
@@ -463,33 +591,7 @@ vercel
 
 - [**Estructura del Proyecto**](./guides/ESTRUCTURA_PROYECTO.md) - Organización de archivos y directorios
 - [**Arquitectura Técnica**](./guides/DOCS_ARQUITECTURA.md) - Detalles técnicos y patrones de diseño
-- [**Configuración Firebase**](./guides/FIREBASE_AUTH_SETUP.md) - Guía completa de setup de autenticación
 - [**Sistema de Documentación**](./guides/README.md) - Cómo agregar contenido a la Knowledge Base
-
----
-
-## ⚠️ Limitaciones Conocidas
-
-- ❌ **Sin backend propio**: Depende completamente de Firebase
-- ❌ **Sin sincronización offline**: Requiere conexión para sync
-- ❌ **Sin PWA**: No funciona offline (feature futuro)
-- ❌ **Sin build process**: Código sin minificar en producción
-- ❌ **Sin analytics**: No hay tracking de uso
-
----
-
-## 🗺️ Roadmap Futuro
-
-### Mejoras Planificadas
-
-- [ ] **PWA**: Funcionalidad offline con Service Workers
-- [ ] **Build Process**: Vite para bundling y optimización
-- [ ] **Tests E2E**: Playwright para tests de integración
-- [ ] **Performance**: Lazy loading y code splitting
-- [ ] **Accesibilidad**: Atributos ARIA y navegación por teclado
-- [ ] **Analytics**: Firebase Analytics integrado
-- [ ] **Notificaciones**: Recordatorios de tareas pendientes
-- [ ] **Sistema de Quizzes**: Evaluaciones interactivas por módulo
 
 ---
 
@@ -505,9 +607,10 @@ Las contribuciones son bienvenidas! Por favor:
 
 ### Guías de Estilo
 
+- **Python**: Seguir PEP 8 (usar `black` para formateo)
 - **JavaScript**: Seguir configuración de ESLint
 - **Commits**: Usar [Conventional Commits](https://www.conventionalcommits.org/)
-- **Código**: Ejecutar `npm run format` antes de commit
+- **Código**: Ejecutar linters antes de commit
 
 ---
 
@@ -528,8 +631,9 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 
 ## 🙏 Agradecimientos
 
+- [FastAPI](https://fastapi.tiangolo.com/) - Framework backend moderno
+- [MongoDB](https://www.mongodb.com/) - Base de datos NoSQL
 - [Tailwind CSS](https://tailwindcss.com/) - Framework CSS
-- [Firebase](https://firebase.google.com/) - Backend as a Service
 - [Font Awesome](https://fontawesome.com/) - Iconos
 - [Marked.js](https://marked.js.org/) - Parser de Markdown
 - [Canvas Confetti](https://www.kirilv.com/canvas-confetti/) - Efectos de celebración
@@ -539,8 +643,9 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 
 ## 📊 Stats del Proyecto
 
-- **Líneas de código**: ~5,000
-- **Módulos JavaScript**: 12
+- **Líneas de código**: ~8,000+
+- **Módulos JavaScript**: 15+
+- **Endpoints API**: 20
 - **Páginas HTML**: 5
 - **Módulos educativos**: 12
 - **XP total disponible**: 14,000
