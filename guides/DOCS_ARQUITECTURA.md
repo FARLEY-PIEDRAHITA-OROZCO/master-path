@@ -660,16 +660,30 @@ function redirectToLogin() {
 ### 2. Cookies Seguras
 
 ```python
+# Configuración optimizada (desde .env)
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+COOKIE_DOMAIN = None  # Usa dominio actual automáticamente
+COOKIE_SECURE = ENVIRONMENT == "production"  # Condicional por entorno
+
 response.set_cookie(
     key="qa_session",
     value=access_token,
     max_age=604800,        # 7 días
+    domain=None,           # None = dominio actual (localhost o producción)
     httponly=True,         # No accesible por JavaScript
-    secure=False,          # True en producción (HTTPS)
+    secure=COOKIE_SECURE,  # False en dev (HTTP), True en prod (HTTPS)
     samesite="lax",        # Protección CSRF
     path="/"
 )
 ```
+
+**Ventajas de esta configuración:**
+- ✅ Funciona tanto en localhost como en producción sin cambios
+- ✅ `domain=None` permite que el navegador use el dominio actual automáticamente
+- ✅ `secure` condicional según entorno (HTTP local, HTTPS producción)
+- ✅ Sin problemas de cookies rechazadas en localhost
+
+📚 **Ver documentación completa**: [SOLUCION_COOKIES_HTTPONLY.md](../SOLUCION_COOKIES_HTTPONLY.md)
 
 ### 3. CORS Configuration
 
