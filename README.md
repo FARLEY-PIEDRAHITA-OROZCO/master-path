@@ -628,6 +628,8 @@ cat backend/.env | grep ENVIRONMENT
 
 ## 📖 Documentación Adicional
 
+- [**Setup Local Completo**](./LOCAL_SETUP.md) - Guía paso a paso para configurar el proyecto localmente
+- [**Solución de Cookies httpOnly**](./SOLUCION_COOKIES_HTTPONLY.md) - Documentación técnica sobre autenticación con cookies
 - [**Estructura del Proyecto**](./guides/ESTRUCTURA_PROYECTO.md) - Organización de archivos y directorios
 - [**Arquitectura Técnica**](./guides/DOCS_ARQUITECTURA.md) - Detalles técnicos y patrones de diseño
 - [**Sistema de Documentación**](./guides/README.md) - Cómo agregar contenido a la Knowledge Base
