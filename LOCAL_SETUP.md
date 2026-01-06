@@ -1,26 +1,47 @@
 # 🏠 Setup para Desarrollo Local
 
-Este documento explica cómo correr el proyecto en tu máquina local (fuera del contenedor de Emergent).
+Este documento explica cómo configurar y ejecutar el proyecto QA Master Path en tu máquina local.
 
 ---
 
 ## 📋 Prerrequisitos
 
-1. **Python 3.11+** instalado
-2. **Node.js 18+** y npm instalados
-3. **MongoDB** instalado y corriendo localmente
-4. **Git** para clonar el repositorio
+Antes de comenzar, asegúrate de tener instalado:
+
+1. **Python 3.11+** - [Descargar](https://www.python.org/downloads/)
+2. **Node.js 18+** y npm - [Descargar](https://nodejs.org/)
+3. **MongoDB 7.0+** - [Descargar](https://www.mongodb.com/try/download/community)
+4. **Git** - [Descargar](https://git-scm.com/downloads)
+
+### Verificar Instalaciones
+
+```bash
+# Verificar versiones
+python --version    # Debe ser 3.11+
+node --version      # Debe ser 18+
+npm --version       # Debe ser 9+
+mongod --version    # Debe ser 7.0+
+```
 
 ---
 
-## 🚀 Setup del Backend (FastAPI)
+## 🚀 Instalación Paso a Paso
 
-### 1. Instalar dependencias de Python
+### 1. Clonar el Repositorio
 
 ```bash
-cd /ruta/a/tu/proyecto/backend
+git clone https://github.com/FARLEY-PIEDRAHITA-OROZCO/qa-master-path.git
+cd qa-master-path
+```
 
-# Crear entorno virtual (opcional pero recomendado)
+### 2. Configurar Backend (FastAPI)
+
+#### a. Instalar Dependencias Python
+
+```bash
+cd backend
+
+# Opcional pero recomendado: Crear entorno virtual
 python -m venv venv
 
 # Activar entorno virtual
@@ -33,103 +54,155 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Configurar variables de entorno
+#### b. Crear Archivo .env
 
-Crea un archivo `.env` en `/backend/`:
+Crear archivo `backend/.env` con el siguiente contenido:
 
 ```env
 # JWT Configuration
-JWT_SECRET=a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6
+JWT_SECRET=tu_secret_key_super_seguro_cambiar_en_produccion
 JWT_ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=60
 REFRESH_TOKEN_EXPIRE_DAYS=7
 
-# MongoDB Configuration (LOCAL)
+# MongoDB Configuration
 MONGO_URL=mongodb://localhost:27017/
 MONGO_DB_NAME=qa_master_path
 
-# CORS Configuration (LOCAL)
+# Cookie Configuration
+COOKIE_DOMAIN=localhost
+COOKIE_SECURE=False
+COOKIE_SAMESITE=lax
+COOKIE_HTTPONLY=True
+COOKIE_MAX_AGE=604800
+
+# CORS Configuration
 FRONTEND_URL=http://localhost:8000
-FRONTEND_DEV_URL=http://127.0.0.1:5500
-CORS_ORIGINS=["http://localhost:8000","http://127.0.0.1:5500","http://192.168.56.1:8000"]
+FRONTEND_DEV_URL=http://localhost:3000
 
 # Environment
 ENVIRONMENT=development
 DEBUG=True
 ```
 
-### 3. Iniciar MongoDB localmente
+**⚠️ IMPORTANTE**: Genera un JWT_SECRET seguro:
+
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+Copia el resultado y reemplaza el valor de `JWT_SECRET` en tu `.env`.
+
+#### c. Verificar Conexión MongoDB
 
 ```bash
 # Asegúrate de que MongoDB esté corriendo
-# En Windows (como servicio):
+
+# Windows (como servicio):
 net start MongoDB
 
-# En Mac:
+# Mac:
 brew services start mongodb-community
 
-# En Linux:
+# Linux:
 sudo systemctl start mongod
+
+# Verificar conexión:
+mongosh --eval "db.version()"
 ```
 
-### 4. Correr el backend
+### 3. Configurar Frontend
 
 ```bash
-cd backend
-
-# Opción 1: Con uvicorn directamente
-uvicorn server:app --reload --host 0.0.0.0 --port 8001
-
-# Opción 2: Con el script de Python
-python -m uvicorn server:app --reload --host 0.0.0.0 --port 8001
-```
-
-**El backend estará disponible en:**
-- API: http://localhost:8001/api
-- Documentación: http://localhost:8001/api/docs
-- Health Check: http://localhost:8001/api/health
-
----
-
-## 🎨 Setup del Frontend
-
-### 1. Instalar dependencias
-
-```bash
-cd /ruta/a/tu/proyecto
+# Volver al directorio raíz
+cd ..
 
 # Instalar dependencias
 npm install
 ```
 
-### 2. Configurar config.js (IMPORTANTE)
+---
 
-El archivo `/app/assets/js/config.js` ya detecta automáticamente el entorno, pero si tienes problemas, puedes modificarlo manualmente:
+## 🎯 Ejecutar la Aplicación
 
-```javascript
-// Para desarrollo local
-window.BACKEND_URL = 'http://localhost:8001/api';
+### Opción 1: Desarrollo con Múltiples Terminales
+
+Esta es la forma más común para desarrollo local.
+
+**Terminal 1 - Backend:**
+```bash
+cd backend
+uvicorn server:app --reload --host 0.0.0.0 --port 8001
 ```
 
-### 3. Correr el frontend
+**Terminal 2 - Frontend:**
+```bash
+cd /ruta/a/tu/proyecto
+npm run dev
+```
+
+**Terminal 3 - MongoDB** (si no está como servicio):
+```bash
+mongod --dbpath /path/to/data
+```
+
+### Opción 2: Con Script Combinado
+
+Crear un script `start-dev.sh` en la raíz:
 
 ```bash
-# Opción 1: Con npm (puerto 8000)
-npm run dev
+#!/bin/bash
 
-# Opción 2: Con Live Server de VSCode (puerto 5500)
-# Click derecho en index.html → "Open with Live Server"
+# Iniciar backend en background
+cd backend
+uvicorn server:app --reload --host 0.0.0.0 --port 8001 &
+BACKEND_PID=$!
+
+# Esperar 2 segundos
+sleep 2
+
+# Iniciar frontend
+cd ..
+npm run dev &
+FRONTEND_PID=$!
+
+# Función para limpiar al salir
+cleanup() {
+    echo "Deteniendo servicios..."
+    kill $BACKEND_PID $FRONTEND_PID
+    exit
+}
+
+# Capturar Ctrl+C
+trap cleanup INT
+
+# Esperar
+echo "Servicios iniciados. Presiona Ctrl+C para detener."
+wait
 ```
 
-**El frontend estará disponible en:**
-- npm: http://localhost:8000/app/pages/auth.html
-- Live Server: http://127.0.0.1:5500/app/pages/auth.html
+```bash
+chmod +x start-dev.sh
+./start-dev.sh
+```
+
+---
+
+## 🌐 URLs de la Aplicación
+
+Una vez iniciados los servicios:
+
+- **Frontend**: http://localhost:8000
+- **Backend API**: http://localhost:8001
+- **API Docs (Swagger)**: http://localhost:8001/api/docs
+- **API Redoc**: http://localhost:8001/api/redoc
+- **MongoDB**: mongodb://localhost:27017
 
 ---
 
 ## ✅ Verificar que Todo Funciona
 
-### 1. Probar el backend
+### 1. Probar el Backend
 
 ```bash
 # Health check
@@ -139,52 +212,53 @@ curl http://localhost:8001/api/health
 # {"status":"ok","database":"connected","environment":"development"}
 ```
 
-### 2. Probar el frontend
+### 2. Probar el Frontend
 
-1. Abre: http://localhost:8000/app/pages/auth.html
+1. Abre http://localhost:8000
 2. Abre la consola del navegador (F12)
-3. Deberías ver:
+3. Deberías ver logs de inicialización:
    ```
    ⚙️ [CONFIG] Backend URL configurado: http://localhost:8001/api
    🔐 [AUTH-SERVICE-V2] Iniciando servicio de autenticación...
    ```
 
-### 3. Probar registro
+### 3. Probar Registro
 
-1. Ve a la pestaña "Registrarse"
-2. Completa el formulario:
+1. Ve a http://localhost:8000/app/pages/auth.html
+2. Click en pestaña "Registrarse"
+3. Completa el formulario:
    - Nombre: Tu Nombre
    - Email: test@example.com
-   - Contraseña: TestPass123 (min 8 caracteres)
+   - Contraseña: TestPass123 (min 8 caracteres con letra y número)
    - Confirmar Contraseña: TestPass123
-3. Click en "Crear Cuenta"
-4. Deberías ser redirigido al dashboard
+4. Click en "Crear Cuenta"
+5. Deberías ser redirigido al dashboard
+
+### 4. Verificar en MongoDB
+
+```bash
+# Conectar a MongoDB
+mongosh
+
+# Usar la base de datos
+use qa_master_path
+
+# Ver usuarios creados
+db.users.find().pretty()
+
+# Salir
+exit
+```
 
 ---
 
 ## 🐛 Solución de Problemas
 
-### Error: "ERR_CONNECTION_REFUSED en localhost:8001"
+### Error: "Cannot connect to MongoDB"
 
-**Causa:** El backend no está corriendo
+**Causa**: MongoDB no está corriendo
 
-**Solución:**
-```bash
-cd backend
-uvicorn server:app --reload --host 0.0.0.0 --port 8001
-```
-
-### Error: "Uncaught SyntaxError: Unexpected token 'export'"
-
-**Causa:** config.js tiene sintaxis de módulo pero se carga como script
-
-**Solución:** Ya está arreglado en la versión actual de config.js (sin export)
-
-### Error: "MongoDB connection failed"
-
-**Causa:** MongoDB no está corriendo localmente
-
-**Solución:**
+**Solución**:
 ```bash
 # Windows
 net start MongoDB
@@ -194,45 +268,171 @@ brew services start mongodb-community
 
 # Linux
 sudo systemctl start mongod
+
+# Verificar
+mongosh --eval "db.version()"
+```
+
+### Error: "Port 8001 already in use"
+
+**Causa**: El puerto ya está ocupado por otro proceso
+
+**Solución**:
+```bash
+# Ver qué proceso usa el puerto
+# En Linux/Mac:
+lsof -i :8001
+
+# En Windows:
+netstat -ano | findstr :8001
+
+# Matar el proceso o usar otro puerto
+uvicorn server:app --reload --port 8002
+```
+
+### Error: "ModuleNotFoundError: No module named 'fastapi'"
+
+**Causa**: Dependencias no instaladas
+
+**Solución**:
+```bash
+cd backend
+pip install -r requirements.txt
 ```
 
 ### Error: CORS en el navegador
 
-**Causa:** El backend no permite peticiones desde tu origen
+**Causa**: Frontend y backend no tienen CORS configurado correctamente
 
-**Solución:** Verifica que tu URL esté en el .env del backend:
+**Solución**: Verificar que en `backend/.env` esté:
 ```env
-CORS_ORIGINS=["http://localhost:8000","http://127.0.0.1:5500"]
+FRONTEND_URL=http://localhost:8000
+```
+
+Y que `backend/server.py` incluya esa URL en `allowed_origins`.
+
+### Frontend no carga (página en blanco)
+
+**Causa**: Servidor frontend no está corriendo o directorio incorrecto
+
+**Solución**:
+```bash
+# Asegúrate de estar en la raíz del proyecto
+cd /ruta/a/qa-master-path
+npm run dev
+
+# Si no funciona, usa directamente:
+npx http-server -p 8000 -c-1
+```
+
+### Error: "Invalid JWT Secret"
+
+**Causa**: JWT_SECRET no está configurado en `.env`
+
+**Solución**:
+```bash
+# Generar secret
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+
+# Agregar a backend/.env
+echo "JWT_SECRET=<secret_generado>" >> backend/.env
+
+# Reiniciar backend
 ```
 
 ---
 
-## 📝 Estructura del Proyecto Local
+## 🔄 Reiniciar Servicios
 
+### Reiniciar Backend
+
+```bash
+# Detener: Ctrl+C en la terminal del backend
+# Reiniciar:
+cd backend
+uvicorn server:app --reload --host 0.0.0.0 --port 8001
 ```
-tu-proyecto/
-├── backend/
-│   ├── server.py
-│   ├── requirements.txt
-│   ├── .env  (crear este archivo)
-│   ├── models/
-│   ├── routes/
-│   ├── services/
-│   └── ...
-│
-├── app/
-│   ├── pages/
-│   │   ├── auth.html
-│   │   ├── dashboard.html
-│   │   └── ...
-│   └── assets/
-│       └── js/
-│           ├── config.js  (detecta automáticamente el backend)
-│           ├── auth-service-v2.js
-│           └── ...
-│
-├── package.json
-└── README.md
+
+### Reiniciar Frontend
+
+```bash
+# Detener: Ctrl+C en la terminal del frontend
+# Reiniciar:
+npm run dev
+```
+
+### Reiniciar MongoDB
+
+```bash
+# Windows
+net stop MongoDB
+net start MongoDB
+
+# Mac
+brew services restart mongodb-community
+
+# Linux
+sudo systemctl restart mongod
+```
+
+---
+
+## 📊 Comandos Útiles
+
+### Backend
+
+```bash
+# Ver logs en tiempo real
+tail -f /var/log/backend.log
+
+# Ejecutar tests
+cd backend
+pytest
+
+# Formatear código
+black .
+
+# Verificar tipos
+mypy .
+```
+
+### Frontend
+
+```bash
+# Ejecutar tests
+npm test
+
+# Linting
+npm run lint
+npm run lint:fix
+
+# Formatear código
+npm run format
+```
+
+### MongoDB
+
+```bash
+# Conectar a MongoDB shell
+mongosh
+
+# Ver bases de datos
+show dbs
+
+# Usar qa_master_path
+use qa_master_path
+
+# Ver colecciones
+show collections
+
+# Ver todos los usuarios
+db.users.find().pretty()
+
+# Contar usuarios
+db.users.count()
+
+# Eliminar todos los datos (CUIDADO!)
+db.users.deleteMany({})
 ```
 
 ---
@@ -241,16 +441,29 @@ tu-proyecto/
 
 - [ ] Python 3.11+ instalado
 - [ ] Node.js 18+ instalado
-- [ ] MongoDB instalado y corriendo
-- [ ] Backend dependencies instaladas (`pip install -r requirements.txt`)
-- [ ] Backend .env creado y configurado
+- [ ] MongoDB 7.0+ instalado y corriendo
+- [ ] Repositorio clonado
+- [ ] Dependencias backend instaladas (`pip install -r requirements.txt`)
+- [ ] Archivo `backend/.env` creado y configurado
+- [ ] JWT_SECRET generado y configurado
+- [ ] Dependencias frontend instaladas (`npm install`)
 - [ ] Backend corriendo en http://localhost:8001
 - [ ] Backend health check exitoso (`curl http://localhost:8001/api/health`)
-- [ ] Frontend dependencies instaladas (`npm install`)
-- [ ] Frontend corriendo en http://localhost:8000 o http://127.0.0.1:5500
+- [ ] Frontend corriendo en http://localhost:8000
 - [ ] Registro de usuario exitoso
 - [ ] Login exitoso
 - [ ] Redirección al dashboard exitosa
+
+---
+
+## 📖 Siguientes Pasos
+
+Una vez que tengas todo funcionando:
+
+1. **Explora la API**: http://localhost:8001/api/docs
+2. **Lee la documentación**: Consulta [`guides/`](./guides/) para más detalles
+3. **Ejecuta los tests**: `npm test` y `pytest`
+4. **Revisa el código**: Explora `backend/` y `app/assets/js/`
 
 ---
 
@@ -258,23 +471,26 @@ tu-proyecto/
 
 Si sigues teniendo problemas:
 
-1. **Verifica los logs del backend:**
-   - La terminal donde corriste uvicorn
-   - Busca errores en rojo
+1. **Revisa los logs**:
+   - Backend: Terminal donde corriste `uvicorn`
+   - Frontend: Consola del navegador (F12)
+   - MongoDB: `sudo tail -f /var/log/mongodb/mongod.log`
 
-2. **Verifica los logs del frontend:**
-   - Consola del navegador (F12 → Console)
-   - Busca errores en rojo
-
-3. **Verifica la conexión:**
+2. **Verifica las conexiones**:
    ```bash
-   # ¿Está el backend corriendo?
+   # Backend corriendo?
    curl http://localhost:8001/api/health
    
-   # ¿Está MongoDB corriendo?
-   mongo --eval "db.version()"
+   # MongoDB corriendo?
+   mongosh --eval "db.version()"
    ```
+
+3. **Revisa la documentación completa**: [`README.md`](./README.md)
+
+4. **Contacta al autor**: frlpiedrahita@gmail.com
 
 ---
 
 **¡Listo! Ahora deberías poder desarrollar localmente sin problemas.**
+
+*Última actualización: Enero 2025*
