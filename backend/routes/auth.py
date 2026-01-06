@@ -1,28 +1,27 @@
 """
-Rutas de Autenticación
-Endpoints para registro, login, logout, etc.
+Rutas de Autenticación con Cookies httpOnly
+Endpoints para registro, login, logout usando cookies seguras
 """
-from fastapi import APIRouter, HTTPException, status, Depends
+import os
+from fastapi import APIRouter, HTTPException, status, Depends, Response, Request
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from datetime import timedelta
 
 from models.user import UserCreate, UserLogin, UserResponse
 from services.auth_service import auth_service
-from services.jwt_service import verify_token, create_access_token
-from middleware.auth_middleware import get_current_user
+from services.jwt_service import create_access_token, create_refresh_token, verify_token
+from middleware.auth_middleware import get_current_user, get_current_user_optional
 
 router = APIRouter()
 
-
-class TokenResponse(BaseModel):
-    """Respuesta de tokens"""
-    access_token: str
-    refresh_token: str
-    token_type: str = "bearer"
-
-
-class RefreshTokenRequest(BaseModel):
-    """Request para refresh token"""
-    refresh_token: str
+# Configuración de cookies desde .env
+COOKIE_NAME = "qa_session"
+COOKIE_DOMAIN = os.getenv("COOKIE_DOMAIN", "localhost")
+COOKIE_SECURE = os.getenv("COOKIE_SECURE", "False").lower() == "true"
+COOKIE_SAMESITE = os.getenv("COOKIE_SAMESITE", "lax")
+COOKIE_HTTPONLY = os.getenv("COOKIE_HTTPONLY", "True").lower() == "true"
+COOKIE_MAX_AGE = int(os.getenv("COOKIE_MAX_AGE", "604800"))  # 7 días
 
 
 class MessageResponse(BaseModel):
@@ -31,23 +30,88 @@ class MessageResponse(BaseModel):
     message: str
 
 
+def set_auth_cookie(response: Response, access_token: str, refresh_token: str):
+    """
+    Configura las cookies de autenticación en la respuesta
+    
+    Args:
+        response: Objeto Response de FastAPI
+        access_token: JWT access token
+        refresh_token: JWT refresh token
+    """
+    # Cookie principal con access token
+    response.set_cookie(
+        key=COOKIE_NAME,
+        value=access_token,
+        max_age=COOKIE_MAX_AGE,
+        httponly=COOKIE_HTTPONLY,
+        secure=COOKIE_SECURE,
+        samesite=COOKIE_SAMESITE,
+        path="/"
+    )
+    
+    # Cookie de refresh token (más duradera)
+    response.set_cookie(
+        key=f"{COOKIE_NAME}_refresh",
+        value=refresh_token,
+        max_age=COOKIE_MAX_AGE,
+        httponly=COOKIE_HTTPONLY,
+        secure=COOKIE_SECURE,
+        samesite=COOKIE_SAMESITE,
+        path="/api/auth/refresh"
+    )
+    
+    print(f"✅ Cookies configuradas: {COOKIE_NAME}")
+
+
+def clear_auth_cookies(response: Response):
+    """
+    Limpia las cookies de autenticación
+    
+    Args:
+        response: Objeto Response de FastAPI
+    """
+    response.delete_cookie(
+        key=COOKIE_NAME,
+        path="/",
+        domain=None  # None para que funcione en todos los dominios
+    )
+    response.delete_cookie(
+        key=f"{COOKIE_NAME}_refresh",
+        path="/api/auth/refresh",
+        domain=None
+    )
+    print(f"🗑️ Cookies eliminadas: {COOKIE_NAME}")
+
+
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register(
-    user_data: UserCreate
+    user_data: UserCreate,
+    response: Response
 ):
     """
-    Registrar un nuevo usuario
+    Registrar un nuevo usuario y establecer sesión con cookies
     
     - **email**: Email del usuario (debe ser único)
     - **display_name**: Nombre para mostrar (2-100 caracteres)
     - **password**: Contraseña (mínimo 8 caracteres, debe contener letra y número)
     
     Returns:
-        Usuario creado y tokens de autenticación
+        Usuario creado (las cookies se establecen automáticamente)
     """
     try:
         result = await auth_service.register_user(user_data)
-        return result
+        
+        # Establecer cookies con los tokens
+        set_auth_cookie(response, result["access_token"], result["refresh_token"])
+        
+        # Retornar solo datos del usuario (NO los tokens)
+        return {
+            "success": True,
+            "message": "Usuario registrado exitosamente",
+            "user": result["user"]
+        }
+        
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -63,20 +127,31 @@ async def register(
 
 @router.post("/login")
 async def login(
-    login_data: UserLogin
+    login_data: UserLogin,
+    response: Response
 ):
     """
-    Autenticar usuario
+    Autenticar usuario y establecer sesión con cookies
     
     - **email**: Email del usuario
     - **password**: Contraseña
     
     Returns:
-        Usuario y tokens de autenticación
+        Usuario autenticado (las cookies se establecen automáticamente)
     """
     try:
         result = await auth_service.login_user(login_data)
-        return result
+        
+        # Establecer cookies con los tokens
+        set_auth_cookie(response, result["access_token"], result["refresh_token"])
+        
+        # Retornar solo datos del usuario (NO los tokens)
+        return {
+            "success": True,
+            "message": "Login exitoso",
+            "user": result["user"]
+        }
+        
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -93,18 +168,27 @@ async def login(
 
 @router.post("/refresh")
 async def refresh_token(
-    request: RefreshTokenRequest
+    request: Request,
+    response: Response
 ):
     """
-    Refrescar access token usando refresh token
-    
-    - **refresh_token**: Refresh token válido
+    Refrescar access token usando refresh token de cookie
     
     Returns:
-        Nuevo access token
+        Confirmación de refresh (nueva cookie se establece automáticamente)
     """
+    # Obtener refresh token de la cookie
+    refresh_token_value = request.cookies.get(f"{COOKIE_NAME}_refresh")
+    
+    if not refresh_token_value:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token no encontrado",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
     # Verificar refresh token
-    payload = verify_token(request.refresh_token, token_type="refresh")
+    payload = verify_token(refresh_token_value, token_type="refresh")
     
     if not payload:
         raise HTTPException(
@@ -136,29 +220,28 @@ async def refresh_token(
         data={"sub": user_id, "email": user["email"]}
     )
     
+    # Actualizar cookie con nuevo access token (mantener mismo refresh token)
+    set_auth_cookie(response, new_access_token, refresh_token_value)
+    
     return {
         "success": True,
-        "access_token": new_access_token,
-        "token_type": "bearer"
+        "message": "Token refrescado exitosamente"
     }
 
 
 @router.post("/logout")
 async def logout(
-    current_user: dict = Depends(get_current_user)
+    response: Response,
+    current_user: dict = Depends(get_current_user_optional)
 ):
     """
-    Cerrar sesión del usuario
-    
-    Nota: En una implementación con JWT stateless, el logout es principalmente
-    del lado del cliente (eliminar tokens). Aquí podríamos implementar
-    una blacklist de tokens si fuera necesario.
+    Cerrar sesión del usuario (limpiar cookies)
     
     Returns:
         Mensaje de confirmación
     """
-    # En el futuro podríamos agregar el token a una blacklist en Redis
-    # Por ahora, solo confirmamos el logout
+    # Limpiar cookies
+    clear_auth_cookies(response)
     
     return {
         "success": True,
@@ -172,6 +255,7 @@ async def get_current_user_info(
 ):
     """
     Obtener información del usuario autenticado
+    La autenticación se verifica automáticamente mediante la cookie
     
     Returns:
         Información del usuario actual
@@ -186,18 +270,43 @@ async def get_current_user_info(
 
 
 @router.get("/verify")
-async def verify_token_endpoint(
-    current_user: dict = Depends(get_current_user)
+async def verify_session(
+    current_user: dict = Depends(get_current_user_optional)
 ):
     """
-    Verificar si el token actual es válido
+    Verificar si hay una sesión activa
     
     Returns:
-        Estado del token
+        Estado de la sesión
+    """
+    if current_user:
+        return {
+            "success": True,
+            "authenticated": True,
+            "user_id": str(current_user["_id"]),
+            "email": current_user["email"]
+        }
+    else:
+        return {
+            "success": True,
+            "authenticated": False
+        }
+
+
+@router.get("/status")
+async def auth_status():
+    """
+    Estado del sistema de autenticación
+    
+    Returns:
+        Configuración y estado
     """
     return {
         "success": True,
-        "valid": True,
-        "user_id": str(current_user["_id"]),
-        "email": current_user["email"]
+        "auth_mode": "cookie_based",
+        "cookie_name": COOKIE_NAME,
+        "cookie_secure": COOKIE_SECURE,
+        "cookie_samesite": COOKIE_SAMESITE,
+        "cookie_httponly": COOKIE_HTTPONLY,
+        "cookie_max_age": COOKIE_MAX_AGE
     }
