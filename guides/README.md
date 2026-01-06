@@ -66,19 +66,33 @@ Esta carpeta contiene documentación técnica detallada para desarrolladores y c
 
 ```bash
 # 1. Clonar repositorio
-git clone https://github.com/tu-usuario/qa-master-path.git
+git clone https://github.com/FARLEY-PIEDRAHITA-OROZCO/qa-master-path.git
 cd qa-master-path
 
-# 2. Instalar dependencias
+# 2. Configurar backend
+cd backend
+pip install -r requirements.txt
+
+# 3. Crear archivo .env (ver LOCAL_SETUP.md para detalles)
+cp .env.example .env
+# Editar .env con tu JWT_SECRET y configuración MongoDB
+
+# 4. Instalar dependencias frontend
+cd ..
 npm install
 
-# 3. Configurar Firebase (ver FIREBASE_AUTH_SETUP.md)
-# Editar app/assets/js/firebase-config.js con tus credenciales
+# 5. Verificar MongoDB corriendo
+mongosh --eval "db.version()"
 
-# 4. Iniciar servidor de desarrollo
+# 6. Iniciar backend
+cd backend
+uvicorn server:app --reload --host 0.0.0.0 --port 8001
+
+# 7. Iniciar frontend (en otra terminal)
+cd ..
 npm run dev
 
-# 5. Abrir http://localhost:8000
+# 8. Abrir http://localhost:8000
 ```
 
 ---
