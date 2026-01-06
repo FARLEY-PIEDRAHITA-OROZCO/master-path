@@ -594,12 +594,35 @@ cat backend/.env | grep MONGO_URL
 # Verificar que JWT_SECRET esté configurado
 cat backend/.env | grep JWT_SECRET
 
+# Verificar que las cookies se estén configurando correctamente
+# Ejecutar script de prueba:
+bash backend/test_cookies_solution.sh
+
 # Limpiar cookies del navegador
 # DevTools (F12) > Application > Cookies > Eliminar todo
 
 # Verificar logs del backend
 sudo supervisorctl tail backend
 ```
+
+### Cookies no se establecen en localhost
+
+Si las cookies no aparecen en DevTools después del login:
+
+```bash
+# 1. Verificar configuración de cookies
+curl http://localhost:8001/api/auth/status | python3 -m json.tool
+
+# Debe mostrar: cookie_secure: false, cookie_domain no debe estar presente
+
+# 2. Ejecutar script de prueba completo
+bash backend/test_cookies_solution.sh
+
+# 3. Verificar que ENVIRONMENT=development en .env
+cat backend/.env | grep ENVIRONMENT
+```
+
+📚 **Ver documentación completa**: [SOLUCION_COOKIES_HTTPONLY.md](./SOLUCION_COOKIES_HTTPONLY.md)
 
 ---
 
