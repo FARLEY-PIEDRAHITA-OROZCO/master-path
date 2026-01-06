@@ -58,9 +58,9 @@ Esta carpeta contiene documentación técnica detallada para desarrolladores y c
 **Lectura recomendada en orden**:
 
 1. Leer [`../README.md`](../README.md) (visión general del proyecto)
-2. Leer [`ESTRUCTURA_PROYECTO.md`](./ESTRUCTURA_PROYECTO.md) (entender organización)
-3. Leer [`DOCS_ARQUITECTURA.md`](./DOCS_ARQUITECTURA.md) (entender arquitectura)
-4. Si vas a trabajar con auth: leer [`FIREBASE_AUTH_SETUP.md`](./FIREBASE_AUTH_SETUP.md)
+2. Leer [`../LOCAL_SETUP.md`](../LOCAL_SETUP.md) (configuración local paso a paso)
+3. Leer [`ESTRUCTURA_PROYECTO.md`](./ESTRUCTURA_PROYECTO.md) (entender organización)
+4. Leer [`DOCS_ARQUITECTURA.md`](./DOCS_ARQUITECTURA.md) (entender arquitectura fullstack)
 
 ### Para Configurar el Proyecto
 
