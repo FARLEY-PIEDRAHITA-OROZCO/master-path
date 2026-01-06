@@ -116,22 +116,23 @@ async def get_current_user(
     return user
 
 
-async def get_current_user_optional(credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)):
+async def get_current_user_optional(
+    request: Request,
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
+):
     """
     Dependency para obtener el usuario actual (opcional)
     No lanza excepción si no hay token, retorna None
     
     Args:
+        request: Request object
         credentials: Credenciales HTTP Bearer (opcional)
     
     Returns:
         Optional[dict]: Documento del usuario o None
     """
-    if not credentials:
-        return None
-    
     try:
-        return await get_current_user(credentials)
+        return await get_current_user(request, credentials)
     except HTTPException:
         return None
 
