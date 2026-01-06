@@ -46,6 +46,7 @@
     "vitest": "^4.0.16"
   },
   "dependencies": {
-    "firebase": "^12.7.0"
+    "firebase": "^12.7.0",
+    "http-server": "^14.1.1"
   }
 }
