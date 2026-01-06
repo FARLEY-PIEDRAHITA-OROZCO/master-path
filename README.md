@@ -206,8 +206,8 @@ MONGO_URL=mongodb://localhost:27017/
 MONGO_DB_NAME=qa_master_path
 
 # Cookie Configuration
-COOKIE_DOMAIN=localhost
-COOKIE_SECURE=False
+# IMPORTANTE: NO configurar COOKIE_DOMAIN (se usa None automáticamente)
+# domain=None funciona tanto en localhost como en producción
 COOKIE_SAMESITE=lax
 COOKIE_HTTPONLY=True
 COOKIE_MAX_AGE=604800
@@ -221,10 +221,12 @@ ENVIRONMENT=development
 DEBUG=True
 ```
 
-**⚠️ IMPORTANTE**: Genera un JWT_SECRET seguro con:
+**⚠️ IMPORTANTE**: 
+1. Genera un JWT_SECRET seguro con:
 ```bash
 python -c "import secrets; print(secrets.token_urlsafe(32))"
 ```
+2. **NO configurar COOKIE_DOMAIN**: El sistema usa automáticamente `domain=None`, lo que permite que funcione correctamente tanto en localhost como en producción. Ver [documentación completa](./SOLUCION_COOKIES_HTTPONLY.md).
 
 ### Ejecutar la Aplicación
 
