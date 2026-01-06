@@ -1,24 +1,17 @@
 import { getAuthService } from './auth-config.js';
 
 /**
- * Obtiene la ruta base del proyecto
- */
-function getBasePath() {
-  return '/app/pages/';
-}
-
-/**
  * Protege una página requiriendo autenticación
- * Compatible con ambos sistemas: Firebase y Backend Propio
+ * Verifica sesión mediante cookie httpOnly en el backend
  */
 export async function requireAuth() {
   console.log('🔐 [AUTH-GUARD] Verificando autenticación...');
   
   try {
-    // Obtener el servicio de autenticación según configuración
+    // Obtener el servicio de autenticación
     const authService = await getAuthService();
     
-    // Crear timeout de 8 segundos con ID para poder cancelarlo
+    // Crear timeout de 8 segundos
     let timeoutId;
     const timeout = new Promise((resolve) => {
       timeoutId = setTimeout(() => {
@@ -30,14 +23,13 @@ export async function requireAuth() {
     // Carrera entre inicialización y timeout
     const result = await Promise.race([
       authService.init().then(user => {
-        // ✅ Cancelar timeout si init() termina primero
         clearTimeout(timeoutId);
         return { user, timeout: false };
       }),
       timeout
     ]);
     
-    // ✅ Asegurar que el timeout esté cancelado en todos los casos
+    // Asegurar que el timeout esté cancelado
     clearTimeout(timeoutId);
     
     if (result.timeout) {
@@ -56,8 +48,8 @@ export async function requireAuth() {
       window.location.href = `/app/pages/auth.html?redirect=${encodeURIComponent(currentPath)}`;
       
     } else {
-      // Usuario autenticado
-      console.log('✅ [AUTH-GUARD] Usuario autenticado:', result.user.email || result.user.displayName);
+      // Usuario autenticado - mostrar contenido
+      console.log('✅ [AUTH-GUARD] Usuario autenticado:', result.user.email || result.user.display_name);
       hideAuthLoading();
     }
     
@@ -66,6 +58,7 @@ export async function requireAuth() {
     showAuthError('Error al verificar autenticación');
     
     setTimeout(() => {
+      // Si hay error, permitir ver la página (modo desarrollo)
       hideAuthLoading();
     }, 3000);
   }
@@ -78,10 +71,10 @@ export async function requireAuth() {
 export async function redirectIfAuthenticated() {
   console.log('🔓 [AUTH-GUARD] Verificando si ya está autenticado...');
   
-  // Si hay un parámetro logout=true, no hacer nada (permitir mostrar login)
+  // Si hay un parámetro logout=true, no hacer nada
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('logout') === 'true') {
-    console.log('🚪 [AUTH-GUARD] Logout detectado, mostrando página de login...');
+    console.log('🚪 [AUTH-GUARD] Logout detectado, mostrando login...');
     return;
   }
   
@@ -115,24 +108,6 @@ export async function redirectIfAuthenticated() {
     console.error('❌ [AUTH-GUARD] Error:', error);
     // Continuar - mostrar formulario
   }
-}
-
-/**
- * Oculta el overlay de loading instantáneamente
- */
-function hideAuthLoadingInstantly() {
-  const loadingEl = document.getElementById('auth-loading');
-  const contentEl = document.getElementById('main-content');
-  
-  if (loadingEl) {
-    loadingEl.style.display = 'none';
-  }
-  
-  if (contentEl) {
-    contentEl.style.display = 'block';
-  }
-  
-  console.log('⚡ [AUTH-GUARD] Contenido mostrado instantáneamente');
 }
 
 /**
