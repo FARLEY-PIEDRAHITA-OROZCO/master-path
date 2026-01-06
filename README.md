@@ -151,7 +151,9 @@ Linting:   ESLint + Prettier
 │
 ├── package.json                  # Dependencias frontend
 ├── index.html                    # Punto de entrada
-└── README.md                     # Este archivo
+├── README.md                     # Este archivo
+├── LOCAL_SETUP.md                # Guía de setup local completa
+└── SOLUCION_COOKIES_HTTPONLY.md  # Documentación técnica de cookies
 ```
 
 ---
