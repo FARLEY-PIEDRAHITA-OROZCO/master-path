@@ -654,6 +654,8 @@ function redirectToLogin() {
 | Password Storage | bcrypt (12 rounds) |
 | Token Format | JWT (HS256) |
 | Token Delivery | httpOnly cookies |
+| Cookie Domain | None (dominio actual automático) |
+| Cookie Secure | Condicional (False dev, True prod) |
 | Token Expiration | 60 min (access), 7 días (refresh) |
 | Refresh Mechanism | Automático antes de expirar |
 
