@@ -67,20 +67,33 @@ def set_auth_cookie(response: Response, access_token: str, refresh_token: str):
 def clear_auth_cookies(response: Response):
     """
     Limpia las cookies de autenticación
+    Establece Max-Age=0 para eliminar inmediatamente
     
     Args:
         response: Objeto Response de FastAPI
     """
-    response.delete_cookie(
+    # Eliminar cookie principal con todos los atributos
+    response.set_cookie(
         key=COOKIE_NAME,
-        path="/",
-        domain=None  # None para que funcione en todos los dominios
+        value="",
+        max_age=0,  # Expira inmediatamente
+        httponly=COOKIE_HTTPONLY,
+        secure=COOKIE_SECURE,
+        samesite=COOKIE_SAMESITE,
+        path="/"
     )
-    response.delete_cookie(
+    
+    # Eliminar cookie de refresh
+    response.set_cookie(
         key=f"{COOKIE_NAME}_refresh",
-        path="/api/auth/refresh",
-        domain=None
+        value="",
+        max_age=0,  # Expira inmediatamente
+        httponly=COOKIE_HTTPONLY,
+        secure=COOKIE_SECURE,
+        samesite=COOKIE_SAMESITE,
+        path="/api/auth/refresh"
     )
+    
     print(f"🗑️ Cookies eliminadas: {COOKIE_NAME}")
 
 
