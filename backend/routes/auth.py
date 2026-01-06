@@ -97,6 +97,7 @@ def clear_auth_cookies(response: Response):
         key=COOKIE_NAME,
         value="",
         max_age=0,  # Expira inmediatamente
+        domain=COOKIE_DOMAIN,  # Debe coincidir con el domain usado al crear
         httponly=COOKIE_HTTPONLY,
         secure=COOKIE_SECURE,
         samesite=COOKIE_SAMESITE,
@@ -108,13 +109,14 @@ def clear_auth_cookies(response: Response):
         key=f"{COOKIE_NAME}_refresh",
         value="",
         max_age=0,  # Expira inmediatamente
+        domain=COOKIE_DOMAIN,  # Debe coincidir con el domain usado al crear
         httponly=COOKIE_HTTPONLY,
         secure=COOKIE_SECURE,
         samesite=COOKIE_SAMESITE,
         path="/api/auth/refresh"
     )
     
-    print(f"🗑️ Cookies eliminadas: {COOKIE_NAME}")
+    print(f"🗑️ [COOKIE-CLEAR] Cookies eliminadas: {COOKIE_NAME}")
 
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
