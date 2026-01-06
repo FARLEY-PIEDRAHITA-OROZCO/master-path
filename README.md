@@ -525,18 +525,32 @@ black .                        # Formatear código
 | JWT Signing | ✅ SEGURO | HS256 con secret fuerte |
 | Token Expiration | ✅ CONFIGURADO | 60 min access, 7 días refresh |
 | httpOnly Cookies | ✅ ACTIVO | Cookies no accesibles por JavaScript |
+| Cookie Domain | ✅ OPTIMIZADO | domain=None (funciona en local y producción) |
+| Cookie Secure | ✅ CONDICIONAL | False en development, True en production |
 | CORS Configuration | ✅ CONFIGURADO | Orígenes permitidos definidos |
 | Input Validation | ✅ ACTIVO | Pydantic models + frontend validation |
 | Error Handling | ✅ ROBUSTO | Try-catch en todos los endpoints |
 
+### Solución de Cookies httpOnly ✨
+
+El sistema implementa una **solución universal de cookies** que funciona tanto en localhost como en producción sin cambios de código:
+
+- **domain=None**: El navegador usa automáticamente el dominio actual
+- **secure condicional**: `False` en development (HTTP), `True` en production (HTTPS)
+- **SameSite=lax**: Protección contra CSRF
+- **HttpOnly=true**: Protección contra XSS
+
+📚 **Documentación completa**: [SOLUCION_COOKIES_HTTPONLY.md](./SOLUCION_COOKIES_HTTPONLY.md)
+
 ### Recomendaciones para Producción ⚠️
 
 1. **Generar nuevo JWT_SECRET**: Usar secret único y fuerte
-2. **Implementar HTTPS**: SSL/TLS obligatorio
-3. **Rate Limiting**: Limitar intentos de login
-4. **Logs a archivo**: No solo consola
-5. **Backup MongoDB**: Estrategia de respaldo regular
-6. **Monitoring**: Uptime y alertas
+2. **Configurar ENVIRONMENT=production**: Activa secure=true automáticamente
+3. **Implementar HTTPS**: SSL/TLS obligatorio en producción
+4. **Rate Limiting**: Limitar intentos de login
+5. **Logs a archivo**: No solo consola
+6. **Backup MongoDB**: Estrategia de respaldo regular
+7. **Monitoring**: Uptime y alertas
 
 ---
 
