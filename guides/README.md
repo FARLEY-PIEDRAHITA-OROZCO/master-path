@@ -2,21 +2,43 @@
 
 Esta carpeta contiene documentación técnica detallada para desarrolladores y colaboradores del proyecto.
 
+> **✨ ACTUALIZACIÓN**: Documentación completamente actualizada con solución de cookies httpOnly y mejores prácticas de autenticación (Enero 2026)
+
 ---
 
 ## 📑 Índice de Documentos
+
+### 🌟 **[INDICE_DOCUMENTACION.md](./INDICE_DOCUMENTACION.md)** - **NUEVO**
+**Índice completo y actualizado de toda la documentación del proyecto**
+
+Incluye:
+- Guías de usuario (README, LOCAL_SETUP, SOLUCION_COOKIES)
+- Guías técnicas (ESTRUCTURA, ARQUITECTURA)
+- Scripts y herramientas de validación
+- Orden recomendado de lectura
+- Mapa de soluciones rápidas
+- Búsqueda por tema
+
+---
 
 ### 1. [**ESTRUCTURA_PROYECTO.md**](./ESTRUCTURA_PROYECTO.md)
 **Descripción**: Organización detallada de archivos y directorios del proyecto.
 
 **Contenido**:
-- Estructura de carpetas `/app/pages/` y `/app/assets/`
-- Rutas y URLs de la aplicación
-- Flujo de autenticación
+- Estructura de carpetas `/app/backend/` y `/app/app/`
+- Rutas y URLs de la aplicación (frontend y API)
+- Flujo de autenticación detallado
+- Flujo de sincronización de progreso
 - Organización de archivos JavaScript
+- MongoDB Schema con índices
+- Responsabilidades de cada módulo
+- Cómo agregar nuevos endpoints y páginas
+- Variables de entorno actualizadas (sin COOKIE_DOMAIN)
 - Mejores prácticas de estructura
 
 **Para quién**: Desarrolladores nuevos, arquitectos, code reviewers
+
+**Actualización**: Variables de entorno actualizadas con configuración correcta de cookies
 
 ---
 
@@ -24,30 +46,83 @@ Esta carpeta contiene documentación técnica detallada para desarrolladores y c
 **Descripción**: Arquitectura técnica completa de la aplicación.
 
 **Contenido**:
-- Patrón de diseño modular
-- Ciclo de vida de la aplicación
-- Descripción de módulos JavaScript (storage.js, app.js, etc.)
-- Modelo de datos (modules.json, docs.json, LocalStorage schema)
+- Patrón de diseño fullstack (3 capas)
+- Diagramas de flujo de datos
+- Descripción detallada de módulos Backend (FastAPI)
+- Descripción detallada de módulos Frontend (JavaScript)
+- Modelo de datos MongoDB
 - Sistema de estilos (Tailwind + CSS custom)
+- Seguridad implementada (cookies httpOnly optimizadas)
 - Dependencias externas
 - Limitaciones conocidas y soluciones propuestas
+- Recomendaciones para producción
 
 **Para quién**: Arquitectos de software, desarrolladores avanzados
 
+**Actualización**: Sección de seguridad actualizada con solución de cookies (domain=None, secure condicional)
+
 ---
 
-### 3. [**LOCAL_SETUP.md**](../LOCAL_SETUP.md)
+### 3. [**../LOCAL_SETUP.md**](../LOCAL_SETUP.md)
 **Descripción**: Guía completa para configurar el proyecto en entorno local.
 
 **Contenido**:
 - Instalación de prerrequisitos (Python, Node.js, MongoDB)
 - Configuración de backend FastAPI
-- Configuración de variables de entorno (.env)
+- Configuración de variables de entorno (.env) actualizada
 - Ejecución de servicios (backend + frontend)
 - Testing y troubleshooting
 - Scripts útiles para desarrollo
 
 **Para quién**: Desarrolladores nuevos, configuración inicial, debugging local
+
+**Actualización**: Configuración de .env correcta sin COOKIE_DOMAIN
+
+---
+
+### 4. [**../SOLUCION_COOKIES_HTTPONLY.md**](../SOLUCION_COOKIES_HTTPONLY.md) - **⭐ NUEVO**
+**Descripción**: Documentación técnica completa sobre la solución de autenticación con cookies httpOnly
+
+**Contenido**:
+- Análisis de causa raíz del problema (domain="localhost" rechazado por navegadores)
+- Solución implementada (domain=None universal)
+- Diferencias entre entorno local vs Emergent/producción
+- Código antes vs después
+- Validación con tests automáticos
+- Configuración de seguridad (HttpOnly, SameSite, Secure condicional)
+- Cómo verificar en local
+- Referencias técnicas (RFC 6265, MDN, OWASP, FastAPI)
+
+**Para quién**: 
+- Desarrolladores trabajando con autenticación
+- Debugging de problemas de cookies en localhost
+- Implementación de cookies httpOnly en otros proyectos
+- Ingenieros de seguridad
+
+**Puntos clave**:
+- ✅ Solución universal para localhost y producción
+- ✅ Sin cambios de código entre entornos
+- ✅ Incluye script de validación automatizado
+- ✅ Documentación completa de seguridad
+
+---
+
+### 5. [**../backend/test_cookies_solution.sh**](../backend/test_cookies_solution.sh) - **⭐ NUEVO**
+**Descripción**: Script automatizado de validación de cookies httpOnly
+
+**Funcionalidad**:
+- Health check del backend
+- Verificación de configuración de cookies
+- Tests de registro y login
+- Validación de headers Set-Cookie
+- Verificación de parámetros (HttpOnly, SameSite, Domain, Secure)
+- Tests de endpoint /auth/me con y sin cookie
+- Resumen visual con colores
+
+**Cómo ejecutar**:
+```bash
+bash /app/backend/test_cookies_solution.sh
+```
 
 ---
 
