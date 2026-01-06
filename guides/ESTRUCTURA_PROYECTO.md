@@ -466,10 +466,12 @@ MONGO_URL=mongodb://localhost:27017/
 MONGO_DB_NAME=qa_master_path
 
 # Cookies
-COOKIE_DOMAIN=localhost
-COOKIE_SECURE=False
 COOKIE_SAMESITE=lax
 COOKIE_HTTPONLY=True
+
+# IMPORTANTE: NO configurar COOKIE_DOMAIN ni COOKIE_SECURE
+# domain=None se usa automáticamente (funciona en local y producción)
+# secure se configura automáticamente según ENVIRONMENT
 
 # CORS
 FRONTEND_URL=http://localhost:8000
