@@ -69,9 +69,9 @@ REFRESH_TOKEN_EXPIRE_DAYS=7
 MONGO_URL=mongodb://localhost:27017/
 MONGO_DB_NAME=qa_master_path
 
-# Cookie Configuration
-COOKIE_DOMAIN=localhost
-COOKIE_SECURE=False
+# Cookie Configuration (Valores por defecto óptimos)
+# NOTA: NO configurar COOKIE_DOMAIN - el código usa None automáticamente
+# domain=None funciona tanto en local como en producción
 COOKIE_SAMESITE=lax
 COOKIE_HTTPONLY=True
 COOKIE_MAX_AGE=604800
