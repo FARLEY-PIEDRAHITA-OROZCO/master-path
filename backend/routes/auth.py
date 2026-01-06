@@ -48,6 +48,9 @@ def set_auth_cookie(response: Response, access_token: str, refresh_token: str):
     """
     Configura las cookies de autenticación en la respuesta
     
+    CRÍTICO: domain=None permite que funcione tanto en localhost como en producción
+    El navegador usa automáticamente el dominio actual cuando domain=None
+    
     Args:
         response: Objeto Response de FastAPI
         access_token: JWT access token
@@ -58,6 +61,7 @@ def set_auth_cookie(response: Response, access_token: str, refresh_token: str):
         key=COOKIE_NAME,
         value=access_token,
         max_age=COOKIE_MAX_AGE,
+        domain=COOKIE_DOMAIN,  # None = usa dominio actual automáticamente
         httponly=COOKIE_HTTPONLY,
         secure=COOKIE_SECURE,
         samesite=COOKIE_SAMESITE,
@@ -69,13 +73,15 @@ def set_auth_cookie(response: Response, access_token: str, refresh_token: str):
         key=f"{COOKIE_NAME}_refresh",
         value=refresh_token,
         max_age=COOKIE_MAX_AGE,
+        domain=COOKIE_DOMAIN,  # None = usa dominio actual automáticamente
         httponly=COOKIE_HTTPONLY,
         secure=COOKIE_SECURE,
         samesite=COOKIE_SAMESITE,
         path="/api/auth/refresh"
     )
     
-    print(f"✅ Cookies configuradas: {COOKIE_NAME}")
+    print(f"✅ [COOKIE-SET] Cookies configuradas: {COOKIE_NAME}")
+    print(f"✅ [COOKIE-SET] Domain: {COOKIE_DOMAIN}, Secure: {COOKIE_SECURE}, SameSite: {COOKIE_SAMESITE}")
 
 
 def clear_auth_cookies(response: Response):
