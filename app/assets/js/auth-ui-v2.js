@@ -44,18 +44,15 @@ async function initAuthUI() {
   // Verificar si ya está autenticado
   await redirectIfAuthenticated();
   
-  // Si usa Firebase, mostrar botón de Google
-  if (!AUTH_CONFIG.USE_BACKEND_AUTH && elements.btnGoogle) {
-    elements.btnGoogle.classList.remove('hidden');
-  } else if (elements.btnGoogle) {
-    // Ocultar botón de Google si usa backend propio
+  // Ocultar botón de Google (solo backend con cookies)
+  if (elements.btnGoogle) {
     elements.btnGoogle.classList.add('hidden');
     // Mostrar mensaje informativo
     const googleContainer = elements.btnGoogle.parentElement;
     if (googleContainer) {
       const notice = document.createElement('p');
       notice.className = 'text-xs text-slate-500 text-center mt-4';
-      notice.textContent = 'Login con Google próximamente disponible';
+      notice.textContent = 'Sistema de autenticación seguro con cookies httpOnly';
       googleContainer.appendChild(notice);
     }
   }
