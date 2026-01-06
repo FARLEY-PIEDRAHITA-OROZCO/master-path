@@ -17,11 +17,25 @@ router = APIRouter()
 
 # Configuración de cookies desde .env
 COOKIE_NAME = "qa_session"
-COOKIE_DOMAIN = os.getenv("COOKIE_DOMAIN", "localhost")
-COOKIE_SECURE = os.getenv("COOKIE_SECURE", "False").lower() == "true"
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+
+# CRÍTICO: domain debe ser None para localhost
+# En producción también funciona con None (usa el dominio actual automáticamente)
+COOKIE_DOMAIN = None
+
+# secure debe ser False en desarrollo, True en producción
+COOKIE_SECURE = ENVIRONMENT == "production"
+
 COOKIE_SAMESITE = os.getenv("COOKIE_SAMESITE", "lax")
 COOKIE_HTTPONLY = os.getenv("COOKIE_HTTPONLY", "True").lower() == "true"
 COOKIE_MAX_AGE = int(os.getenv("COOKIE_MAX_AGE", "604800"))  # 7 días
+
+print(f"🍪 [COOKIE-CONFIG] Entorno: {ENVIRONMENT}")
+print(f"🍪 [COOKIE-CONFIG] Cookie name: {COOKIE_NAME}")
+print(f"🍪 [COOKIE-CONFIG] Domain: {COOKIE_DOMAIN} (None = dominio actual)")
+print(f"🍪 [COOKIE-CONFIG] Secure: {COOKIE_SECURE}")
+print(f"🍪 [COOKIE-CONFIG] SameSite: {COOKIE_SAMESITE}")
+print(f"🍪 [COOKIE-CONFIG] HttpOnly: {COOKIE_HTTPONLY}")
 
 
 class MessageResponse(BaseModel):
