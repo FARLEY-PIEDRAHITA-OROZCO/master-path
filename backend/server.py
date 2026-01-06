@@ -28,6 +28,7 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8000")
 FRONTEND_DEV_URL = os.getenv("FRONTEND_DEV_URL", "http://localhost:3000")
 
 # Lista de orígenes permitidos para desarrollo local
+# IMPORTANTE: En producción, especificar dominios exactos
 allowed_origins = [
     FRONTEND_URL,
     FRONTEND_DEV_URL,
@@ -38,12 +39,14 @@ allowed_origins = [
     "http://192.168.56.1:8000",  # VirtualBox/VM
 ]
 
+# CORS con soporte para cookies
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_credentials=True,
+    allow_credentials=True,  # CRÍTICO para cookies
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["Set-Cookie"],  # Exponer header Set-Cookie
 )
 
 
