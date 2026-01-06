@@ -36,18 +36,18 @@ Esta carpeta contiene documentación técnica detallada para desarrolladores y c
 
 ---
 
-### 3. [**FIREBASE_AUTH_SETUP.md**](./FIREBASE_AUTH_SETUP.md)
-**Descripción**: Guía completa de configuración de Firebase Authentication.
+### 3. [**LOCAL_SETUP.md**](../LOCAL_SETUP.md)
+**Descripción**: Guía completa para configurar el proyecto en entorno local.
 
 **Contenido**:
-- Configuración paso a paso de Firebase
-- Implementación de autenticación (Email/Password y Google)
-- Resolución de dependencias circulares
-- Troubleshooting de errores comunes
-- Configuración de reglas de Firestore
-- Testing de autenticación
+- Instalación de prerrequisitos (Python, Node.js, MongoDB)
+- Configuración de backend FastAPI
+- Configuración de variables de entorno (.env)
+- Ejecución de servicios (backend + frontend)
+- Testing y troubleshooting
+- Scripts útiles para desarrollo
 
-**Para quién**: Developers implementando auth, DevOps, nuevos colaboradores
+**Para quién**: Desarrolladores nuevos, configuración inicial, debugging local
 
 ---
 
