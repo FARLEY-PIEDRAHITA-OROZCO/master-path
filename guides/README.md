@@ -132,10 +132,19 @@ bash /app/backend/test_cookies_solution.sh
 
 **Lectura recomendada en orden**:
 
-1. Leer [`../README.md`](../README.md) (visión general del proyecto)
-2. Leer [`../LOCAL_SETUP.md`](../LOCAL_SETUP.md) (configuración local paso a paso)
-3. Leer [`ESTRUCTURA_PROYECTO.md`](./ESTRUCTURA_PROYECTO.md) (entender organización)
-4. Leer [`DOCS_ARQUITECTURA.md`](./DOCS_ARQUITECTURA.md) (entender arquitectura fullstack)
+1. Leer [**INDICE_DOCUMENTACION.md**](./INDICE_DOCUMENTACION.md) (mapa completo de docs)
+2. Leer [`../README.md`](../README.md) (visión general del proyecto)
+3. Leer [`../LOCAL_SETUP.md`](../LOCAL_SETUP.md) (configuración local paso a paso)
+4. Leer [`ESTRUCTURA_PROYECTO.md`](./ESTRUCTURA_PROYECTO.md) (entender organización)
+5. Leer [`DOCS_ARQUITECTURA.md`](./DOCS_ARQUITECTURA.md) (entender arquitectura fullstack)
+
+### Para Debugging de Autenticación/Cookies
+
+**Si tienes problemas con cookies en localhost**:
+
+1. Leer [`../SOLUCION_COOKIES_HTTPONLY.md`](../SOLUCION_COOKIES_HTTPONLY.md) (solución completa)
+2. Ejecutar `bash /app/backend/test_cookies_solution.sh` (validación automatizada)
+3. Revisar [`DOCS_ARQUITECTURA.md`](./DOCS_ARQUITECTURA.md) → "Flujos de Autenticación"
 
 ### Para Configurar el Proyecto
 
