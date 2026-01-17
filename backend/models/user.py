@@ -1,10 +1,10 @@
 """
-Modelos de Usuario
-Define las estructuras de datos para usuarios en la aplicación
+Modelos de Usuario (SIMPLIFICADO - SIN AUTENTICACIÓN)
+Define las estructuras de datos para usuarios sin sistema de login
 """
 from datetime import datetime
 from typing import Optional, Dict, List
-from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel, EmailStr, Field
 from bson import ObjectId
 
 
@@ -29,7 +29,7 @@ class PyObjectId(ObjectId):
 
 class UserProgress(BaseModel):
     """
-    Modelo de progreso del usuario (embebido en User)
+    Modelo de progreso del usuario
     """
     modules: Dict[str, bool] = Field(default_factory=dict, description="Módulos completados")
     subtasks: Dict[str, bool] = Field(default_factory=dict, description="Subtareas completadas")
@@ -59,20 +59,6 @@ class UserSettings(BaseModel):
     theme: str = Field(default="dark", description="Tema de la aplicación")
     language: str = Field(default="es", description="Idioma preferido")
 
-    @validator('theme')
-    def validate_theme(cls, v):
-        allowed_themes = ['light', 'dark', 'auto']
-        if v not in allowed_themes:
-            raise ValueError(f'Theme must be one of {allowed_themes}')
-        return v
-
-    @validator('language')
-    def validate_language(cls, v):
-        allowed_languages = ['es', 'en', 'pt']
-        if v not in allowed_languages:
-            raise ValueError(f'Language must be one of {allowed_languages}')
-        return v
-
     class Config:
         json_schema_extra = {
             "example": {
@@ -85,7 +71,7 @@ class UserSettings(BaseModel):
 
 class UserBase(BaseModel):
     """
-    Campos básicos comunes de usuario
+    Campos básicos de usuario
     """
     email: EmailStr = Field(..., description="Email del usuario")
     display_name: str = Field(..., min_length=2, max_length=100, description="Nombre para mostrar")
@@ -101,34 +87,14 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     """
-    Modelo para crear un nuevo usuario (registro)
+    Modelo para crear un nuevo usuario
     """
-    password: str = Field(..., min_length=8, max_length=100, description="Contraseña")
-
-    @validator('password')
-    def validate_password(cls, v):
-        if len(v) < 8:
-            raise ValueError('Password must be at least 8 characters long')
-        if not any(char.isdigit() for char in v):
-            raise ValueError('Password must contain at least one digit')
-        if not any(char.isalpha() for char in v):
-            raise ValueError('Password must contain at least one letter')
-        return v
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "email": "nuevo@example.com",
-                "display_name": "Nuevo Usuario",
-                "password": "Password123"
-            }
-        }
+    pass
 
 
 class UserUpdate(BaseModel):
     """
     Modelo para actualizar un usuario existente
-    Todos los campos son opcionales
     """
     display_name: Optional[str] = Field(None, min_length=2, max_length=100)
     photo_url: Optional[str] = None
@@ -149,33 +115,16 @@ class UserUpdate(BaseModel):
 
 class UserInDB(UserBase):
     """
-    Modelo de usuario en la base de datos (documento completo)
+    Modelo de usuario en la base de datos
     """
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    password_hash: str = Field(..., description="Hash de la contraseña")
     photo_url: Optional[str] = Field(None, description="URL de la foto de perfil")
-    auth_provider: str = Field(default="email", description="Proveedor de autenticación")
-    google_id: Optional[str] = Field(None, description="Google ID para OAuth")
-    firebase_uid: Optional[str] = Field(None, description="Firebase UID (para migración)")
     
     created_at: datetime = Field(default_factory=datetime.utcnow, description="Fecha de creación")
     last_active: datetime = Field(default_factory=datetime.utcnow, description="Última actividad")
-    email_verified: bool = Field(default=False, description="Email verificado")
-    is_active: bool = Field(default=True, description="Usuario activo")
     
     progress: UserProgress = Field(default_factory=UserProgress, description="Progreso del usuario")
     settings: UserSettings = Field(default_factory=UserSettings, description="Configuración del usuario")
-    
-    # Metadata de migración
-    migrated_from_firebase: bool = Field(default=False, description="Migrado desde Firebase")
-    migration_date: Optional[datetime] = Field(None, description="Fecha de migración")
-
-    @validator('auth_provider')
-    def validate_auth_provider(cls, v):
-        allowed_providers = ['email', 'google', 'firebase']
-        if v not in allowed_providers:
-            raise ValueError(f'Auth provider must be one of {allowed_providers}')
-        return v
 
     class Config:
         populate_by_name = True
@@ -186,13 +135,9 @@ class UserInDB(UserBase):
                 "_id": "507f1f77bcf86cd799439011",
                 "email": "usuario@example.com",
                 "display_name": "Juan Pérez",
-                "password_hash": "$2b$12$...",
                 "photo_url": "https://example.com/photo.jpg",
-                "auth_provider": "email",
                 "created_at": "2025-01-15T10:00:00",
                 "last_active": "2025-01-15T15:30:00",
-                "email_verified": True,
-                "is_active": True,
                 "progress": {
                     "modules": {"1": True},
                     "subtasks": {"1-0": True},
@@ -211,14 +156,12 @@ class UserInDB(UserBase):
 
 class UserResponse(UserBase):
     """
-    Modelo de respuesta de usuario (sin datos sensibles)
+    Modelo de respuesta de usuario
     """
     id: str = Field(..., description="ID del usuario")
     photo_url: Optional[str] = None
-    auth_provider: str
     created_at: datetime
     last_active: datetime
-    email_verified: bool
     progress: UserProgress
     settings: UserSettings
 
@@ -229,10 +172,8 @@ class UserResponse(UserBase):
                 "email": "usuario@example.com",
                 "display_name": "Juan Pérez",
                 "photo_url": "https://example.com/photo.jpg",
-                "auth_provider": "email",
                 "created_at": "2025-01-15T10:00:00",
                 "last_active": "2025-01-15T15:30:00",
-                "email_verified": True,
                 "progress": {
                     "modules": {"1": True},
                     "subtasks": {"1-0": True},
@@ -246,75 +187,5 @@ class UserResponse(UserBase):
                     "theme": "dark",
                     "language": "es"
                 }
-            }
-        }
-
-
-class UserLogin(BaseModel):
-    """
-    Modelo para login de usuario
-    """
-    email: EmailStr = Field(..., description="Email del usuario")
-    password: str = Field(..., description="Contraseña")
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "email": "usuario@example.com",
-                "password": "Password123"
-            }
-        }
-
-
-class GoogleAuthRequest(BaseModel):
-    """
-    Modelo para autenticación con Google
-    """
-    id_token: str = Field(..., description="Google ID Token")
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "id_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjE5ZmUyYT..."
-            }
-        }
-
-
-class PasswordResetRequest(BaseModel):
-    """
-    Modelo para solicitud de reset de contraseña
-    """
-    email: EmailStr = Field(..., description="Email del usuario")
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "email": "usuario@example.com"
-            }
-        }
-
-
-class PasswordResetConfirm(BaseModel):
-    """
-    Modelo para confirmar reset de contraseña
-    """
-    token: str = Field(..., description="Token de reset")
-    new_password: str = Field(..., min_length=8, description="Nueva contraseña")
-
-    @validator('new_password')
-    def validate_password(cls, v):
-        if len(v) < 8:
-            raise ValueError('Password must be at least 8 characters long')
-        if not any(char.isdigit() for char in v):
-            raise ValueError('Password must contain at least one digit')
-        if not any(char.isalpha() for char in v):
-            raise ValueError('Password must contain at least one letter')
-        return v
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "token": "abc123def456",
-                "new_password": "NewPassword123"
             }
         }
