@@ -157,8 +157,7 @@ async def status():
 
 
 # Importar y registrar rutas
-from routes import auth_router, user_router, progress_router
-app.include_router(auth_router, prefix="/api/auth", tags=["Autenticación"])
+from routes import user_router, progress_router
 app.include_router(user_router, prefix="/api/user", tags=["Usuario"])
 app.include_router(progress_router, prefix="/api/progress", tags=["Progreso"])
 
