@@ -2,19 +2,16 @@ import { AppEngine } from './app.js';
 import { StorageService } from './storage-unified.js';
 import { KEYS } from './storage-service-v2.js';
 import { UIComponents } from './components.js';
-import { requireAuth } from './auth-guard-v2.js';
 
-// ⚠️ CRÍTICO: Verificar autenticación PRIMERO antes de cargar nada
-requireAuth();
+// Sistema de roadmap sin autenticación
 
 document.addEventListener('DOMContentLoaded', async () => {
   UIComponents.init();
-  await AppEngine.init(); // Esperamos a que el JSON cargue
+  await AppEngine.init();
 
-  // Verificación de seguridad
   if (AppEngine.modules && AppEngine.modules.length > 0) {
     renderRoadmap();
-    updateGlobalProgress(); // Nueva función
+    updateGlobalProgress();
   } else {
     console.error('No se pudieron cargar los módulos para el Roadmap');
     document.getElementById('roadmap-container').innerHTML =
@@ -22,9 +19,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-/**
- * Actualiza la barra de progreso global en el header
- */
 function updateGlobalProgress() {
   const stats = AppEngine.getAnalytics();
   const progressBar = document.getElementById('global-progress-bar-roadmap');
@@ -44,27 +38,18 @@ function updateGlobalProgress() {
   }
 }
 
-/**
- * Determina el estado de un módulo
- * @param {Object} module - Módulo a evaluar
- * @param {number} index - Índice del módulo en el array
- * @returns {string} Estado: 'locked', 'pending', 'active', 'completed'
- */
 function getModuleState(module, index) {
   const progress = StorageService.get(KEYS.PROGRESS);
   const subProgress = StorageService.get(KEYS.SUBTASKS);
   
-  // Si está completado
   if (progress[module.id]) {
     return 'completed';
   }
   
-  // Si es el primer módulo o el anterior está completado, está disponible
   const previousModuleCompleted = index === 0 || progress[AppEngine.modules[index - 1].id];
   console.log(`  🔍 Módulo ${module.id}: index=${index}, previousCompleted=${previousModuleCompleted}`);
   
   if (previousModuleCompleted) {
-    // Verificar si tiene tareas en progreso
     const totalTasks = module.schedule.length;
     const completedTasks = module.schedule.filter((_, i) => subProgress[`${module.id}-${i}`]).length;
     
@@ -74,13 +59,9 @@ function getModuleState(module, index) {
     return 'pending';
   }
   
-  // De lo contrario, está bloqueado
   return 'locked';
 }
 
-/**
- * Obtiene las clases CSS según el estado del módulo
- */
 function getStateClasses(state) {
   const baseClasses = 'glass-panel rounded-[3rem] overflow-hidden transition-all duration-500';
   
@@ -98,9 +79,6 @@ function getStateClasses(state) {
   }
 }
 
-/**
- * Obtiene el badge del estado
- */
 function getStateBadge(state) {
   switch(state) {
     case 'locked':
@@ -126,19 +104,16 @@ function renderRoadmap() {
 
   container.innerHTML = AppEngine.modules
     .map((m, index) => {
-      // Determinar estado del módulo
       const state = getModuleState(m, index);
       const isLocked = state === 'locked';
       
       console.log(`📦 Módulo ${m.id} (${m.title}): estado = ${state}, index = ${index}`);
       
-      // Cálculo de progreso interno del módulo
       const totalTasks = m.schedule.length;
       const completedTasks = m.schedule.filter((_, i) => subProgress[`${m.id}-${i}`]).length;
       const percentage = Math.round((completedTasks / totalTasks) * 100) || 0;
       const strokeDash = 251.2 - (251.2 * percentage) / 100;
       
-      // Color del anillo según estado
       let ringColor = 'text-blue-500';
       if (state === 'completed') ringColor = 'text-emerald-500';
       if (state === 'locked') ringColor = 'text-slate-700';
@@ -203,7 +178,6 @@ function renderRoadmap() {
                         </div>
                         <div class="space-y-3">
                             <div class="bg-gradient-to-br from-slate-900/50 to-slate-950/50 rounded-3xl border border-white/5 overflow-hidden">
-                                <!-- Header del Editor -->
                                 <div class="px-5 py-3 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
                                     <div class="flex items-center gap-2">
                                         <i class="fas fa-pen text-blue-500 text-xs"></i>
@@ -218,7 +192,6 @@ function renderRoadmap() {
                                     </div>
                                 </div>
                                 
-                                <!-- Área de Texto -->
                                 <div class="relative">
                                     <textarea 
                                         data-module-note="${m.id}"
@@ -230,7 +203,6 @@ function renderRoadmap() {
                                     >${notes[m.id] || ''}</textarea>
                                 </div>
                                 
-                                <!-- Footer del Editor -->
                                 <div class="px-4 py-2.5 border-t border-white/5 flex flex-wrap items-center justify-between gap-2 bg-black/20">
                                     <div class="flex items-center gap-3">
                                         <span id="char-count-${m.id}" class="text-[9px] font-bold text-slate-600 whitespace-nowrap" data-testid="char-count-${m.id}">
@@ -337,15 +309,8 @@ function renderRoadmap() {
   attachEventListeners();
 }
 
-// Mapa para almacenar los timers de debounce de cada módulo
 const noteDebounceTimers = {};
 
-/**
- * Guarda una nota con feedback visual
- * @param {string} moduleId - ID del módulo
- * @param {string} content - Contenido de la nota
- * @param {boolean} showFeedback - Mostrar feedback visual
- */
 function saveNote(moduleId, content, showFeedback = true) {
   const notes = StorageService.get(KEYS.NOTES);
   notes[moduleId] = content;
@@ -357,11 +322,6 @@ function saveNote(moduleId, content, showFeedback = true) {
   }
 }
 
-/**
- * Actualiza el estado de guardado visual
- * @param {string} moduleId - ID del módulo
- * @param {string} status - Estado: 'saving', 'saved', 'error', 'idle'
- */
 function updateSaveStatus(moduleId, status) {
   const statusElement = document.getElementById(`save-status-${moduleId}`);
   if (!statusElement) return;
@@ -379,7 +339,6 @@ function updateSaveStatus(moduleId, status) {
       statusElement.className = 'text-[8px] font-bold text-emerald-500 italic flex items-center gap-1';
       if (icon) icon.className = 'fas fa-check-circle text-[6px]';
       if (statusText) statusText.textContent = 'Guardado';
-      // Volver a idle después de 2 segundos
       setTimeout(() => updateSaveStatus(moduleId, 'idle'), 2000);
       break;
     case 'error':
@@ -396,10 +355,6 @@ function updateSaveStatus(moduleId, status) {
   }
 }
 
-/**
- * Actualiza el timestamp de última modificación
- * @param {string} moduleId - ID del módulo
- */
 function updateLastSavedTime(moduleId) {
   const lastSavedElement = document.getElementById(`last-saved-${moduleId}`);
   if (!lastSavedElement) return;
@@ -410,11 +365,6 @@ function updateLastSavedTime(moduleId) {
   lastSavedElement.classList.remove('hidden');
 }
 
-/**
- * Actualiza los contadores de caracteres y palabras
- * @param {string} moduleId - ID del módulo
- * @param {string} content - Contenido del texto
- */
 function updateCharCount(moduleId, content) {
   const charCountElement = document.getElementById(`char-count-${moduleId}`);
   const wordCountElement = document.getElementById(`word-count-${moduleId}`);
@@ -431,10 +381,6 @@ function updateCharCount(moduleId, content) {
   }
 }
 
-/**
- * Copia el contenido de la nota al portapapeles
- * @param {string} moduleId - ID del módulo
- */
 async function copyNoteToClipboard(moduleId) {
   const textarea = document.querySelector(`[data-module-note="${moduleId}"]`);
   if (!textarea) return;
@@ -448,21 +394,15 @@ async function copyNoteToClipboard(moduleId) {
   }
 }
 
-/**
- * Limpia las notas con confirmación
- * @param {string} moduleId - ID del módulo
- */
 function clearNote(moduleId) {
   const textarea = document.querySelector(`[data-module-note="${moduleId}"]`);
   if (!textarea) return;
   
-  // Si no hay contenido, no hacer nada
   if (!textarea.value.trim()) {
     showToast('ℹ️ No hay notas para limpiar', 'info', 2000);
     return;
   }
   
-  // Confirmación
   if (confirm('⚠️ ¿Estás seguro de que deseas eliminar todas las notas de este sprint?\n\nEsta acción no se puede deshacer.')) {
     textarea.value = '';
     saveNote(moduleId, '', true);
@@ -472,7 +412,6 @@ function clearNote(moduleId) {
 }
 
 function attachEventListeners() {
-  // Delegación de eventos para optimizar memoria
   document.querySelectorAll('[data-expand]').forEach(btn => {
     if (!btn.disabled) {
       btn.onclick = () => toggleExpand(btn.dataset.expand);
@@ -484,20 +423,15 @@ function attachEventListeners() {
       const [mId, tIdx] = input.dataset.task.split('-');
       console.log('🔄 Checkbox cambiado:', { moduleId: mId, taskIndex: tIdx, checked: input.checked });
       
-      // Mostrar celebración si se marca como completado
       if (input.checked) {
         showTaskCompletionCelebration();
       }
       
-      // Esperar a que se guarde el estado antes de actualizar la UI
       await StorageService.toggleSubtask(mId, tIdx);
       
       console.log('💾 Estado guardado, actualizando UI...');
       
-      // Ahora actualizar el progreso del módulo
       updateModuleProgress(mId);
-      
-      // Actualizar progreso global
       updateGlobalProgress();
     };
   });
@@ -508,54 +442,41 @@ function attachEventListeners() {
       const currentStatus = StorageService.get(KEYS.PROGRESS)[mId];
       
       if (!currentStatus) {
-        // Solo celebrar si se está completando (no si se desmarca)
         showSprintCompletionCelebration();
       }
       
-      // Esperar a que se guarde antes de re-renderizar
       await StorageService.toggleProgress(mId, !currentStatus);
       
-      // Re-renderizar con datos actualizados
       renderRoadmap();
       updateGlobalProgress();
     };
   });
 
-  // ========== NUEVOS EVENT LISTENERS PARA EL EDITOR DE NOTAS ==========
-  
-  // Editor de notas con auto-guardado debounced
   document.querySelectorAll('[data-module-note]').forEach(txt => {
     const moduleId = txt.dataset.moduleNote;
     
-    // Inicializar contadores al cargar
     updateCharCount(moduleId, txt.value);
     
-    // Input event para actualizar contadores en tiempo real
     txt.addEventListener('input', () => {
       const content = txt.value;
       updateCharCount(moduleId, content);
       
-      // Mostrar estado "guardando"
       updateSaveStatus(moduleId, 'saving');
       
-      // Limpiar timer anterior si existe
       if (noteDebounceTimers[moduleId]) {
         clearTimeout(noteDebounceTimers[moduleId]);
       }
       
-      // Auto-guardar después de 1.5 segundos sin escribir
       noteDebounceTimers[moduleId] = setTimeout(() => {
         saveNote(moduleId, content, true);
       }, 1500);
     });
     
-    // Atajo de teclado Ctrl+S para guardar manual
     txt.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
         const content = txt.value;
         
-        // Limpiar debounce si existe
         if (noteDebounceTimers[moduleId]) {
           clearTimeout(noteDebounceTimers[moduleId]);
         }
@@ -569,7 +490,6 @@ function attachEventListeners() {
     });
   });
   
-  // Botón de guardar manual
   document.querySelectorAll('[data-save-note]').forEach(btn => {
     btn.onclick = () => {
       const moduleId = btn.dataset.saveNote;
@@ -584,12 +504,10 @@ function attachEventListeners() {
     };
   });
   
-  // Botón de copiar
   document.querySelectorAll('[data-copy-note]').forEach(btn => {
     btn.onclick = () => copyNoteToClipboard(btn.dataset.copyNote);
   });
   
-  // Botón de limpiar
   document.querySelectorAll('[data-clear-note]').forEach(btn => {
     btn.onclick = () => clearNote(btn.dataset.clearNote);
   });
@@ -602,10 +520,6 @@ function toggleExpand(id) {
   icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
 }
 
-/**
- * Actualiza solo el progreso de un módulo específico sin re-renderizar todo
- * @param {string} moduleId - ID del módulo a actualizar
- */
 function updateModuleProgress(moduleId) {
   const subProgress = StorageService.get(KEYS.SUBTASKS);
   const module = AppEngine.modules.find(m => m.id == moduleId);
@@ -615,7 +529,6 @@ function updateModuleProgress(moduleId) {
     return;
   }
 
-  // Calcular el progreso actualizado
   const totalTasks = module.schedule.length;
   const completedTasks = module.schedule.filter((_, i) => {
     const key = `${moduleId}-${i}`;
@@ -624,24 +537,18 @@ function updateModuleProgress(moduleId) {
   const percentage = Math.round((completedTasks / totalTasks) * 100) || 0;
   const strokeDash = 251.2 - (251.2 * percentage) / 100;
 
-  // Actualizar el anillo de progreso (SVG)
   const progressRing = document.getElementById(`progress-ring-${moduleId}`);
   if (progressRing) {
     progressRing.style.strokeDashoffset = strokeDash;
   }
 
-  // Actualizar el texto del porcentaje
   const percentageText = document.getElementById(`progress-text-${moduleId}`);
   if (percentageText) {
     percentageText.textContent = `${percentage}%`;
   }
 }
 
-/**
- * Muestra celebración al completar una tarea individual
- */
 function showTaskCompletionCelebration() {
-  // Confetti sutil
   if (typeof confetti !== 'undefined') {
     confetti({
       particleCount: 30,
@@ -651,15 +558,10 @@ function showTaskCompletionCelebration() {
     });
   }
   
-  // Toast notification
   showToast('¡Tarea completada! 🎯', 'success');
 }
 
-/**
- * Muestra celebración al completar un sprint completo
- */
 function showSprintCompletionCelebration() {
-  // Confetti épico
   if (typeof confetti !== 'undefined') {
     const duration = 3000;
     const end = Date.now() + duration;
@@ -683,22 +585,14 @@ function showSprintCompletionCelebration() {
     })();
   }
   
-  // Toast notification
   showToast('🎉 ¡Sprint Completado! XP Reclamado', 'success', 4000);
 }
 
-/**
- * Muestra un toast notification
- * @param {string} message - Mensaje a mostrar
- * @param {string} type - Tipo: 'success', 'info', 'warning', 'error'
- * @param {number} duration - Duración en ms
- */
 function showToast(message, type = 'info', duration = 3000) {
   const toast = document.createElement('div');
   toast.className = `fixed top-24 right-6 z-[100] px-6 py-4 rounded-2xl border backdrop-blur-xl transform transition-all duration-500 translate-x-0 opacity-100 shadow-2xl`;
   toast.setAttribute('data-testid', 'toast-notification');
   
-  // Estilos según tipo
   const styles = {
     success: 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300',
     info: 'bg-blue-500/20 border-blue-500/50 text-blue-300',
@@ -716,12 +610,10 @@ function showToast(message, type = 'info', duration = 3000) {
   
   document.body.appendChild(toast);
   
-  // Animación de entrada
   setTimeout(() => {
     toast.style.transform = 'translateX(0)';
   }, 10);
   
-  // Remover después de la duración
   setTimeout(() => {
     toast.style.transform = 'translateX(400px)';
     toast.style.opacity = '0';

@@ -1,6 +1,7 @@
 /**
  * UI Components Module
  * Maneja la inyección de elementos comunes (Navbar/Footer)
+ * Versión sin autenticación
  */
 
 export const UIComponents = {
@@ -24,7 +25,7 @@ export const UIComponents = {
                     <a href="toolbox.html" class="nav-item hover:text-white transition-colors">Toolbox</a>
                 </div>
                 
-                <!-- User Menu -->
+                <!-- User Menu (simplified without auth) -->
                 <div class="relative">
                     <button id="user-menu-btn" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.02] hover:bg-white/[0.05] border border-white/5 transition-all" data-testid="user-menu-button">
                         <i class="fas fa-user-circle text-blue-500 text-lg"></i>
@@ -34,18 +35,17 @@ export const UIComponents = {
                     <!-- Dropdown Menu -->
                     <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-64 glass-panel rounded-2xl border border-white/5 shadow-xl overflow-hidden">
                         <div class="p-4 border-b border-white/5">
-                            <p id="user-name-display" class="text-sm font-bold text-white mb-1 truncate">Cargando...</p>
-                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2" id="user-rank-display">Cargando rango...</p>
+                            <p id="user-name-display" class="text-sm font-bold text-white mb-1 truncate">Usuario Local</p>
+                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2" id="user-rank-display">Junior Talent</p>
                             <div class="flex items-center gap-2">
                                 <i class="fas fa-star text-blue-500 text-xs"></i>
                                 <p class="text-xs text-slate-400" id="user-xp-display">0 XP</p>
                             </div>
-                            <p id="user-email-display" class="text-[10px] text-slate-500 mt-2 truncate">Cargando email...</p>
+                            <p id="user-email-display" class="text-[10px] text-slate-500 mt-2 truncate">Modo local</p>
                         </div>
-                        <button id="logout-btn" class="w-full px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-red-400 hover:bg-red-500/10 transition-colors flex items-center gap-2" data-testid="logout-button">
-                            <i class="fas fa-sign-out-alt"></i>
-                            Cerrar Sesión
-                        </button>
+                        <div class="p-3">
+                            <p class="text-[10px] text-slate-600 italic text-center">Datos guardados localmente</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -87,8 +87,6 @@ export const UIComponents = {
 
     links.forEach(link => {
       const linkPath = link.getAttribute('href');
-      // Verificamos si el path actual termina con el href del link
-      // Agregamos lógica para manejar parámetros (como ?topic=...)
       if (
         currentPath.includes(linkPath) ||
         (currentPath.endsWith('/') && linkPath === 'index.html')
@@ -100,12 +98,10 @@ export const UIComponents = {
   },
 
   setupUserMenu() {
-    // Toggle dropdown menu
     const menuBtn = document.getElementById('user-menu-btn');
     const dropdown = document.getElementById('user-dropdown');
-    const logoutBtn = document.getElementById('logout-btn');
 
-    if (!menuBtn || !dropdown || !logoutBtn) {
+    if (!menuBtn || !dropdown) {
       console.log('[COMPONENTS] User menu elements not found - skipping setup');
       return;
     }
@@ -115,7 +111,6 @@ export const UIComponents = {
       e.stopPropagation();
       dropdown.classList.toggle('hidden');
       
-      // Refresh user info when opening dropdown
       if (!dropdown.classList.contains('hidden')) {
         this.loadUserInfo();
       }
@@ -125,48 +120,6 @@ export const UIComponents = {
     document.addEventListener('click', (e) => {
       if (!menuBtn.contains(e.target) && !dropdown.contains(e.target)) {
         dropdown.classList.add('hidden');
-      }
-    });
-
-    // Logout functionality
-    logoutBtn.addEventListener('click', async () => {
-      try {
-        // Importar authService correcto según configuración
-        const { getAuthService } = await import('./auth-config.js');
-        const authService = await getAuthService();
-        
-        console.log('🚪 [COMPONENTS] Cerrando sesión...');
-        
-        // Mostrar loading
-        logoutBtn.innerHTML = '<i class="fas fa-circle-notch animate-spin"></i> Cerrando sesión...';
-        logoutBtn.disabled = true;
-        
-        // Cerrar sesión
-        const result = await authService.logout();
-        
-        if (result.success) {
-          console.log('✅ [COMPONENTS] Sesión cerrada exitosamente');
-          
-          // Limpiar localStorage completamente
-          localStorage.removeItem('qa_access_token');
-          localStorage.removeItem('qa_refresh_token');
-          localStorage.removeItem('qa_current_user');
-          
-          console.log('🧹 [COMPONENTS] LocalStorage limpiado');
-          
-          // Redirigir a login con flag para evitar auto-login
-          window.location.href = '/app/pages/auth.html?logout=true';
-        } else {
-          console.error('❌ [COMPONENTS] Error al cerrar sesión:', result.error);
-          alert('Error al cerrar sesión. Por favor intenta de nuevo.');
-          logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Cerrar Sesión';
-          logoutBtn.disabled = false;
-        }
-      } catch (error) {
-        console.error('❌ [COMPONENTS] Error crítico en logout:', error);
-        alert('Error al cerrar sesión. Por favor intenta de nuevo.');
-        logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Cerrar Sesión';
-        logoutBtn.disabled = false;
       }
     });
 
@@ -181,70 +134,45 @@ export const UIComponents = {
     const xpDisplay = document.getElementById('user-xp-display');
 
     try {
-      // Importar authService correcto según configuración
-      const { getAuthService } = await import('./auth-config.js');
-      const authService = await getAuthService();
       const { AppEngine } = await import('./app.js');
       
-      // Esperar a que authService esté inicializado
-      if (!authService.isInitialized) {
-        await authService.init();
+      // Asegurar que AppEngine esté inicializado
+      if (!AppEngine.modules || AppEngine.modules.length === 0) {
+        await AppEngine.init();
       }
       
-      const user = authService.getCurrentUser();
+      const stats = AppEngine.getAnalytics();
       
-      if (user) {
-        // Mostrar nombre
-        if (nameDisplay) {
-          nameDisplay.textContent = user.displayName || 'Usuario';
-        }
-        
-        // Mostrar email
-        if (emailDisplay) {
-          emailDisplay.textContent = user.email || 'Sin email';
-        }
-        
-        // Obtener estadísticas del usuario
-        try {
-          // Asegurar que AppEngine esté inicializado
-          if (!AppEngine.modules || AppEngine.modules.length === 0) {
-            await AppEngine.init();
-          }
-          
-          const stats = AppEngine.getAnalytics();
-          
-          // Mostrar XP
-          if (xpDisplay) {
-            xpDisplay.textContent = `${stats.xp.toLocaleString()} XP`;
-          }
-          
-          // Calcular y mostrar rango
-          if (rankDisplay) {
-            const ranks = [
-              { min: 10000, name: 'Senior QA Automation' },
-              { min: 5000, name: 'QA Engineer Mid' },
-              { min: 1000, name: 'Technical QA Tester' },
-              { min: 0, name: 'Junior Talent' },
-            ];
-            const currentRank = ranks.find(r => stats.xp >= r.min);
-            rankDisplay.textContent = currentRank ? currentRank.name : 'Junior Talent';
-          }
-        } catch (statsError) {
-          console.warn('[COMPONENTS] Error al cargar estadísticas:', statsError);
-          if (xpDisplay) xpDisplay.textContent = '0 XP';
-          if (rankDisplay) rankDisplay.textContent = 'Junior Talent';
-        }
-      } else {
-        // No hay usuario - valores por defecto
-        if (nameDisplay) nameDisplay.textContent = 'Usuario';
-        if (emailDisplay) emailDisplay.textContent = 'No autenticado';
-        if (xpDisplay) xpDisplay.textContent = '0 XP';
-        if (rankDisplay) rankDisplay.textContent = 'Junior Talent';
+      // Mostrar nombre genérico
+      if (nameDisplay) {
+        nameDisplay.textContent = 'Usuario Local';
+      }
+      
+      // Mostrar modo local
+      if (emailDisplay) {
+        emailDisplay.textContent = 'Datos guardados localmente';
+      }
+      
+      // Mostrar XP
+      if (xpDisplay) {
+        xpDisplay.textContent = `${stats.xp.toLocaleString()} XP`;
+      }
+      
+      // Calcular y mostrar rango
+      if (rankDisplay) {
+        const ranks = [
+          { min: 10000, name: 'Senior QA Automation' },
+          { min: 5000, name: 'QA Engineer Mid' },
+          { min: 1000, name: 'Technical QA Tester' },
+          { min: 0, name: 'Junior Talent' },
+        ];
+        const currentRank = ranks.find(r => stats.xp >= r.min);
+        rankDisplay.textContent = currentRank ? currentRank.name : 'Junior Talent';
       }
     } catch (error) {
       console.error('❌ [COMPONENTS] Error al cargar información del usuario:', error);
       if (nameDisplay) nameDisplay.textContent = 'Usuario';
-      if (emailDisplay) emailDisplay.textContent = 'Error al cargar';
+      if (emailDisplay) emailDisplay.textContent = 'Modo local';
       if (xpDisplay) xpDisplay.textContent = '0 XP';
       if (rankDisplay) rankDisplay.textContent = 'Junior Talent';
     }

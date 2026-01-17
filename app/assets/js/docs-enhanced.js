@@ -1,9 +1,7 @@
 /* global marked */
 import { UIComponents } from './components.js';
-import { requireAuth } from './auth-guard-v2.js';
 
-// ⚠️ CRÍTICO: Verificar autenticación PRIMERO antes de cargar nada
-requireAuth();
+// Sistema de documentación sin autenticación
 
 const DocsEngine = {
   manifest: null,
@@ -179,7 +177,6 @@ const DocsEngine = {
     const main = document.querySelector('main.ml-72');
     if (!main) return;
     
-    // Insertar toolbar antes del contenido - Optimizado para mejor posicionamiento
     const toolbar = document.createElement('div');
     toolbar.id = 'doc-toolbar';
     toolbar.className = 'sticky top-16 z-40 mb-6 flex items-center justify-between gap-4 bg-slate-950/90 backdrop-blur-xl border border-white/5 rounded-2xl px-6 py-3 shadow-lg';
@@ -222,7 +219,6 @@ const DocsEngine = {
     
     main.insertBefore(toolbar, main.firstChild);
     
-    // Event listeners
     document.getElementById('prev-doc-btn')?.addEventListener('click', () => this.navigatePrevious());
     document.getElementById('next-doc-btn')?.addEventListener('click', () => this.navigateNext());
     document.getElementById('focus-mode-btn')?.addEventListener('click', () => this.toggleFocusMode());
@@ -232,7 +228,6 @@ const DocsEngine = {
     const main = document.querySelector('main.ml-72');
     if (!main) return;
     
-    // Insertar TOC flotante - Ajustado para no chocar con toolbar y footer
     const toc = document.createElement('div');
     toc.id = 'table-of-contents';
     toc.className = 'fixed right-8 top-48 w-64 hidden xl:block';
@@ -247,18 +242,15 @@ const DocsEngine = {
   },
 
   async handleNavigation() {
-    // Obtener el tema de la URL (?topic=...)
     const params = new URLSearchParams(window.location.search);
     const topicId = params.get('topic');
 
     let selectedDoc = null;
     
     if (topicId) {
-      // Buscar el documento por ID
       selectedDoc = this.allDocs.find(doc => doc.id === topicId);
     }
     
-    // Si no se encontró o no hay topicId, usar el primero
     if (!selectedDoc && this.allDocs.length > 0) {
       selectedDoc = this.allDocs[0];
     }
@@ -284,7 +276,6 @@ const DocsEngine = {
     this.currentTopic = doc;
     
     try {
-      // Mostrar loading
       container.innerHTML = `
         <div class="animate-pulse space-y-4">
           <div class="h-8 bg-white/5 rounded w-3/4"></div>
@@ -295,12 +286,10 @@ const DocsEngine = {
 
       let markdownContent;
       
-      // Verificar cache primero
       if (this.cache.has(doc.id)) {
         console.log('✅ [DOCS] Cargando desde cache');
         markdownContent = this.cache.get(doc.id);
       } else {
-        // Cargar el archivo .md
         const mdPath = `/docs/content/${doc.file}`;
         console.log('📚 [DOCS] Fetch desde:', mdPath);
         const response = await fetch(mdPath);
@@ -310,25 +299,19 @@ const DocsEngine = {
         }
         
         markdownContent = await response.text();
-        
-        // Guardar en cache
         this.cache.set(doc.id, markdownContent);
         console.log('💾 [DOCS] Guardado en cache');
       }
       
       console.log('✅ [DOCS] Documento cargado:', markdownContent.length, 'caracteres');
       
-      // Renderizar el documento
       this.renderArticle(doc, markdownContent);
       console.log('✅ [DOCS] Documento renderizado exitosamente');
       
-      // Actualizar UI
       this.updateBreadcrumbs(doc);
       this.updateNavigationButtons();
       this.generateTableOfContents();
       this.calculateReadingTime(markdownContent);
-      
-      // Pre-cargar siguiente documento
       this.preloadNextDocument();
       
     } catch (error) {
@@ -348,7 +331,6 @@ const DocsEngine = {
     console.log('📚 [DOCS] Renderizando artículo:', doc.title);
     const container = document.getElementById('doc-content');
     
-    // Configurar marked para mejor rendering
     if (typeof marked !== 'undefined' && marked.setOptions) {
       marked.setOptions({
         breaks: true,
@@ -358,14 +340,12 @@ const DocsEngine = {
       });
     }
     
-    // Convertir markdown a HTML
     const htmlContent = typeof marked !== 'undefined' && marked.parse 
       ? marked.parse(markdownContent)
       : markdownContent;
 
     console.log('📚 [DOCS] HTML generado:', htmlContent.length, 'caracteres');
     
-    // Remover la opacidad y mostrar el contenido con animación
     container.style.opacity = '0';
     container.innerHTML = `
       <article class="doc-article">
@@ -428,23 +408,17 @@ const DocsEngine = {
       </article>
     `;
 
-    // Fade in animation
     setTimeout(() => {
       container.style.transition = 'opacity 0.3s ease';
       container.style.opacity = '1';
     }, 50);
 
     console.log('✅ [DOCS] Artículo renderizado y visible');
-    
-    // Scroll to top suave
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
-  // === NAVEGACIÓN ===
-  
   initKeyboardNavigation() {
     document.addEventListener('keydown', (e) => {
-      // Ignorar si está en un input
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
         return;
       }
@@ -465,7 +439,6 @@ const DocsEngine = {
           break;
       }
       
-      // Ctrl+K para búsqueda
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
         document.getElementById('doc-search')?.focus();
@@ -505,12 +478,10 @@ const DocsEngine = {
   },
 
   updateActiveLink(docId) {
-    // Remover active de todos los links
     document.querySelectorAll('.doc-link').forEach(link => {
       link.classList.remove('bg-blue-500/10', 'text-white', 'border-blue-500');
     });
     
-    // Agregar active al link actual
     const activeLink = document.querySelector(`[data-topic-link="${docId}"]`);
     if (activeLink) {
       activeLink.classList.add('bg-blue-500/10', 'text-white', 'border-blue-500');
@@ -524,8 +495,6 @@ const DocsEngine = {
     }
   },
 
-  // === TABLA DE CONTENIDOS ===
-  
   generateTableOfContents() {
     const tocLinks = document.getElementById('toc-links');
     if (!tocLinks) return;
@@ -553,14 +522,12 @@ const DocsEngine = {
       `;
     }).join('');
     
-    // Smooth scroll en TOC links con offset correcto
     tocLinks.querySelectorAll('.toc-link').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
         const targetId = link.getAttribute('data-heading-id');
         const target = document.getElementById(targetId);
         if (target) {
-          // Calcular offset: navbar (64px) + toolbar (60px) + padding (20px)
           const offset = 144;
           const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - offset;
           
@@ -573,17 +540,13 @@ const DocsEngine = {
     });
   },
 
-  // === PROGRESO DE LECTURA ===
-  
   initReadingProgress() {
-    // Crear barra de progreso
     const progressBar = document.createElement('div');
     progressBar.id = 'reading-progress-bar';
     progressBar.className = 'fixed top-0 left-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500 z-50 transition-all duration-100';
     progressBar.style.width = '0%';
     document.body.appendChild(progressBar);
     
-    // Actualizar en scroll
     window.addEventListener('scroll', () => {
       const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
       const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
@@ -603,8 +566,6 @@ const DocsEngine = {
     }
   },
 
-  // === BÚSQUEDA ===
-  
   initSearch() {
     const searchInput = document.getElementById('doc-search');
     if (!searchInput) return;
@@ -645,8 +606,6 @@ const DocsEngine = {
     });
   },
 
-  // === MODO FOCUS ===
-  
   toggleFocusMode() {
     const sidebar = document.querySelector('aside');
     const toc = document.getElementById('table-of-contents');
@@ -671,7 +630,6 @@ const DocsEngine = {
   },
 
   initFocusMode() {
-    // Escape para salir del modo focus
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && document.body.classList.contains('focus-mode')) {
         this.toggleFocusMode();
@@ -679,8 +637,6 @@ const DocsEngine = {
     });
   },
 
-  // === MARCADORES ===
-  
   attachBookmarkListeners() {
     document.querySelectorAll('.bookmark-icon').forEach(icon => {
       icon.addEventListener('click', (e) => {
@@ -704,7 +660,6 @@ const DocsEngine = {
     this.savePersistedData();
     this.renderBookmarks();
     
-    // Actualizar icono en el menú
     const icon = document.querySelector(`.bookmark-icon[data-bookmark="${docId}"]`);
     if (icon) {
       if (this.bookmarks.includes(docId)) {
@@ -743,8 +698,6 @@ const DocsEngine = {
     }).join('');
   },
 
-  // === PRE-CARGA ===
-  
   preloadNextDocument() {
     if (this.currentDocIndex < this.allDocs.length - 1) {
       const nextDoc = this.allDocs[this.currentDocIndex + 1];
@@ -761,8 +714,6 @@ const DocsEngine = {
     }
   },
 
-  // === PERSISTENCIA ===
-  
   loadPersistedData() {
     try {
       const saved = localStorage.getItem('docs_bookmarks');
