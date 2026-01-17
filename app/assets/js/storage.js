@@ -6,8 +6,6 @@
 
 // ==================== IMPORTS ====================
 
-import { doc, updateDoc, getDoc } from 'firebase/firestore';
-import { db } from './firebase-config.js';
 import { Logger } from './logger.js';
 
 // ==================== CONFIGURACIÓN ====================
@@ -30,9 +28,6 @@ const DEFAULT_VALUES = {
   [KEYS.BADGES]: [],
   [KEYS.VERSION]: CURRENT_VERSION,
 };
-
-// ==================== LOGGER ====================
-// Logger se importa desde logger.js (ver imports arriba)
 
 // ==================== VALIDATOR ====================
 
@@ -229,7 +224,7 @@ export const StorageService = {
    * Alterna el progreso de un módulo
    * @param {number|string} id - ID del módulo
    * @param {boolean} isChecked - Estado del checkbox
-   * @returns {Promise<boolean>} Nuevo estado
+   * @returns {boolean} Nuevo estado
    */
   async toggleProgress(id, isChecked) {
     try {
@@ -242,7 +237,7 @@ export const StorageService = {
       const progress = this.get(KEYS.PROGRESS);
       progress[id] = Boolean(isChecked);
 
-      const saved = await this.syncWithFirestore(KEYS.PROGRESS, progress);
+      const saved = this.save(KEYS.PROGRESS, progress);
 
       if (saved) {
         Logger.info('Progress toggled', { moduleId: id, isChecked });
@@ -259,7 +254,7 @@ export const StorageService = {
    * Alterna el estado de una subtarea
    * @param {number|string} moduleId - ID del módulo
    * @param {number|string} taskIndex - Índice de la tarea
-   * @returns {Promise<boolean>} Nuevo estado
+   * @returns {boolean} Nuevo estado
    */
   async toggleSubtask(moduleId, taskIndex) {
     try {
@@ -269,8 +264,8 @@ export const StorageService = {
       subProgress[key] = !subProgress[key];
       const newState = subProgress[key];
 
-      // Esperar a que se guarde antes de continuar
-      await this.syncWithFirestore(KEYS.SUBTASKS, subProgress);
+      // Guardar cambios
+      this.save(KEYS.SUBTASKS, subProgress);
 
       Logger.info('Subtask toggled', { moduleId, taskIndex, newState });
 
@@ -298,7 +293,7 @@ export const StorageService = {
       const notes = this.get(KEYS.NOTES);
       notes[moduleId] = sanitized;
 
-      return this.syncWithFirestore(KEYS.NOTES, notes);
+      return this.save(KEYS.NOTES, notes);
     } catch (error) {
       Logger.error('Error saving note', { moduleId, error });
       return false;
@@ -508,94 +503,4 @@ export { KEYS, Validator };
 // Auto-inicializar cuando se carga el módulo
 if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
   StorageService.init();
-}
-
-// Método para sincronizar con Firestore
-StorageService.syncWithFirestore = async function(key, data) {
-  try {
-    // Importar authService dinámicamente para evitar dependencia circular
-    const { authService } = await import('./auth-service.js');
-    const user = authService.getCurrentUser();
-    
-    if (!user) {
-      // No autenticado - solo guardar local
-      return this.save(key, data);
-    }
-
-    // Guardar localmente
-    const saved = this.save(key, data);
-
-    // Sincronizar con Firestore
-    const userDocRef = doc(db, 'users', user.uid);
-    const fieldName = key.replace('qa_', '').replace('_', '');
-
-    await updateDoc(userDocRef, {
-      [fieldName]: data,
-      lastSync: new Date().toISOString()
-    });
-
-    Logger.success('Data synced with Firestore', { key });
-
-    return saved;
-
-  } catch (error) {
-    Logger.error('Failed to sync with Firestore', { key, error });
-    // No fallar, al menos tenemos copia local
-    return true;
-  }
-};
-
-// Método para cargar desde Firestore
-StorageService.loadFromFirestore = async function() {
-  try {
-    const user = authService.getCurrentUser();
-    
-    if (!user) {
-      Logger.info('No user logged in, using local data');
-      return false;
-    }
-
-    const userDocRef = doc(db, 'users', user.uid);
-    const userDoc = await getDoc(userDocRef);
-
-    if (!userDoc.exists()) {
-      Logger.warn('User document not found in Firestore');
-      return false;
-    }
-
-    const data = userDoc.data();
-
-    // Cargar cada tipo de dato
-    if (data.progress) {
-      this.save(KEYS.PROGRESS, data.progress);
-    }
-    if (data.subtasks) {
-      this.save(KEYS.SUBTASKS, data.subtasks);
-    }
-    if (data.notes) {
-      this.save(KEYS.NOTES, data.notes);
-    }
-    if (data.badges) {
-      this.save(KEYS.BADGES, data.badges);
-    }
-
-    Logger.success('Data loaded from Firestore');
-    return true;
-
-  } catch (error) {
-    Logger.error('Failed to load from Firestore', { error });
-    return false;
-  }
-};
-
-// Auto-cargar datos cuando el usuario inicia sesión
-if (typeof window !== 'undefined') {
-  // Importar authService dinámicamente
-  import('./auth-service.js').then(({ authService }) => {
-    authService.onAuthChange(async (user) => {
-      if (user) {
-        await StorageService.loadFromFirestore();
-      }
-    });
-  });
 }
