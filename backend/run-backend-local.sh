@@ -3,20 +3,20 @@
 # Script para correr el backend localmente
 # Uso: ./run-backend-local.sh
 
-echo "      Iniciando Backend FastAPI (Desarrollo Local)"
+echo "🚀 Iniciando Backend FastAPI (Desarrollo Local)"
 echo "================================================"
 echo ""
 
 # Verificar si estamos en el directorio correcto
 if [ ! -f "server.py" ]; then
-    echo "      Error: No se encontró server.py"
+    echo "❌ Error: No se encontró server.py"
     echo "   Por favor, ejecuta este script desde el directorio /backend"
     exit 1
 fi
 
 # Verificar si existe .env
 if [ ! -f ".env" ]; then
-    echo "      Advertencia: No se encontró archivo .env"
+    echo "⚠️  Advertencia: No se encontró archivo .env"
     echo "   Creando .env con configuración por defecto..."
     cat > .env << 'EOF'
 # JWT Configuration
@@ -38,30 +38,30 @@ CORS_ORIGINS=["http://localhost:8000","http://127.0.0.1:5500","http://192.168.56
 ENVIRONMENT=development
 DEBUG=True
 EOF
-    echo "Archivo .env creado"
+    echo "✅ Archivo .env creado"
 fi
 
 # Verificar si Python está instalado
 if ! command -v python3 &> /dev/null; then
-    echo "      Error: Python 3 no está instalado"
+    echo "❌ Error: Python 3 no está instalado"
     echo "   Instala Python 3.11+ desde https://www.python.org"
     exit 1
 fi
 
-echo "Python encontrado: $(python3 --version)"
+echo "✅ Python encontrado: $(python3 --version)"
 echo ""
 
 # Verificar si las dependencias están instaladas
 if ! python3 -c "import fastapi" 2>/dev/null; then
-    echo "      Instalando dependencias..."
+    echo "⚠️  Instalando dependencias..."
     pip install -r requirements.txt
     echo ""
 fi
 
 # Verificar si MongoDB está corriendo
-echo "Verificando MongoDB..."
+echo "🔍 Verificando MongoDB..."
 if ! mongosh --eval "db.version()" &>/dev/null && ! mongo --eval "db.version()" &>/dev/null; then
-    echo "      Advertencia: MongoDB no parece estar corriendo"
+    echo "⚠️  Advertencia: MongoDB no parece estar corriendo"
     echo "   Asegúrate de iniciar MongoDB antes de continuar"
     echo ""
     echo "   Windows: net start MongoDB"
@@ -71,9 +71,9 @@ if ! mongosh --eval "db.version()" &>/dev/null && ! mongo --eval "db.version()" 
 fi
 
 # Iniciar el servidor
-echo "Iniciando servidor en http://localhost:8001"
-echo "Documentación API: http://localhost:8001/api/docs"
-echo "Health Check: http://localhost:8001/api/health"
+echo "🚀 Iniciando servidor en http://localhost:8001"
+echo "📚 Documentación API: http://localhost:8001/api/docs"
+echo "💚 Health Check: http://localhost:8001/api/health"
 echo ""
 echo "Presiona Ctrl+C para detener el servidor"
 echo "================================================"
