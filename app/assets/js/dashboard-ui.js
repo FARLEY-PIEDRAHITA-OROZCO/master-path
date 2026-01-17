@@ -3,13 +3,21 @@ import { AppEngine } from './app.js';
 import { StorageService } from './storage-unified.js';
 import { KEYS } from './storage-service-v2.js';
 import { UIComponents } from './components.js';
-import { requireAuth } from './auth-guard-v2.js';
 
-// ⚠️ CRÍTICO: Verificar autenticación PRIMERO antes de cargar nada
-requireAuth();
-
-// Solo cargar el dashboard después de que se verifique la autenticación
+// Cargar el dashboard sin autenticación
 document.addEventListener('DOMContentLoaded', async () => {
+  // Ocultar loading overlay
+  const authLoading = document.getElementById('auth-loading');
+  if (authLoading) {
+    authLoading.style.display = 'none';
+  }
+  
+  // Mostrar contenido principal
+  const mainContent = document.getElementById('main-content');
+  if (mainContent) {
+    mainContent.style.display = 'block';
+  }
+
   // Inicializar el motor (Cargar JSON)
   UIComponents.init();
   await AppEngine.init();
@@ -48,137 +56,112 @@ function refreshDashboard() {
     { min: 0, name: 'Junior Talent', color: 'text-slate-400' },
   ];
   const currentRank = ranks.find(r => stats.xp >= r.min);
-  if (rankText) {
+  
+  if (rankText && currentRank) {
     rankText.textContent = currentRank.name;
     rankText.className = `${currentRank.color} font-bold uppercase tracking-widest`;
   }
 
-  // "Continuar donde lo dejaste" - si hay módulos incompletos
-  const firstIncomplete = AppEngine.getAllModules().find(m => !m.isComplete);
-  const continueSection = document.getElementById('continue-section');
-  
-  if (firstIncomplete && continueSection) {
-    continueSection.classList.remove('hidden');
-    const titleEl = document.getElementById('continue-module-title');
-    const progressEl = document.getElementById('continue-module-progress');
-    
-    if (titleEl) {
-      titleEl.textContent = firstIncomplete.title;
-    }
-    if (progressEl) {
-      const total = firstIncomplete.tasks.length;
-      const completed = firstIncomplete.tasks.filter(t => t.isComplete).length;
-      progressEl.textContent = `${completed} de ${total} tareas completadas`;
-    }
-  } else if (continueSection) {
-    continueSection.classList.add('hidden');
-  }
-
-  // Estadísticas
-  updateStatistics(stats);
-
-  // Progreso por fase
-  updatePhaseProgress();
-
-  // Badges
+  // Badges - Renderizar todos (obtenidos dinámicamente del Storage)
   updateBadges(stats.badges);
+
+  // Timeline - Últimas actividades (usar módulos completados como proxy)
+  updateTimeline(stats.lastActions);
+
+  // Module cards
+  renderMiniModules();
 }
 
-function updateStatistics(stats) {
-  const completedCount = document.getElementById('completed-count');
-  const completedPercentage = document.getElementById('completed-percentage');
-  const timeRemaining = document.getElementById('time-remaining');
-  const timeCompleted = document.getElementById('time-completed');
-  const streakCount = document.getElementById('streak-count');
-
-  if (completedCount) {
-    animateNumber(completedCount, stats.completedModules, '');
-  }
-  if (completedPercentage) {
-    completedPercentage.textContent = `${stats.progressPercent}% del total`;
-  }
-
-  // Tiempo
-  const totalHours = stats.totalEstimatedMinutes / 60;
-  const completedHours = stats.completedEstimatedMinutes / 60;
-  const remainingHours = totalHours - completedHours;
-
-  if (timeRemaining) {
-    timeRemaining.textContent = `${Math.round(remainingHours)}h`;
-  }
-  if (timeCompleted) {
-    timeCompleted.textContent = `${Math.round(completedHours)}h completadas`;
-  }
-
-  // Racha (placeholder - calcular con fechas reales)
-  if (streakCount) {
-    streakCount.textContent = Math.min(stats.completedModules, 30);
-  }
-}
-
-function updatePhaseProgress() {
-  const container = document.getElementById('phase-progress-container');
-  if (!container) return;
-
-  const phases = AppEngine.getPhaseProgress();
-  
-  container.innerHTML = phases.map(phase => `
-    <div>
-      <div class="flex justify-between items-center mb-2">
-        <span class="text-xs font-bold text-white uppercase tracking-wider">${phase.name}</span>
-        <span class="text-xs text-slate-500">${phase.completed} / ${phase.total}</span>
-      </div>
-      <div class="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-        <div class="h-full bg-gradient-to-r ${phase.color} rounded-full transition-all duration-500" 
-             style="width: ${phase.percentage}%"></div>
-      </div>
-    </div>
-  `).join('');
-}
-
-function updateBadges(unlockedBadges) {
-  const badgeIds = ['badge-core', 'badge-technical', 'badge-automation', 'badge-expert'];
-  const badgeNames = ['core', 'technical', 'automation', 'expert'];
-
-  badgeIds.forEach((id, index) => {
-    const el = document.getElementById(id);
-    if (el && unlockedBadges.includes(badgeNames[index])) {
-      if (!el.classList.contains('unlocked')) {
-        el.classList.add('unlocked');
-        // Confetti cuando se desbloquea
-        setTimeout(() => {
-          const rect = el.getBoundingClientRect();
-          confetti({
-            particleCount: 50,
-            spread: 70,
-            origin: {
-              x: (rect.left + rect.width / 2) / window.innerWidth,
-              y: (rect.top + rect.height / 2) / window.innerHeight,
-            },
-          });
-        }, 300);
-      }
-    }
-  });
-}
-
-function animateNumber(element, target, suffix = '') {
-  const current = parseInt(element.textContent) || 0;
-  if (current === target) return;
-
-  const duration = 800;
-  const steps = 30;
-  const increment = (target - current) / steps;
+function animateNumber(element, finalValue, suffix = '') {
+  const currentValue = parseFloat(element.textContent.replace(/[^0-9.]/g, '')) || 0;
+  const diff = finalValue - currentValue;
+  const steps = 20;
+  const increment = diff / steps;
   let step = 0;
 
   const interval = setInterval(() => {
     step++;
-    const newValue = Math.round(current + increment * step);
-    element.textContent = newValue + suffix;
-
+    const newValue = currentValue + increment * step;
+    element.textContent = Math.round(newValue) + suffix;
     if (step >= steps) {
-      element.textContent = target + suffix;
+      element.textContent = Math.round(finalValue) + suffix;
       clearInterval(interval);
     }
-  }, duration / steps);
+  }, 30);
+}
+
+function updateBadges(badges) {
+  const badgeGrid = document.getElementById('badge-grid');
+  if (!badgeGrid) return;
+
+  const badgeDefinitions = [
+    { id: 'core', icon: 'fa-user-check', label: 'Core QA', color: 'blue' },
+    { id: 'technical', icon: 'fa-laptop-code', label: 'Technical', color: 'purple' },
+    { id: 'automation', icon: 'fa-robot', label: 'Automation', color: 'cyan' },
+    { id: 'performance', icon: 'fa-tachometer-alt', label: 'Performance', color: 'green' },
+    { id: 'agile', icon: 'fa-project-diagram', label: 'Agile', color: 'yellow' },
+    { id: 'master', icon: 'fa-crown', label: 'QA Master', color: 'orange' },
+  ];
+
+  badgeGrid.innerHTML = badgeDefinitions
+    .map((badge) => {
+      const unlocked = badges.includes(badge.id);
+      return `
+        <div class="badge-slot ${unlocked ? 'unlocked' : ''} border-4 border-slate-800/50 bg-slate-900/70 backdrop-blur-sm p-6 rounded-3xl flex flex-col items-center justify-center gap-3 aspect-square relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-${badge.color}-500/10 to-transparent opacity-0 ${unlocked ? 'opacity-100' : ''}"></div>
+          <i class="fas ${badge.icon} text-${badge.color}-400 text-3xl relative z-10"></i>
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400 ${unlocked ? 'text-white' : ''} relative z-10">${badge.label}</span>
+        </div>
+      `;
+    })
+    .join('');
+}
+
+function updateTimeline(lastActions) {
+  const container = document.getElementById('activity-timeline');
+  if (!container || !lastActions || lastActions.length === 0) return;
+
+  container.innerHTML = lastActions
+    .map((action) => {
+      return `
+        <div class="flex items-start gap-4 p-5 bg-slate-900/50 rounded-2xl border border-slate-800/30 hover:border-blue-500/30 transition-colors">
+          <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+            <i class="fas ${action.icon || 'fa-check'} text-white text-sm"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-white text-sm font-semibold">${action.title}</p>
+            <p class="text-slate-500 text-xs">${action.timestamp || 'Reciente'}</p>
+          </div>
+        </div>
+      `;
+    })
+    .join('');
+}
+
+function renderMiniModules() {
+  const container = document.getElementById('module-mini-cards');
+  if (!container) return;
+
+  const modules = AppEngine.getAllModules();
+  const progress = StorageService.getProgress();
+
+  container.innerHTML = modules
+    .slice(0, 3)
+    .map((mod) => {
+      const completed = progress.modules[mod.id] || false;
+      const icon = completed ? 'fa-check-circle text-green-500' : 'fa-circle text-slate-700';
+
+      return `
+        <a href="roadmap.html?module=${mod.id}" class="group glass-panel p-6 rounded-3xl border border-white/5 hover:border-blue-500/30 transition-all">
+          <div class="flex items-start gap-4">
+            <i class="fas ${icon} text-2xl"></i>
+            <div class="flex-1 min-w-0">
+              <h4 class="text-white font-bold text-sm uppercase tracking-wide group-hover:text-blue-400 transition-colors">${mod.title}</h4>
+              <p class="text-slate-500 text-xs mt-1 line-clamp-2">${mod.description}</p>
+            </div>
+          </div>
+        </a>
+      `;
+    })
+    .join('');
 }
