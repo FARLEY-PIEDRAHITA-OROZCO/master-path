@@ -22,31 +22,6 @@ def validate_email_format(email: str) -> tuple[bool, Optional[str]]:
         return False, str(e)
 
 
-def validate_password_strength(password: str) -> tuple[bool, Optional[str]]:
-    """
-    Validar fortaleza de la contraseña
-    
-    Requisitos:
-    - Mínimo 8 caracteres
-    - Al menos una letra
-    - Al menos un número
-    - Opcional: caracteres especiales
-    
-    Returns:
-        tuple: (is_valid, error_message)
-    """
-    if len(password) < 8:
-        return False, "La contraseña debe tener al menos 8 caracteres"
-    
-    if not any(char.isalpha() for char in password):
-        return False, "La contraseña debe contener al menos una letra"
-    
-    if not any(char.isdigit() for char in password):
-        return False, "La contraseña debe contener al menos un número"
-    
-    return True, None
-
-
 def validate_display_name(name: str) -> tuple[bool, Optional[str]]:
     """
     Validar nombre para mostrar
