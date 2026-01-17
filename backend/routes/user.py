@@ -1,18 +1,22 @@
 """
-Rutas de Usuario
-Endpoints para gestión de perfil de usuario
+Rutas de Usuario (SIN AUTENTICACIÓN)
+Endpoints públicos para gestión de perfil de usuario
 """
-from fastapi import APIRouter, HTTPException, status, Depends
-from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException, status
+from pydantic import BaseModel, EmailStr
 from typing import Optional
-
-from models.user import UserUpdate, UserSettings
-from services.database import get_database
-from middleware.auth_middleware import get_current_user
 from bson import ObjectId
 from datetime import datetime
 
+from services.database import get_database
+
 router = APIRouter()
+
+
+class CreateUserRequest(BaseModel):
+    """Request para crear usuario básico"""
+    email: EmailStr
+    display_name: str
 
 
 class UpdateProfileRequest(BaseModel):
@@ -28,37 +32,103 @@ class UpdateSettingsRequest(BaseModel):
     language: Optional[str] = None
 
 
-@router.get("/me")
-async def get_my_profile(
-    current_user: dict = Depends(get_current_user)
-):
+@router.post("/create")
+async def create_user(user_data: CreateUserRequest):
     """
-    Obtener perfil del usuario autenticado
+    Crear un usuario básico (sin autenticación)
     
     Returns:
-        Información completa del usuario
+        Usuario creado con ID
     """
-    from services.auth_service import auth_service
+    db = get_database()
     
-    # Convertir a formato de respuesta
-    user_response = auth_service._convert_to_user_response(current_user)
+    # Verificar si el email ya existe
+    existing_user = await db.users.find_one({"email": user_data.email})
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El email ya está registrado"
+        )
+    
+    # Crear documento de usuario básico
+    user_doc = {
+        "email": user_data.email,
+        "display_name": user_data.display_name,
+        "created_at": datetime.utcnow(),
+        "last_active": datetime.utcnow(),
+        "progress": {
+            "modules": {},
+            "subtasks": {},
+            "notes": {},
+            "badges": [],
+            "xp": 0,
+            "last_sync": None
+        },
+        "settings": {
+            "notifications": True,
+            "theme": "dark",
+            "language": "es"
+        }
+    }
+    
+    # Insertar usuario
+    result = await db.users.insert_one(user_doc)
+    user_doc["_id"] = result.inserted_id
     
     return {
         "success": True,
-        "user": user_response
+        "message": "Usuario creado exitosamente",
+        "user": {
+            "id": str(result.inserted_id),
+            "email": user_data.email,
+            "display_name": user_data.display_name
+        }
     }
 
 
-@router.put("/me")
-async def update_my_profile(
-    profile_data: UpdateProfileRequest,
-    current_user: dict = Depends(get_current_user)
-):
+@router.get("/{user_id}")
+async def get_user_profile(user_id: str):
     """
-    Actualizar perfil del usuario autenticado
+    Obtener perfil de usuario por ID
     
-    - **display_name**: Nuevo nombre para mostrar (opcional)
-    - **photo_url**: Nueva URL de foto (opcional)
+    Returns:
+        Información del usuario
+    """
+    db = get_database()
+    
+    try:
+        user_doc = await db.users.find_one({"_id": ObjectId(user_id)})
+    except:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="ID de usuario inválido"
+        )
+    
+    if not user_doc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
+        )
+    
+    return {
+        "success": True,
+        "user": {
+            "id": str(user_doc["_id"]),
+            "email": user_doc["email"],
+            "display_name": user_doc["display_name"],
+            "photo_url": user_doc.get("photo_url"),
+            "created_at": user_doc["created_at"].isoformat() if isinstance(user_doc["created_at"], datetime) else user_doc["created_at"],
+            "last_active": user_doc["last_active"].isoformat() if isinstance(user_doc["last_active"], datetime) else user_doc["last_active"],
+            "progress": user_doc.get("progress", {}),
+            "settings": user_doc.get("settings", {})
+        }
+    }
+
+
+@router.put("/{user_id}")
+async def update_user_profile(user_id: str, profile_data: UpdateProfileRequest):
+    """
+    Actualizar perfil de usuario
     
     Returns:
         Usuario actualizado
@@ -69,7 +139,6 @@ async def update_my_profile(
     update_fields = {}
     
     if profile_data.display_name is not None:
-        # Validar display_name
         if len(profile_data.display_name) < 2 or len(profile_data.display_name) > 100:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -86,52 +155,66 @@ async def update_my_profile(
             detail="No hay campos para actualizar"
         )
     
-    # Actualizar en la base de datos
     update_fields["last_active"] = datetime.utcnow()
     
-    result = await db.users.update_one(
-        {"_id": current_user["_id"]},
-        {"$set": update_fields}
-    )
-    
-    if result.modified_count == 0:
+    try:
+        result = await db.users.update_one(
+            {"_id": ObjectId(user_id)},
+            {"$set": update_fields}
+        )
+    except:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="No se pudo actualizar el perfil"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="ID de usuario inválido"
+        )
+    
+    if result.matched_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
         )
     
     # Obtener usuario actualizado
-    updated_user = await db.users.find_one({"_id": current_user["_id"]})
-    
-    from services.auth_service import auth_service
-    user_response = auth_service._convert_to_user_response(updated_user)
+    updated_user = await db.users.find_one({"_id": ObjectId(user_id)})
     
     return {
         "success": True,
         "message": "Perfil actualizado exitosamente",
-        "user": user_response
+        "user": {
+            "id": str(updated_user["_id"]),
+            "email": updated_user["email"],
+            "display_name": updated_user["display_name"],
+            "photo_url": updated_user.get("photo_url")
+        }
     }
 
 
-@router.put("/me/settings")
-async def update_my_settings(
-    settings_data: UpdateSettingsRequest,
-    current_user: dict = Depends(get_current_user)
-):
+@router.put("/{user_id}/settings")
+async def update_user_settings(user_id: str, settings_data: UpdateSettingsRequest):
     """
     Actualizar configuración del usuario
-    
-    - **notifications**: Activar/desactivar notificaciones (opcional)
-    - **theme**: Tema de la interfaz (opcional)
-    - **language**: Idioma (opcional)
     
     Returns:
         Configuración actualizada
     """
     db = get_database()
     
+    try:
+        user_doc = await db.users.find_one({"_id": ObjectId(user_id)})
+    except:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="ID de usuario inválido"
+        )
+    
+    if not user_doc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
+        )
+    
     # Obtener configuración actual
-    current_settings = current_user.get("settings", {})
+    current_settings = user_doc.get("settings", {})
     
     # Actualizar solo los campos proporcionados
     if settings_data.notifications is not None:
@@ -155,7 +238,7 @@ async def update_my_settings(
     
     # Actualizar en la base de datos
     result = await db.users.update_one(
-        {"_id": current_user["_id"]},
+        {"_id": ObjectId(user_id)},
         {
             "$set": {
                 "settings": current_settings,
@@ -164,12 +247,6 @@ async def update_my_settings(
         }
     )
     
-    if result.modified_count == 0:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="No se pudo actualizar la configuración"
-        )
-    
     return {
         "success": True,
         "message": "Configuración actualizada exitosamente",
@@ -177,55 +254,61 @@ async def update_my_settings(
     }
 
 
-@router.delete("/me")
-async def delete_my_account(
-    current_user: dict = Depends(get_current_user)
-):
+@router.delete("/{user_id}")
+async def delete_user(user_id: str):
     """
-    Desactivar cuenta del usuario autenticado
-    
-    Nota: En lugar de eliminar completamente, marcamos el usuario como inactivo
-    para mantener integridad referencial.
+    Eliminar usuario
     
     Returns:
-        Confirmación de desactivación
+        Confirmación de eliminación
     """
     db = get_database()
     
-    # Marcar usuario como inactivo
-    result = await db.users.update_one(
-        {"_id": current_user["_id"]},
-        {
-            "$set": {
-                "is_active": False,
-                "last_active": datetime.utcnow()
-            }
-        }
-    )
-    
-    if result.modified_count == 0:
+    try:
+        result = await db.users.delete_one({"_id": ObjectId(user_id)})
+    except:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="No se pudo desactivar la cuenta"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="ID de usuario inválido"
+        )
+    
+    if result.deleted_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
         )
     
     return {
         "success": True,
-        "message": "Cuenta desactivada exitosamente"
+        "message": "Usuario eliminado exitosamente"
     }
 
 
-@router.get("/stats")
-async def get_my_stats(
-    current_user: dict = Depends(get_current_user)
-):
+@router.get("/{user_id}/stats")
+async def get_user_stats(user_id: str):
     """
     Obtener estadísticas del usuario
     
     Returns:
         Estadísticas de progreso, badges, XP, etc.
     """
-    progress = current_user.get("progress", {})
+    db = get_database()
+    
+    try:
+        user_doc = await db.users.find_one({"_id": ObjectId(user_id)})
+    except:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="ID de usuario inválido"
+        )
+    
+    if not user_doc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
+        )
+    
+    progress = user_doc.get("progress", {})
     
     # Calcular estadísticas
     modules_completed = sum(1 for v in progress.get("modules", {}).values() if v)
@@ -256,7 +339,7 @@ async def get_my_stats(
             },
             "badges": badges_count,
             "xp": xp,
-            "member_since": current_user["created_at"].isoformat() if isinstance(current_user["created_at"], datetime) else current_user["created_at"],
-            "last_active": current_user["last_active"].isoformat() if isinstance(current_user["last_active"], datetime) else current_user["last_active"]
+            "member_since": user_doc["created_at"].isoformat() if isinstance(user_doc["created_at"], datetime) else user_doc["created_at"],
+            "last_active": user_doc["last_active"].isoformat() if isinstance(user_doc["last_active"], datetime) else user_doc["last_active"]
         }
     }
