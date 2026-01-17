@@ -3,7 +3,6 @@ Utilidades del backend
 """
 from .validators import (
     validate_email_format,
-    validate_password_strength,
     validate_display_name,
     validate_url,
     validate_module_id,
@@ -16,7 +15,6 @@ from .validators import (
 
 __all__ = [
     'validate_email_format',
-    'validate_password_strength',
     'validate_display_name',
     'validate_url',
     'validate_module_id',
