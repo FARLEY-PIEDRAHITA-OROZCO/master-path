@@ -5,48 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Testing Toolbox | QA Engineering</title>
     
-    <!-- Import Maps para Firebase - Versión 11.x (estable) -->
-    <script type="importmap">
-    {
-      "imports": {
-        "firebase/app": "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js",
-        "firebase/auth": "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js",
-        "firebase/firestore": "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js"
-      }
-    }
-    </script>
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/app/assets/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* Loading overlay para auth */
-        #auth-loading {
-            display: flex;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: #020617;
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 1rem;
-        }
-    </style>
 </head>
 <body class="bg-slate-950 text-slate-300 min-h-screen">
 
-    <!-- Loading overlay durante verificación de auth -->
-    <div id="auth-loading">
-        <i class="fas fa-circle-notch animate-spin text-blue-500 text-4xl"></i>
-        <p class="text-xs font-black uppercase tracking-widest text-slate-600">Verificando autenticación...</p>
-    </div>
-
-    <main class="pt-32 pb-20 px-6 max-w-6xl mx-auto" id="main-content" style="display: none;">
+    <main class="pt-32 pb-20 px-6 max-w-6xl mx-auto" id="main-content">
         <header class="mb-16 gap-6">
             <h1 class="text-5xl font-black text-white italic uppercase tracking-tighter mb-4">
                 Testing <span class="text-blue-600 underline decoration-blue-500/30">Toolbox</span>
