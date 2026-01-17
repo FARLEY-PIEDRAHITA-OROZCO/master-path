@@ -1,4 +1,4 @@
-# FastAPI Core (ACTUALIZADAS - Enero 2026)
+# FastAPI Core
 fastapi==0.115.12
 uvicorn[standard]==0.27.0
 pydantic==2.10.4
@@ -8,17 +8,8 @@ pydantic-settings==2.7.1
 pymongo==4.6.1
 motor==3.3.2
 
-# Authentication & Security
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-python-multipart==0.0.6
-bcrypt==4.1.2
-
 # CORS & Middleware
 python-dotenv==1.0.0
-
-# Email (for password reset)
-python-decouple==3.8
 
 # Validation & Utils
 email-validator==2.1.0.post1
