@@ -1,14 +1,14 @@
 """
-Rutas de Progreso
-Endpoints para gestión de progreso del usuario en el curso
+Rutas de Progreso (SIN AUTENTICACIÓN)
+Endpoints públicos para gestión de progreso del usuario en el curso
 """
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
 from typing import Optional, Dict, List
 from datetime import datetime
+from bson import ObjectId
 
 from services.database import get_database
-from middleware.auth_middleware import get_current_user
 from utils.validators import validate_module_id, validate_badge_name, validate_xp_amount
 
 router = APIRouter()
@@ -17,12 +17,14 @@ router = APIRouter()
 # Request Models
 class ModuleProgressUpdate(BaseModel):
     """Actualización de progreso de módulo"""
+    user_id: str = Field(..., description="ID del usuario")
     module_id: str = Field(..., description="ID del módulo (ej: '1', '2', '3')")
     is_completed: bool = Field(..., description="Estado de completitud")
 
 
 class SubtaskProgressUpdate(BaseModel):
     """Actualización de progreso de subtarea"""
+    user_id: str = Field(..., description="ID del usuario")
     module_id: str = Field(..., description="ID del módulo")
     task_index: int = Field(..., ge=0, description="Índice de la tarea")
     is_completed: bool = Field(..., description="Estado de completitud")
@@ -30,23 +32,27 @@ class SubtaskProgressUpdate(BaseModel):
 
 class NoteUpdate(BaseModel):
     """Actualización de nota de módulo"""
+    user_id: str = Field(..., description="ID del usuario")
     module_id: str = Field(..., description="ID del módulo")
     note_text: str = Field(..., max_length=10000, description="Texto de la nota")
 
 
 class BadgeAdd(BaseModel):
     """Agregar badge"""
+    user_id: str = Field(..., description="ID del usuario")
     badge_name: str = Field(..., description="Nombre del badge")
 
 
 class XPAdd(BaseModel):
     """Agregar XP"""
+    user_id: str = Field(..., description="ID del usuario")
     amount: int = Field(..., ge=1, le=1000, description="Cantidad de XP a agregar")
     reason: Optional[str] = Field(None, description="Razón del XP")
 
 
 class ProgressSync(BaseModel):
     """Sincronización completa de progreso"""
+    user_id: str = Field(..., description="ID del usuario")
     modules: Optional[Dict[str, bool]] = None
     subtasks: Optional[Dict[str, bool]] = None
     notes: Optional[Dict[str, str]] = None
@@ -55,17 +61,31 @@ class ProgressSync(BaseModel):
 
 
 # Endpoints
-@router.get("")
-async def get_progress(
-    current_user: dict = Depends(get_current_user)
-):
+@router.get("/{user_id}")
+async def get_progress(user_id: str):
     """
     Obtener progreso completo del usuario
     
     Returns:
         Todo el progreso: módulos, subtareas, notas, badges, XP
     """
-    progress = current_user.get("progress", {
+    db = get_database()
+    
+    try:
+        user_doc = await db.users.find_one({"_id": ObjectId(user_id)})
+    except:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="ID de usuario inválido"
+        )
+    
+    if not user_doc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
+        )
+    
+    progress = user_doc.get("progress", {
         "modules": {},
         "subtasks": {},
         "notes": {},
@@ -81,15 +101,9 @@ async def get_progress(
 
 
 @router.put("/module")
-async def update_module_progress(
-    data: ModuleProgressUpdate,
-    current_user: dict = Depends(get_current_user)
-):
+async def update_module_progress(data: ModuleProgressUpdate):
     """
     Actualizar progreso de un módulo
-    
-    - **module_id**: ID del módulo (ej: '1', '2', '3')
-    - **is_completed**: true si está completado, false si no
     
     Returns:
         Progreso actualizado de módulos
@@ -107,25 +121,31 @@ async def update_module_progress(
     # Actualizar progreso del módulo
     field_name = f"progress.modules.{data.module_id}"
     
-    result = await db.users.update_one(
-        {"_id": current_user["_id"]},
-        {
-            "$set": {
-                field_name: data.is_completed,
-                "progress.last_sync": datetime.utcnow(),
-                "last_active": datetime.utcnow()
+    try:
+        result = await db.users.update_one(
+            {"_id": ObjectId(data.user_id)},
+            {
+                "$set": {
+                    field_name: data.is_completed,
+                    "progress.last_sync": datetime.utcnow(),
+                    "last_active": datetime.utcnow()
+                }
             }
-        }
-    )
-    
-    if result.modified_count == 0:
+        )
+    except:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="No se pudo actualizar el progreso"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="ID de usuario inválido"
+        )
+    
+    if result.matched_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
         )
     
     # Obtener progreso actualizado
-    updated_user = await db.users.find_one({"_id": current_user["_id"]})
+    updated_user = await db.users.find_one({"_id": ObjectId(data.user_id)})
     modules = updated_user.get("progress", {}).get("modules", {})
     
     return {
@@ -136,16 +156,9 @@ async def update_module_progress(
 
 
 @router.put("/subtask")
-async def update_subtask_progress(
-    data: SubtaskProgressUpdate,
-    current_user: dict = Depends(get_current_user)
-):
+async def update_subtask_progress(data: SubtaskProgressUpdate):
     """
     Actualizar progreso de una subtarea
-    
-    - **module_id**: ID del módulo
-    - **task_index**: Índice de la tarea (0, 1, 2, ...)
-    - **is_completed**: true si está completada, false si no
     
     Returns:
         Progreso actualizado de subtareas
@@ -164,25 +177,31 @@ async def update_subtask_progress(
     subtask_key = f"{data.module_id}-{data.task_index}"
     field_name = f"progress.subtasks.{subtask_key}"
     
-    result = await db.users.update_one(
-        {"_id": current_user["_id"]},
-        {
-            "$set": {
-                field_name: data.is_completed,
-                "progress.last_sync": datetime.utcnow(),
-                "last_active": datetime.utcnow()
+    try:
+        result = await db.users.update_one(
+            {"_id": ObjectId(data.user_id)},
+            {
+                "$set": {
+                    field_name: data.is_completed,
+                    "progress.last_sync": datetime.utcnow(),
+                    "last_active": datetime.utcnow()
+                }
             }
-        }
-    )
-    
-    if result.modified_count == 0:
+        )
+    except:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="No se pudo actualizar la subtarea"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="ID de usuario inválido"
+        )
+    
+    if result.matched_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
         )
     
     # Obtener progreso actualizado
-    updated_user = await db.users.find_one({"_id": current_user["_id"]})
+    updated_user = await db.users.find_one({"_id": ObjectId(data.user_id)})
     subtasks = updated_user.get("progress", {}).get("subtasks", {})
     
     return {
@@ -193,15 +212,9 @@ async def update_subtask_progress(
 
 
 @router.put("/note")
-async def update_note(
-    data: NoteUpdate,
-    current_user: dict = Depends(get_current_user)
-):
+async def update_note(data: NoteUpdate):
     """
     Actualizar nota de un módulo
-    
-    - **module_id**: ID del módulo
-    - **note_text**: Texto de la nota (máximo 10,000 caracteres)
     
     Returns:
         Notas actualizadas
@@ -221,36 +234,48 @@ async def update_note(
     
     # Si el texto está vacío, eliminar la nota
     if not data.note_text.strip():
-        result = await db.users.update_one(
-            {"_id": current_user["_id"]},
-            {
-                "$unset": {field_name: ""},
-                "$set": {
-                    "progress.last_sync": datetime.utcnow(),
-                    "last_active": datetime.utcnow()
+        try:
+            result = await db.users.update_one(
+                {"_id": ObjectId(data.user_id)},
+                {
+                    "$unset": {field_name: ""},
+                    "$set": {
+                        "progress.last_sync": datetime.utcnow(),
+                        "last_active": datetime.utcnow()
+                    }
                 }
-            }
-        )
+            )
+        except:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="ID de usuario inválido"
+            )
     else:
-        result = await db.users.update_one(
-            {"_id": current_user["_id"]},
-            {
-                "$set": {
-                    field_name: data.note_text,
-                    "progress.last_sync": datetime.utcnow(),
-                    "last_active": datetime.utcnow()
+        try:
+            result = await db.users.update_one(
+                {"_id": ObjectId(data.user_id)},
+                {
+                    "$set": {
+                        field_name: data.note_text,
+                        "progress.last_sync": datetime.utcnow(),
+                        "last_active": datetime.utcnow()
+                    }
                 }
-            }
-        )
+            )
+        except:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="ID de usuario inválido"
+            )
     
-    if result.modified_count == 0:
+    if result.matched_count == 0:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="No se pudo actualizar la nota"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
         )
     
     # Obtener notas actualizadas
-    updated_user = await db.users.find_one({"_id": current_user["_id"]})
+    updated_user = await db.users.find_one({"_id": ObjectId(data.user_id)})
     notes = updated_user.get("progress", {}).get("notes", {})
     
     return {
@@ -261,14 +286,9 @@ async def update_note(
 
 
 @router.post("/badge")
-async def add_badge(
-    data: BadgeAdd,
-    current_user: dict = Depends(get_current_user)
-):
+async def add_badge(data: BadgeAdd):
     """
     Agregar un badge al usuario
-    
-    - **badge_name**: Nombre del badge a agregar
     
     Returns:
         Lista actualizada de badges
@@ -283,8 +303,22 @@ async def add_badge(
     
     db = get_database()
     
-    # Verificar si el badge ya existe
-    current_badges = current_user.get("progress", {}).get("badges", [])
+    # Verificar usuario y badges actuales
+    try:
+        user_doc = await db.users.find_one({"_id": ObjectId(data.user_id)})
+    except:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="ID de usuario inválido"
+        )
+    
+    if not user_doc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
+        )
+    
+    current_badges = user_doc.get("progress", {}).get("badges", [])
     if data.badge_name in current_badges:
         return {
             "success": True,
@@ -294,7 +328,7 @@ async def add_badge(
     
     # Agregar badge
     result = await db.users.update_one(
-        {"_id": current_user["_id"]},
+        {"_id": ObjectId(data.user_id)},
         {
             "$addToSet": {"progress.badges": data.badge_name},
             "$set": {
@@ -304,14 +338,8 @@ async def add_badge(
         }
     )
     
-    if result.modified_count == 0:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="No se pudo agregar el badge"
-        )
-    
     # Obtener badges actualizados
-    updated_user = await db.users.find_one({"_id": current_user["_id"]})
+    updated_user = await db.users.find_one({"_id": ObjectId(data.user_id)})
     badges = updated_user.get("progress", {}).get("badges", [])
     
     return {
@@ -322,15 +350,9 @@ async def add_badge(
 
 
 @router.post("/xp")
-async def add_xp(
-    data: XPAdd,
-    current_user: dict = Depends(get_current_user)
-):
+async def add_xp(data: XPAdd):
     """
     Agregar XP al usuario
-    
-    - **amount**: Cantidad de XP a agregar (1-1000)
-    - **reason**: Razón del XP (opcional)
     
     Returns:
         XP total actualizado
@@ -346,25 +368,31 @@ async def add_xp(
     db = get_database()
     
     # Incrementar XP
-    result = await db.users.update_one(
-        {"_id": current_user["_id"]},
-        {
-            "$inc": {"progress.xp": data.amount},
-            "$set": {
-                "progress.last_sync": datetime.utcnow(),
-                "last_active": datetime.utcnow()
+    try:
+        result = await db.users.update_one(
+            {"_id": ObjectId(data.user_id)},
+            {
+                "$inc": {"progress.xp": data.amount},
+                "$set": {
+                    "progress.last_sync": datetime.utcnow(),
+                    "last_active": datetime.utcnow()
+                }
             }
-        }
-    )
-    
-    if result.modified_count == 0:
+        )
+    except:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="No se pudo agregar XP"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="ID de usuario inválido"
+        )
+    
+    if result.matched_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
         )
     
     # Obtener XP actualizado
-    updated_user = await db.users.find_one({"_id": current_user["_id"]})
+    updated_user = await db.users.find_one({"_id": ObjectId(data.user_id)})
     xp = updated_user.get("progress", {}).get("xp", 0)
     
     message = f"{data.amount} XP agregado"
@@ -379,15 +407,9 @@ async def add_xp(
 
 
 @router.post("/sync")
-async def sync_progress(
-    data: ProgressSync,
-    current_user: dict = Depends(get_current_user)
-):
+async def sync_progress(data: ProgressSync):
     """
     Sincronizar progreso completo del usuario
-    
-    Permite actualizar múltiples campos de progreso de una sola vez.
-    Solo se actualizan los campos proporcionados.
     
     Returns:
         Progreso completo sincronizado
@@ -413,19 +435,25 @@ async def sync_progress(
         update_fields["progress.xp"] = data.xp
     
     # Actualizar en la base de datos
-    result = await db.users.update_one(
-        {"_id": current_user["_id"]},
-        {"$set": update_fields}
-    )
-    
-    if result.modified_count == 0:
+    try:
+        result = await db.users.update_one(
+            {"_id": ObjectId(data.user_id)},
+            {"$set": update_fields}
+        )
+    except:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="No se pudo sincronizar el progreso"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="ID de usuario inválido"
+        )
+    
+    if result.matched_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
         )
     
     # Obtener progreso actualizado
-    updated_user = await db.users.find_one({"_id": current_user["_id"]})
+    updated_user = await db.users.find_one({"_id": ObjectId(data.user_id)})
     progress = updated_user.get("progress", {})
     
     return {
@@ -436,17 +464,31 @@ async def sync_progress(
     }
 
 
-@router.get("/stats")
-async def get_progress_stats(
-    current_user: dict = Depends(get_current_user)
-):
+@router.get("/{user_id}/stats")
+async def get_progress_stats(user_id: str):
     """
     Obtener estadísticas detalladas de progreso
     
     Returns:
-        Estadísticas completas: completitud, racha, tiempos, etc.
+        Estadísticas completas
     """
-    progress = current_user.get("progress", {})
+    db = get_database()
+    
+    try:
+        user_doc = await db.users.find_one({"_id": ObjectId(user_id)})
+    except:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="ID de usuario inválido"
+        )
+    
+    if not user_doc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
+        )
+    
+    progress = user_doc.get("progress", {})
     
     # Módulos
     modules = progress.get("modules", {})
@@ -467,7 +509,7 @@ async def get_progress_stats(
     if total_modules > 0:
         completion_percentage = (modules_completed / total_modules) * 100
     
-    # Nivel basado en XP (cada 100 XP = 1 nivel)
+    # Nivel basado en XP
     level = xp // 100
     xp_for_next_level = 100 - (xp % 100)
     
@@ -493,19 +535,15 @@ async def get_progress_stats(
                 "for_next_level": xp_for_next_level
             },
             "last_sync": progress.get("last_sync"),
-            "member_since": current_user["created_at"].isoformat() if isinstance(current_user["created_at"], datetime) else current_user["created_at"]
+            "member_since": user_doc["created_at"].isoformat() if isinstance(user_doc["created_at"], datetime) else user_doc["created_at"]
         }
     }
 
 
-@router.delete("")
-async def reset_progress(
-    current_user: dict = Depends(get_current_user)
-):
+@router.delete("/{user_id}")
+async def reset_progress(user_id: str):
     """
     Resetear todo el progreso del usuario
-    
-    CUIDADO: Esta acción es irreversible.
     
     Returns:
         Confirmación de reset
@@ -513,27 +551,33 @@ async def reset_progress(
     db = get_database()
     
     # Resetear progreso
-    result = await db.users.update_one(
-        {"_id": current_user["_id"]},
-        {
-            "$set": {
-                "progress": {
-                    "modules": {},
-                    "subtasks": {},
-                    "notes": {},
-                    "badges": [],
-                    "xp": 0,
-                    "last_sync": datetime.utcnow()
-                },
-                "last_active": datetime.utcnow()
+    try:
+        result = await db.users.update_one(
+            {"_id": ObjectId(user_id)},
+            {
+                "$set": {
+                    "progress": {
+                        "modules": {},
+                        "subtasks": {},
+                        "notes": {},
+                        "badges": [],
+                        "xp": 0,
+                        "last_sync": datetime.utcnow()
+                    },
+                    "last_active": datetime.utcnow()
+                }
             }
-        }
-    )
-    
-    if result.modified_count == 0:
+        )
+    except:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="No se pudo resetear el progreso"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="ID de usuario inválido"
+        )
+    
+    if result.matched_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
         )
     
     return {
