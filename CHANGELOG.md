@@ -7,6 +7,156 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
+## [5.0.0] - 2025-01-17
+
+### 🔥 CAMBIO MAYOR - Eliminación Completa del Sistema de Autenticación
+
+#### ❌ Eliminado
+
+**Sistema de Autenticación Completo**
+- Eliminados todos los imports de Firebase de archivos HTML
+- Eliminados Import Maps de Firebase en todas las páginas
+- Eliminados overlays de loading de autenticación
+- Eliminadas funciones de sincronización con Firestore
+- Eliminada dependencia de `auth-guard-v2.js`
+- Eliminadas cookies httpOnly de JWT
+- Eliminados endpoints de autenticación (`/api/auth/*`)
+
+**Archivos Frontend Limpiados**
+- ✅ `/app/app/pages/dashboard.html` - Sin Firebase, sin overlay de auth
+- ✅ `/app/app/pages/roadmap.html` - Sin Firebase, sin overlay de auth
+- ✅ `/app/app/pages/toolbox.html` - Sin Firebase, sin overlay de auth
+- ✅ `/app/app/pages/knowledge-base.html` - Sin Firebase, sin overlay de auth
+- ✅ `/app/app/assets/js/storage.js` - 100% LocalStorage, sin Firebase
+- ✅ `/app/app/assets/js/dashboard-ui.js` - Sin código de auth
+- ✅ `/app/app/assets/js/toolbox-ui.js` - Sin requireAuth()
+
+**Referencias Eliminadas**
+- `firebase/app`
+- `firebase/auth`
+- `firebase/firestore`
+- `auth-service-v2.js`
+- `auth-guard-v2.js`
+- `firebase-config.js`
+- Métodos `syncWithFirestore()`
+- Métodos `loadFromFirestore()`
+
+#### ✨ Agregado
+
+**Sistema de Storage Simplificado**
+- `storage.js` completamente reescrito sin dependencias de Firebase
+- Sistema 100% basado en LocalStorage del navegador
+- Validación robusta de datos
+- Sistema de backups automáticos (últimos 3)
+- Recuperación de datos corruptos
+- Exportación e importación de datos
+
+**Backend API Público**
+- Todos los endpoints ahora son públicos (sin autenticación)
+- Endpoints de usuario sin protección JWT
+- Endpoints de progreso sin protección JWT
+- Sistema simplificado de gestión de usuarios
+
+#### 🔧 Modificado
+
+**Backend (FastAPI)**
+- `routes/user.py` - Comentarios actualizados: "SIN AUTENTICACIÓN"
+- `routes/progress.py` - Comentarios actualizados: "SIN AUTENTICACIÓN"
+- `models/user.py` - Modelo simplificado sin campos de auth
+- `server.py` - Mantenido limpio sin middleware de auth
+
+**Frontend (JavaScript)**
+- `storage.js` - Reescrito completamente sin Firebase
+- `dashboard-ui.js` - Eliminado código de auth loading
+- `toolbox-ui.js` - Eliminado import y llamada a requireAuth()
+- `roadmap-ui-enhanced.js` - Funcionando sin autenticación
+- `docs-enhanced.js` - Funcionando sin autenticación
+
+**Documentación**
+- `README.md` - Actualizado para reflejar sistema sin autenticación
+- `CHANGELOG.md` - Este archivo con cambios v5.0.0
+
+#### 💾 Sistema de Persistencia
+
+**LocalStorage Principal**
+```javascript
+// Keys de almacenamiento
+qa_master_progress     // Progreso de módulos
+qa_subtask_progress    // Progreso de subtareas  
+qa_module_notes        // Notas por módulo
+qa_celebrated_badges   // Badges obtenidos
+qa_data_version        // Versión de datos
+```
+
+**Características del Storage**
+- ✅ Auto-guardado con debounce (1.5s)
+- ✅ Validación de estructura de datos
+- ✅ Backups automáticos (últimos 3)
+- ✅ Recuperación de datos corruptos
+- ✅ Exportación/importación de datos
+- ✅ Migración de versiones
+
+#### 🎯 Impacto del Cambio
+
+**Ventajas**
+- ✅ Aplicación más simple y directa
+- ✅ Sin necesidad de registro/login
+- ✅ Datos guardados localmente en el navegador
+- ✅ Sin dependencias externas (Firebase)
+- ✅ Carga más rápida (menos requests)
+- ✅ Funciona completamente offline
+
+**Consideraciones**
+- ⚠️ Datos almacenados por navegador/dispositivo
+- ⚠️ Limpiar cookies/cache borra el progreso
+- ⚠️ No hay sincronización entre dispositivos
+- ℹ️ Backend API disponible para sincronización opcional
+
+#### 🚀 Estado del Sistema
+
+**✅ Servicios Operativos**
+```
+backend     RUNNING   (puerto 8001)
+frontend    RUNNING   (puerto 3000)
+mongodb     RUNNING   (puerto 27017)
+```
+
+**✅ API Health Check**
+```json
+{
+  "status": "ok",
+  "database": "connected",
+  "environment": "development"
+}
+```
+
+**✅ Verificaciones Completadas**
+- ❌ No hay imports de Firebase
+- ❌ No hay overlays de autenticación
+- ❌ No hay import maps de Firebase
+- ❌ No hay llamadas a requireAuth()
+- ✅ LocalStorage funcionando correctamente
+- ✅ Todas las páginas cargan sin errores
+
+#### 📚 Archivos Modificados
+
+**HTML (4 archivos)**
+1. `/app/app/pages/dashboard.html`
+2. `/app/app/pages/roadmap.html`
+3. `/app/app/pages/toolbox.html`
+4. `/app/app/pages/knowledge-base.html`
+
+**JavaScript (3 archivos)**
+1. `/app/app/assets/js/storage.js` (reescrito completo)
+2. `/app/app/assets/js/dashboard-ui.js`
+3. `/app/app/assets/js/toolbox-ui.js`
+
+**Documentación (2 archivos)**
+1. `/app/README.md` (actualizado completo)
+2. `/app/CHANGELOG.md` (este archivo)
+
+---
+
 ## [4.0.0] - 2026-01-06
 
 ### ✨ Agregado - Sistema de Autenticación Optimizado
@@ -16,133 +166,6 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - `domain=None` configura automáticamente el dominio actual (localhost o producción)
 - `secure` condicional según entorno: `False` en development, `True` en production
 - Eliminada configuración problemática de `domain="localhost"` que causaba rechazo de cookies por navegadores
-
-#### Documentación Nueva
-- **[SOLUCION_COOKIES_HTTPONLY.md](./SOLUCION_COOKIES_HTTPONLY.md)**: Documentación técnica completa
-  - Análisis de causa raíz del problema
-  - Solución implementada con ejemplos de código
-  - Validación y testing
-  - Diferencias por entorno
-  - Referencias técnicas (RFC 6265, OWASP, etc.)
-
-- **[guides/INDICE_DOCUMENTACION.md](./guides/INDICE_DOCUMENTACION.md)**: Índice maestro de toda la documentación
-  - Mapa completo de documentos
-  - Orden recomendado de lectura
-  - Mapa de soluciones rápidas
-  - Búsqueda por tema
-
-#### Scripts de Validación
-- **[backend/test_cookies_solution.sh](./backend/test_cookies_solution.sh)**: Script automatizado de testing
-  - Validación completa de configuración de cookies
-  - Tests de registro y login
-  - Verificación de headers HTTP
-  - Validación de parámetros de seguridad
-  - Resumen visual con colores
-
-### 🔧 Modificado
-
-#### Backend (FastAPI)
-- **routes/auth.py**:
-  - `COOKIE_DOMAIN = None` (antes: `os.getenv("COOKIE_DOMAIN", "localhost")`)
-  - `COOKIE_SECURE = ENVIRONMENT == "production"` (condicional automático)
-  - Agregados logs de debug para configuración de cookies
-  - Actualizada función `set_auth_cookie()` con `domain=None` explícito
-  - Actualizada función `clear_auth_cookies()` con `domain=None`
-
-- **.env** (configuración):
-  - Eliminada variable `COOKIE_DOMAIN`
-  - Eliminada variable `COOKIE_SECURE` (ahora automática)
-  - Agregados comentarios explicativos sobre la configuración
-
-#### Documentación Actualizada
-- **README.md**:
-  - Sección "Variables de Entorno" actualizada sin COOKIE_DOMAIN
-  - Sección "Seguridad" expandida con detalles de cookies
-  - Nuevo troubleshooting para problemas de cookies
-  - Agregado enlace a SOLUCION_COOKIES_HTTPONLY.md
-
-- **LOCAL_SETUP.md**:
-  - Configuración de .env actualizada sin COOKIE_DOMAIN
-  - Instrucciones claras sobre configuración de cookies
-  - Agregada referencia a documentación técnica
-
-- **guides/ESTRUCTURA_PROYECTO.md**:
-  - Variables de entorno actualizadas
-  - Comentarios sobre la configuración correcta
-
-- **guides/DOCS_ARQUITECTURA.md**:
-  - Sección "Cookies Seguras" completamente reescrita
-  - Tabla de autenticación actualizada con Cookie Domain y Secure
-  - Agregadas ventajas de la nueva configuración
-
-- **guides/README.md**:
-  - Agregado enlace a INDICE_DOCUMENTACION.md
-  - Nueva sección sobre SOLUCION_COOKIES_HTTPONLY.md
-  - Actualizado orden de lectura para debugging
-
-### 🐛 Corregido
-
-#### Problema de Cookies en Localhost
-- **Síntoma**: Las cookies no se establecían en localhost, causando que `/auth/me` retornara 401
-- **Causa**: `domain="localhost"` era rechazado por navegadores modernos según RFC 6265
-- **Solución**: `domain=None` permite que el navegador use el dominio actual automáticamente
-- **Impacto**: Autenticación ahora funciona correctamente en todos los entornos
-
-#### Dependencias
-- Actualizado `pydantic` de 2.10.4 a 2.12.5
-- Actualizado `pydantic-settings` de 2.7.1 a 2.12.0
-- Corregido `starlette` a versión compatible (0.46.2)
-
-### 🔒 Seguridad
-
-#### Mejoras Implementadas
-- **HttpOnly=true**: Cookies no accesibles desde JavaScript (protección XSS)
-- **SameSite=lax**: Protección contra ataques CSRF
-- **Secure condicional**: HTTPS obligatorio en producción
-- **Domain=None**: Limita cookies al dominio actual (principio de menor privilegio)
-- **Path específicos**: Cookie principal en `/`, refresh token en `/api/auth/refresh`
-
-#### Configuración por Entorno
-```python
-# Development (localhost)
-domain=None, secure=False, httponly=True, samesite=lax
-
-# Production (Emergent)
-domain=None, secure=True, httponly=True, samesite=lax
-```
-
-### 📚 Documentación
-
-#### Nuevos Documentos
-1. `SOLUCION_COOKIES_HTTPONLY.md` - 500+ líneas de documentación técnica
-2. `guides/INDICE_DOCUMENTACION.md` - Índice maestro completo
-3. `backend/test_cookies_solution.sh` - Script de validación (200+ líneas)
-4. `CHANGELOG.md` - Este archivo
-
-#### Documentos Actualizados
-1. `README.md` - Secciones de seguridad y troubleshooting
-2. `LOCAL_SETUP.md` - Configuración de .env
-3. `guides/ESTRUCTURA_PROYECTO.md` - Variables de entorno
-4. `guides/DOCS_ARQUITECTURA.md` - Seguridad y cookies
-5. `guides/README.md` - Índice y orden de lectura
-
-### ✅ Testing
-
-#### Validación Automática
-- Script `test_cookies_solution.sh` ejecutado exitosamente
-- 6 tests pasados:
-  1. Health check del backend
-  2. Verificación de configuración de cookies
-  3. Registro de usuario
-  4. Login con validación de headers
-  5. Endpoint /auth/me con cookie
-  6. Endpoint /auth/me sin cookie (401)
-
-#### Validación Manual
-- Login en navegador (localhost:8000)
-- Cookie `qa_session` visible en DevTools
-- Endpoint /auth/me retorna 200 OK
-- Sin redirecciones infinitas al login
 
 ---
 
@@ -161,7 +184,7 @@ domain=None, secure=True, httponly=True, samesite=lax
 - Editor de notas con auto-guardado
 - Dashboard interactivo
 - Knowledge Base con Markdown
-- Tests unitarios (Vitest + pytest)
+- Tests unitarios (pytest)
 
 ---
 
