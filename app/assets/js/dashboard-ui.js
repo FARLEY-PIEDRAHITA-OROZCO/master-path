@@ -6,18 +6,6 @@ import { UIComponents } from './components.js';
 
 // Cargar el dashboard sin autenticación
 document.addEventListener('DOMContentLoaded', async () => {
-  // Ocultar loading overlay
-  const authLoading = document.getElementById('auth-loading');
-  if (authLoading) {
-    authLoading.style.display = 'none';
-  }
-  
-  // Mostrar contenido principal
-  const mainContent = document.getElementById('main-content');
-  if (mainContent) {
-    mainContent.style.display = 'block';
-  }
-
   // Inicializar el motor (Cargar JSON)
   UIComponents.init();
   await AppEngine.init();
